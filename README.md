@@ -1,7 +1,7 @@
 # Mini E-Commerce Order & Shipment Tracking
 
 <p align="center">
-  <img src="frontend/public/parcelpath-logo.png" alt="PARCELPATH" width="220" />
+  <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 120'><rect width='420' height='120' rx='20' fill='%23EEF2FF'/><text x='28' y='78' font-family='Segoe UI,sans-serif' font-size='42' font-weight='700' fill='%234F46E5'>PARCELPATH</text></svg>" alt="PARCELPATH" width="220" />
 </p>
 
 - **Backend:** Python 3.11+, FastAPI, SQLAlchemy 2.x, PostgreSQL 15, Alembic, JWT + bcrypt
