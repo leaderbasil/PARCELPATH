@@ -5,6 +5,9 @@ import { UI } from "@/constants/ui";
 import { Button } from "@/components/common/Button";
 import { config } from "@/config";
 
+const PARCELPATH_LOGO =
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 120'><rect width='420' height='120' rx='20' fill='%23EEF2FF'/><text x='28' y='78' font-family='Segoe UI,sans-serif' font-size='42' font-weight='700' fill='%234F46E5'>PARCELPATH</text></svg>";
+
 export function Header() {
   const { isAuthenticated, user, logout } = useAuth();
   const { itemCount } = useCart();

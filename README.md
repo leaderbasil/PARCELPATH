@@ -4,8 +4,6 @@
   <img src="frontend/public/parcelpath-logo.png" alt="PARCELPATH" width="220" />
 </p>
 
-نظام متجر مصغّر لإدارة الطلبات وتتبّع الشحنات، بواجهة عربية RTL وواجهة برمجية FastAPI مع PostgreSQL.
-
 - **Backend:** Python 3.11+, FastAPI, SQLAlchemy 2.x, PostgreSQL 15, Alembic, JWT + bcrypt
 - **Frontend:** React 18, Vite, strict TypeScript, Tailwind (design tokens only), TanStack Query v5, React Hook Form + Zod, Recharts, MSW tests
 - **API:** `/api/v1`; success bodies are `{ data, message }`, errors are `{ detail, code, meta?, errors? }`
