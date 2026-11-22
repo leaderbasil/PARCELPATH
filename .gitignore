@@ -1,0 +1,31 @@
+# Backend
+backend/.venv/
+backend/.env
+**/__pycache__/
+*.pyc
+backend/*.egg-info/
+backend/.pytest_cache/
+backend/.coverage
+backend/htmlcov/
+
+# Frontend
+frontend/node_modules/
+frontend/.env
+frontend/dist/
+frontend/.vite/
+frontend/.vitest/
+frontend/coverage/
+frontend/*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
