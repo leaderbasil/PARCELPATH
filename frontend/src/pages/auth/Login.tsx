@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/common/Button";
-import { DashboardIcon, UsersIcon } from "@/components/common/Icons";
+import { DashboardIcon, EyeIcon, EyeOffIcon, UsersIcon } from "@/components/common/Icons";
 import { Input } from "@/components/common/Input";
 import { Modal } from "@/components/common/Modal";
 import { AuthLayout } from "@/components/layout/AuthLayout";
@@ -16,6 +16,8 @@ import { useAuth } from "@/context/AuthContext";
 import { ApiRequestError } from "@/services/api";
 import { authService } from "@/services/auth.service";
 import type { Role } from "@/types/domain";
+
+const REMEMBER_EMAIL_KEY = "parcelpath.rememberEmail";
 
 const loginSchema = z.object({
   email: z
@@ -36,10 +38,33 @@ function readRedirectTarget(state: unknown): string | undefined {
   return typeof from === "string" && from.length > 0 ? from : undefined;
 }
 
+function readRememberedEmail(): string {
+  try {
+    return localStorage.getItem(REMEMBER_EMAIL_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function persistRememberedEmail(email: string, remember: boolean): void {
+  try {
+    if (remember) {
+      localStorage.setItem(REMEMBER_EMAIL_KEY, email.trim());
+    } else {
+      localStorage.removeItem(REMEMBER_EMAIL_KEY);
+    }
+  } catch {
+    // Storage may be unavailable; sign-in still works without it.
+  }
+}
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [rememberedEmail] = useState(readRememberedEmail);
+  const [rememberMe, setRememberMe] = useState(rememberedEmail.length > 0);
+  const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [demoPickerOpen, setDemoPickerOpen] = useState(false);
   const [demoLoadingRole, setDemoLoadingRole] = useState<Role | null>(null);
@@ -50,13 +75,14 @@ export default function Login() {
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: rememberedEmail, password: "" },
   });
 
   const onSubmit = async (values: LoginValues): Promise<void> => {
     setFormError(null);
     try {
       const token = await authService.login({ email: values.email, password: values.password });
+      persistRememberedEmail(values.email, rememberMe);
       login(token.access_token, token.user, token.expires_in);
       const target =
         readRedirectTarget(location.state) ??
@@ -96,7 +122,11 @@ export default function Login() {
       const fallback = role === "ADMIN" ? "/admin" : "/";
       navigate(readRedirectTarget(location.state) ?? fallback, { replace: true });
     } catch (error: unknown) {
-      setFormError(error instanceof ApiRequestError ? getErrorMessage(error.code, error.message) : getErrorMessage("INTERNAL_ERROR"));
+      setFormError(
+        error instanceof ApiRequestError
+          ? getErrorMessage(error.code, error.message)
+          : getErrorMessage("INTERNAL_ERROR")
+      );
     } finally {
       setDemoLoadingRole(null);
     }
@@ -104,65 +134,92 @@ export default function Login() {
 
   return (
     <AuthLayout>
-      <div className="mb-8">
-        <p className="text-sm font-medium text-primary-strong">{UI.appName}</p>
-        <h1 className="mt-2 text-3xl font-bold text-text">{UI.auth.welcomeBack}</h1>
-        <p className="mt-2 text-sm text-text-muted">{UI.auth.welcomeBackSubtitle}</p>
+      <div className="mb-7">
+        <p className="text-xs font-semibold text-primary-strong">{UI.appName}</p>
+        <h1 className="mt-2 text-2xl font-bold leading-snug text-text sm:text-3xl">
+          {UI.auth.welcomeBack}
+        </h1>
+        <p className="mt-2 text-sm leading-6 text-text-muted">{UI.auth.welcomeBackSubtitle}</p>
       </div>
 
-      <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-5">
+      <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
+        {formError ? (
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-lg border border-danger/30 bg-danger-soft px-3 py-2.5 text-sm leading-6 text-danger-strong"
+          >
+            <span aria-hidden="true" className="mt-0.5 font-bold">!</span>
+            <p>{formError}</p>
+          </div>
+        ) : null}
+
         <Input
           label={UI.auth.email}
           type="email"
-          autoComplete="email"
+          inputMode="email"
+          autoComplete="username"
+          className="h-11 text-base"
           error={errors.email?.message}
           {...register("email")}
         />
-        <Input
-          label={UI.auth.password}
-          type="password"
-          autoComplete="current-password"
-          error={errors.password?.message}
-          {...register("password")}
-        />
-        {formError ? (
-          <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger">
-            {formError}
-          </p>
-        ) : null}
+
+        <div>
+          <div className="relative">
+            <Input
+              label={UI.auth.password}
+              type={showPassword ? "text" : "password"}
+              autoComplete="current-password"
+              className="h-11 pe-12 text-base"
+              error={errors.password?.message}
+              {...register("password")}
+            />
+            <button
+              type="button"
+              aria-label={showPassword ? UI.auth.hidePassword : UI.auth.showPassword}
+              title={showPassword ? UI.auth.hidePassword : UI.auth.showPassword}
+              onClick={() => setShowPassword((current) => !current)}
+              className="absolute end-0 top-[26px] flex h-11 w-11 items-center justify-center rounded-lg text-text-muted transition-colors hover:text-text"
+            >
+              {showPassword ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+
+        <label className="flex items-center gap-2 text-sm text-text-muted">
+          <input
+            type="checkbox"
+            checked={rememberMe}
+            onChange={(event) => setRememberMe(event.target.checked)}
+            className="h-4 w-4 cursor-pointer"
+          />
+          {UI.auth.rememberMe}
+        </label>
+
         <Button type="submit" loading={isSubmitting} className="h-11 w-full text-base">
-          {UI.nav.login}
+          {isSubmitting ? UI.auth.signingIn : UI.nav.login}
         </Button>
       </form>
 
       {demoLoginEnabled ? (
-        <div className="mt-8">
-          <div className="flex items-center gap-3">
-            <span className="h-px flex-1 bg-border" />
-            <span className="text-xs font-medium text-text-muted">{UI.auth.demoDivider}</span>
-            <span className="h-px flex-1 bg-border" />
-          </div>
-          <div className="mt-4 rounded-card border border-primary/20 bg-primary-soft/40 p-4">
-            <p className="mb-3 text-center text-xs leading-relaxed text-text-muted">{UI.auth.demoHint}</p>
-            <Button
-              variant="secondary"
-              loading={demoLoadingRole !== null}
-              disabled={isSubmitting}
-              onClick={() => setDemoPickerOpen(true)}
-              className="w-full"
-            >
-              {UI.auth.demoLogin}
-            </Button>
-          </div>
+        <div className="mt-7 border-t border-border pt-6">
+          <Button
+            variant="secondary"
+            loading={demoLoadingRole !== null}
+            disabled={isSubmitting}
+            onClick={() => setDemoPickerOpen(true)}
+            className="h-11 w-full text-sm"
+          >
+            {UI.auth.demoLogin}
+          </Button>
         </div>
       ) : null}
 
-      <p className="mt-8 text-center text-sm text-text-muted">
+      <div className="mt-7 border-t border-border pt-5 text-center text-sm text-text-muted">
         {UI.auth.noAccount}{" "}
-        <Link to="/register" className="font-medium text-primary-strong underline">
+        <Link to="/register" className="font-semibold text-primary-strong hover:underline">
           {UI.auth.registerTitle}
         </Link>
-      </p>
+      </div>
 
       <Modal
         open={demoPickerOpen}

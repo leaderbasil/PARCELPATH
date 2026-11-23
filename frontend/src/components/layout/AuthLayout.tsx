@@ -11,36 +11,41 @@ interface AuthLayoutProps {
 export function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div dir="rtl" className="flex min-h-screen bg-background font-sans text-text">
-      <aside className="relative hidden w-[46%] shrink-0 flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-primary-strong to-primary px-12 py-10 text-surface lg:flex">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-surface/10 blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-surface/10 blur-3xl" />
-        </div>
+      <aside className="hidden w-[45%] shrink-0 flex-col justify-between bg-gradient-to-br from-primary via-primary-strong to-primary px-10 py-10 text-surface lg:flex xl:px-14">
+        <BrandLogo inverse showTagline />
 
-        <BrandLogo inverse showTagline className="relative" />
-
-        <div className="relative max-w-md">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-surface/70">
-            PARCELPATH
+        <div className="max-w-lg">
+          <p className="text-xs font-semibold tracking-wide text-surface/80">{UI.appName}</p>
+          <h2 className="mt-3 text-4xl font-bold leading-snug text-balance xl:text-[2.75rem]">
+            {UI.auth.heroTitle}
+          </h2>
+          <p className="mt-4 max-w-md text-base leading-8 text-surface/85">
+            {UI.auth.heroDescription}
           </p>
-          <h2 className="text-4xl font-bold leading-snug">{UI.auth.heroTitle}</h2>
-          <p className="mt-4 text-base leading-relaxed text-surface/80">{UI.auth.heroDescription}</p>
         </div>
 
-        <p className="relative text-xs text-surface/60">© {new Date().getFullYear()} PARCELPATH</p>
+        <p className="text-xs text-surface/65">© {new Date().getFullYear()} PARCELPATH</p>
       </aside>
 
-      <main className="relative flex flex-1 items-center justify-center px-5 py-10 sm:px-10">
-        <div className="absolute end-6 top-6 hidden lg:block">
-          <ThemeToggle />
-        </div>
-
+      <main className="flex min-w-0 flex-1 items-center justify-center px-4 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
         <div className="w-full max-w-md">
-          <div className="mb-8 flex items-center justify-between lg:hidden">
-            <BrandLogo showTagline />
-            <ThemeToggle />
+          <div className="mb-6 hidden rounded-card border border-border bg-surface p-4 md:block lg:hidden">
+            <p className="text-xs font-semibold text-primary-strong">{UI.appName}</p>
+            <p className="mt-1 text-base font-bold text-text">{UI.auth.heroTitle}</p>
+            <p className="mt-1 text-sm leading-6 text-text-muted">{UI.auth.heroDescription}</p>
           </div>
-          {children}
+
+          <div className="rounded-card border border-border bg-surface p-6 shadow-card sm:p-8">
+            <div className="mb-6 flex items-center gap-3">
+              <div className="lg:hidden">
+                <BrandLogo showTagline />
+              </div>
+              <div className="ms-auto">
+                <ThemeToggle />
+              </div>
+            </div>
+            {children}
+          </div>
         </div>
       </main>
     </div>

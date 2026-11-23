@@ -65,7 +65,7 @@ export default function Checkout() {
 
   if (cart.items.length === 0) {
     return (
-      <main className="mx-auto max-w-5xl p-4 py-10">
+      <main className="mx-auto w-full max-w-none p-4 py-10">
         <h1 className="mb-6 text-2xl font-bold text-text">{UI.checkout.title}</h1>
         <EmptyState message={UI.cart.empty} />
         <div className="mt-6 text-center">
@@ -128,7 +128,7 @@ export default function Checkout() {
   const submitting = isSubmitting || createOrder.isPending;
 
   return (
-    <main className="mx-auto max-w-5xl p-4 py-10">
+    <main className="mx-auto w-full max-w-none p-4 py-10">
       <h1 className="mb-6 text-2xl font-bold text-text">{UI.checkout.title}</h1>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_20rem]">
         <form
