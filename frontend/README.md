@@ -30,7 +30,7 @@ The test suite uses jsdom and MSW v2, so it needs Node but **does not** need Pos
 First-time visitors enter the demo automatically as a CUSTOMER and land on the catalog. To switch roles, open `/login`, press **الدخول بالوضع التجريبي**, and choose **دخول كزبون** or **دخول كمدير**. The demo runs entirely in the browser:
 
 - `sessionStorage` holds a local demo token (`parcelpath-demo-token-v1`) and the selected demo user.
-- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v2.*`.
+- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v3.*`.
 - Product cards use lazy-loaded remote images with a local icon fallback.
 - Every service checks `isDemoMode()` first; non-demo sessions continue to call `/api/v1` exactly as before.
 - Catalog search/filtering, product details, cart, checkout, idempotent order creation, stock deduction, order tracking, cancellation, admin status changes, shipping, product/user management and reports all work offline.

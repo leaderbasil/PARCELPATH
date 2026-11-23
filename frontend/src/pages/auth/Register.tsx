@@ -4,10 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
-import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { AuthLayout } from "@/components/layout/AuthLayout";
 import { getErrorMessage } from "@/constants/messages";
 import { UI } from "@/constants/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -72,62 +71,58 @@ export default function Register() {
   };
 
   return (
-    <main className="relative mx-auto w-full max-w-2xl p-4 py-12 sm:px-6">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-16 right-1/4 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
-        <div className="absolute -bottom-16 left-1/4 h-64 w-64 rounded-full bg-primary-soft blur-3xl" />
+    <AuthLayout>
+      <div className="mb-8">
+        <p className="text-sm font-medium text-primary-strong">{UI.appName}</p>
+        <h1 className="mt-2 text-3xl font-bold text-text">{UI.auth.createAccount}</h1>
+        <p className="mt-2 text-sm text-text-muted">{UI.auth.createAccountSubtitle}</p>
       </div>
-      <div className="relative z-10 rounded-card border border-border bg-surface/90 p-8 shadow-card backdrop-blur sm:p-10">
-        <ThemeToggle className="absolute end-4 top-4" />
-        <div className="mb-8 flex flex-col items-center gap-4 text-center">
-          <BrandLogo showTagline />
-          <h1 className="text-3xl font-bold text-text">{UI.auth.registerTitle}</h1>
-        </div>
-        <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
-          <Input
-            label={UI.auth.fullName}
-            autoComplete="name"
-            error={errors.full_name?.message}
-            {...register("full_name")}
-          />
-          <Input
-            label={UI.auth.email}
-            type="email"
-            autoComplete="email"
-            error={errors.email?.message}
-            {...register("email")}
-          />
-          <Input
-            label={UI.auth.password}
-            type="password"
-            autoComplete="new-password"
-            error={errors.password?.message}
-            {...register("password")}
-          />
-          <Input
-            label={UI.auth.confirmPassword}
-            type="password"
-            autoComplete="new-password"
-            error={errors.confirmPassword?.message}
-            {...register("confirmPassword")}
-          />
-          <Input label={UI.checkout.phone} type="tel" error={errors.phone?.message} {...register("phone")} />
-          {formError ? (
-            <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger">
-              {formError}
-            </p>
-          ) : null}
-          <Button type="submit" loading={isSubmitting} className="w-full">
-            {UI.nav.register}
-          </Button>
-        </form>
-        <p className="mt-6 text-center text-sm text-text-muted">
-          {UI.auth.haveAccount}{" "}
-          <Link to="/login" className="text-primary-strong underline">
-            {UI.nav.login}
-          </Link>
-        </p>
-      </div>
-    </main>
+
+      <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-5">
+        <Input
+          label={UI.auth.fullName}
+          autoComplete="name"
+          error={errors.full_name?.message}
+          {...register("full_name")}
+        />
+        <Input
+          label={UI.auth.email}
+          type="email"
+          autoComplete="email"
+          error={errors.email?.message}
+          {...register("email")}
+        />
+        <Input
+          label={UI.auth.password}
+          type="password"
+          autoComplete="new-password"
+          error={errors.password?.message}
+          {...register("password")}
+        />
+        <Input
+          label={UI.auth.confirmPassword}
+          type="password"
+          autoComplete="new-password"
+          error={errors.confirmPassword?.message}
+          {...register("confirmPassword")}
+        />
+        <Input label={UI.checkout.phone} type="tel" error={errors.phone?.message} {...register("phone")} />
+        {formError ? (
+          <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger">
+            {formError}
+          </p>
+        ) : null}
+        <Button type="submit" loading={isSubmitting} className="h-11 w-full text-base">
+          {UI.nav.register}
+        </Button>
+      </form>
+
+      <p className="mt-8 text-center text-sm text-text-muted">
+        {UI.auth.haveAccount}{" "}
+        <Link to="/login" className="font-medium text-primary-strong underline">
+          {UI.nav.login}
+        </Link>
+      </p>
+    </AuthLayout>
   );
 }

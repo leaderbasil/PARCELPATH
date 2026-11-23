@@ -125,6 +125,12 @@ export const UI = {
   auth: {
     loginTitle: "تسجيل الدخول",
     registerTitle: "إنشاء حساب جديد",
+    welcomeBack: "مرحبًا بعودتك",
+    welcomeBackSubtitle: "سجّل الدخول لمتابعة طلباتك وشحناتك.",
+    createAccount: "أنشئ حسابك",
+    createAccountSubtitle: "انضم إلينا لإدارة طلباتك وتتبّع شحناتك.",
+    heroTitle: "كل طلباتك وشحناتك في مكان واحد",
+    heroDescription: "تابع الطلبات، أدر المنتجات، واعرف حالة الشحن في الوقت الفعلي من واجهة عربية بسيطة.",
     email: "البريد الإلكتروني",
     password: "كلمة المرور",
     fullName: "الاسم الكامل",

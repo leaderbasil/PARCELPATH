@@ -45,12 +45,12 @@ export default function App() {
             <CartProvider>
               <Suspense fallback={<LoadingState />}>
                 <Routes>
+                  <Route path="login" element={<Login />} />
+                  <Route path="register" element={<Register />} />
                   <Route element={<AppShell />}>
                     <Route index element={<Catalog />} />
                     <Route path="products/:id" element={<ProductDetails />} />
                     <Route path="cart" element={<Cart />} />
-                    <Route path="login" element={<Login />} />
-                    <Route path="register" element={<Register />} />
                     <Route path="403" element={<Forbidden />} />
 
                     <Route

@@ -12,7 +12,7 @@ import type {
 } from "@/types/domain";
 import { fromSubunits, toSubunits } from "@/utils/money";
 
-const STORAGE_NAMESPACE = "parcelpath.demo.v2";
+const STORAGE_NAMESPACE = "parcelpath.demo.v3";
 const STORAGE_KEYS = {
   products: `${STORAGE_NAMESPACE}.products`,
   orders: `${STORAGE_NAMESPACE}.orders`,
@@ -178,7 +178,7 @@ const INITIAL_DEMO_PRODUCTS: ProductAdmin[] = [
     description: "عسل نحل خام.",
     category: "محليات ومعلبات",
     price: "9.00",
-    image_url: "https://images.unsplash.com/photo-1587049352846-4a222e784d38?auto=format&fit=crop&w=600&q=80",
+    image_url: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?auto=format&fit=crop&w=600&q=80",
     in_stock: true,
     stock_quantity: 15,
     is_active: true,

@@ -46,7 +46,7 @@ export default function Catalog() {
   const canGoNext = currentPage < pageCount;
 
   return (
-    <main className="mx-auto w-full max-w-none p-4 py-8">
+    <main className="mx-auto w-full max-w-none p-4 py-4">
       <Filters
         categories={categoriesQuery.data ?? []}
         value={{ ...query, search: searchInput }}
