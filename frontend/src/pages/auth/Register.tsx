@@ -72,10 +72,12 @@ export default function Register() {
 
   return (
     <AuthLayout>
-      <div className="mb-8">
+      <div className="mb-7 text-center">
         <p className="text-sm font-medium text-primary-strong">{UI.appName}</p>
-        <h1 className="mt-2 text-3xl font-bold text-text">{UI.auth.createAccount}</h1>
-        <p className="mt-2 text-sm text-text-muted">{UI.auth.createAccountSubtitle}</p>
+        <h1 className="mt-2 text-2xl font-bold leading-snug text-text sm:text-3xl">
+          {UI.auth.createAccount}
+        </h1>
+        <p className="mt-2 text-sm leading-6 text-text-muted">{UI.auth.createAccountSubtitle}</p>
       </div>
 
       <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-5">

@@ -80,10 +80,18 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
   const demoMode = isDemoMode();
   const page = pageMetaForPath(pathname);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
+
+  useEffect(() => {
+    const onScroll = (): void => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -99,9 +107,16 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
     navigate("/login", { replace: true });
   };
 
+  const headerSurface = scrolled ? "bg-surface/75 backdrop-blur-sm" : "bg-surface/95";
+
   if (isAdmin) {
     return (
-      <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border bg-surface/95 px-4 backdrop-blur md:px-6">
+      <header
+        className={cn(
+          "sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border px-4 transition-colors md:px-6",
+          headerSurface
+        )}
+      >
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
@@ -156,7 +171,12 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur">
+      <header
+        className={cn(
+          "sticky top-0 z-20 border-b border-border transition-colors",
+          headerSurface
+        )}
+      >
       <div className="mx-auto flex h-16 max-w-none items-center justify-between gap-3 px-4 md:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
