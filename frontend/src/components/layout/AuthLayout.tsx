@@ -33,14 +33,12 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <p className="mt-1 text-sm leading-6 text-text-muted">{UI.auth.heroDescription}</p>
           </div>
 
-          <div className="rounded-card border border-border bg-surface p-6 shadow-card sm:p-8">
-            <div className="mb-6 flex items-center gap-3">
-              <div className="lg:hidden">
-                <BrandLogo showTagline />
-              </div>
-              <div className="ms-auto">
-                <ThemeToggle />
-              </div>
+          <div className="relative rounded-card border border-border bg-surface p-6 shadow-card sm:p-8">
+            <div className="absolute end-4 top-4 sm:end-6 sm:top-6">
+              <ThemeToggle />
+            </div>
+            <div className="mb-5 flex justify-center lg:hidden">
+              <BrandLogo compact />
             </div>
             {children}
           </div>
