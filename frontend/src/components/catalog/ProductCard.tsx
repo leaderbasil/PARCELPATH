@@ -3,6 +3,7 @@ import { UI } from "@/constants/ui";
 import type { Product } from "@/types/domain";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/common/Button";
+import { CartIcon } from "@/components/common/Icons";
 import { MoneyText } from "@/components/common/MoneyText";
 import { ProductImage } from "@/components/common/ProductImage";
 
@@ -18,7 +19,7 @@ export function ProductCard({ product }: { product: Product }) {
         <MoneyText value={product.price} className="mt-auto text-lg font-bold text-primary-strong" />
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button
-            className="flex-1"
+            className="h-11 w-full text-sm sm:w-auto sm:flex-1"
             disabled={!product.in_stock}
             onClick={() =>
               addItem({
@@ -34,10 +35,11 @@ export function ProductCard({ product }: { product: Product }) {
               })
             }
           >
+            <CartIcon className="h-4 w-4" aria-hidden="true" />
             {product.in_stock ? UI.catalog.addToCart : UI.catalog.outOfStock}
           </Button>
           <Link to={`/products/${product.id}`}>
-            <Button variant="secondary" className="w-full px-3 sm:w-auto">
+            <Button variant="secondary" className="h-11 w-full px-3 sm:w-auto">
               {UI.catalog.viewDetails}
             </Button>
           </Link>

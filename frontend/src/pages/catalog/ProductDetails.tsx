@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
-import { BackIcon } from "@/components/common/Icons";
+import { BackIcon, CartIcon } from "@/components/common/Icons";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Input } from "@/components/common/Input";
@@ -98,11 +98,12 @@ export default function ProductDetails() {
             ) : null}
           </dl>
 
-          <div className="mt-auto flex flex-wrap items-end gap-3">
-            <div className="w-24">
+          <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-end">
+            <div className="w-full sm:w-28">
               <Input
                 label="الكمية"
                 type="number"
+                className="h-12 text-base"
                 min={1}
                 max={Math.max(1, maxQuantity)}
                 value={quantity}
@@ -113,7 +114,12 @@ export default function ProductDetails() {
                 }}
               />
             </div>
-            <Button onClick={handleAddToCart} disabled={outOfStock}>
+            <Button
+              onClick={handleAddToCart}
+              disabled={outOfStock}
+              className="h-12 w-full text-base sm:w-auto sm:flex-1"
+            >
+              <CartIcon className="h-4 w-4" aria-hidden="true" />
               {outOfStock ? UI.catalog.outOfStock : UI.catalog.addToCart}
             </Button>
           </div>
