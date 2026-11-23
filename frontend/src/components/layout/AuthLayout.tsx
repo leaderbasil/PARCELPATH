@@ -16,6 +16,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <span className="auth-orb auth-orb-two" aria-hidden="true" />
         <span className="auth-orb auth-orb-three" aria-hidden="true" />
         <span className="auth-grid" aria-hidden="true" />
+        <span className="auth-veil" aria-hidden="true" />
 
         <div className="auth-rise relative z-10">
           <BrandLogo inverse showTagline />

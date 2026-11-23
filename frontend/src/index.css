@@ -22,6 +22,10 @@
   --color-danger-strong: 185 28 28;
   --color-danger-soft: 254 226 226;
   --color-overlay: 15 23 42;
+  --auth-orb-soft-alpha: 0.14;
+  --auth-orb-primary-alpha: 0.28;
+  --auth-grid-alpha: 0.08;
+  --auth-veil-alpha: 0.08;
 }
 
 [data-theme="dark"] {
@@ -43,6 +47,10 @@
   --color-danger-strong: 252 165 165;
   --color-danger-soft: 76 25 30;
   --color-overlay: 2 6 23;
+  --auth-orb-soft-alpha: 0.28;
+  --auth-orb-primary-alpha: 0.45;
+  --auth-grid-alpha: 0.16;
+  --auth-veil-alpha: 0;
 }
 
 @layer base {
@@ -98,7 +106,7 @@
     height: 32rem;
     background: radial-gradient(
       circle at center,
-      rgb(var(--color-surface) / 0.28) 0%,
+      rgb(var(--color-surface) / var(--auth-orb-soft-alpha)) 0%,
       rgb(var(--color-surface) / 0) 68%
     );
     animation: auth-float 20s ease-in-out infinite alternate;
@@ -111,7 +119,7 @@
     height: 36rem;
     background: radial-gradient(
       circle at center,
-      rgb(var(--color-primary) / 0.45) 0%,
+      rgb(var(--color-primary) / var(--auth-orb-primary-alpha)) 0%,
       rgb(var(--color-primary) / 0) 70%
     );
     animation: auth-float 26s ease-in-out infinite alternate;
@@ -125,7 +133,7 @@
     height: 22rem;
     background: radial-gradient(
       circle at center,
-      rgb(var(--color-surface) / 0.18) 0%,
+      rgb(var(--color-surface) / var(--auth-orb-soft-alpha)) 0%,
       rgb(var(--color-surface) / 0) 70%
     );
     animation: auth-drift 32s ease-in-out infinite alternate;
@@ -136,13 +144,20 @@
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.16;
+    opacity: var(--auth-grid-alpha);
     background-image:
       linear-gradient(rgb(var(--color-surface) / 0.35) 1px, transparent 1px),
       linear-gradient(90deg, rgb(var(--color-surface) / 0.35) 1px, transparent 1px);
     background-size: 44px 44px;
     -webkit-mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
     mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
+  }
+
+  .auth-veil {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: rgb(var(--color-text) / var(--auth-veil-alpha));
   }
 
   .auth-rise {
