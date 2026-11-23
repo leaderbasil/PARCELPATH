@@ -46,7 +46,7 @@ export default function Catalog() {
   const canGoNext = currentPage < pageCount;
 
   return (
-    <main className="mx-auto w-full max-w-none p-4 py-4">
+    <div className="w-full">
       <Filters
         categories={categoriesQuery.data ?? []}
         value={{ ...query, search: searchInput }}
@@ -85,6 +85,6 @@ export default function Catalog() {
           </nav>
         </>
       )}
-    </main>
+    </div>
   );
 }

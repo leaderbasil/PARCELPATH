@@ -16,7 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
         <h3 className="font-semibold text-text">{product.name}</h3>
         <p className="line-clamp-2 text-xs text-text-muted">{product.description ?? product.category ?? "—"}</p>
         <MoneyText value={product.price} className="mt-auto text-lg font-bold text-primary-strong" />
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button
             className="flex-1"
             disabled={!product.in_stock}
@@ -37,7 +37,7 @@ export function ProductCard({ product }: { product: Product }) {
             {product.in_stock ? UI.catalog.addToCart : UI.catalog.outOfStock}
           </Button>
           <Link to={`/products/${product.id}`}>
-            <Button variant="secondary" className="px-3">
+            <Button variant="secondary" className="w-full px-3 sm:w-auto">
               {UI.catalog.viewDetails}
             </Button>
           </Link>

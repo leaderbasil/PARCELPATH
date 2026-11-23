@@ -169,7 +169,10 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
             <MenuIcon />
           </button>
           <Link to="/" className="flex shrink-0 items-center" aria-label="PARCELPATH">
-            <BrandLogo showTagline />
+            <BrandLogo
+              showTagline
+              markClassName="h-12 w-12 rounded-2xl lg:h-10 lg:w-10 lg:rounded-xl"
+            />
           </Link>
 
           {isAuthenticated ? (
