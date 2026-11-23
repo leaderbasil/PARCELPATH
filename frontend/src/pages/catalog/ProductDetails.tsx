@@ -71,7 +71,7 @@ export default function ProductDetails() {
         <ProductImage
           src={product.image_url}
           alt={product.name}
-          className="h-72 w-full rounded-xl border border-border"
+          className="aspect-[4/3] w-full rounded-xl border border-border"
         />
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-bold text-text">{product.name}</h1>

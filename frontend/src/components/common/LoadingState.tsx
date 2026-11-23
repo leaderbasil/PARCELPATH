@@ -20,7 +20,7 @@ function CardsSkeleton({ count }: { count: number }) {
           key={index}
           className="overflow-hidden rounded-card border border-border bg-surface shadow-card"
         >
-          <Skeleton className="h-44 w-full rounded-none" />
+          <Skeleton className="aspect-[4/3] w-full rounded-none" />
           <div className="space-y-3 p-4">
             <Skeleton className="h-4 w-4/5" />
             <Skeleton className="h-3 w-full" />
@@ -60,7 +60,7 @@ function RowsSkeleton({ count }: { count: number }) {
 function DetailSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 rounded-card border border-border bg-surface p-6 shadow-card sm:grid-cols-2">
-      <Skeleton className="h-72 w-full rounded-xl" />
+      <Skeleton className="aspect-[4/3] w-full rounded-xl" />
       <div className="space-y-4">
         <Skeleton className="h-8 w-3/4" />
         <Skeleton className="h-6 w-24" />
