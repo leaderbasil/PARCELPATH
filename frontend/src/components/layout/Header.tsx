@@ -108,12 +108,16 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
         </Link>
 
         <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label={UI.appName}>
-          <NavLink end to="/" className={({ isActive }) => storefrontLinkClass(isActive)}>
-            {UI.nav.catalog}
-          </NavLink>
-          <NavLink to="/cart" className={({ isActive }) => storefrontLinkClass(isActive)}>
-            {UI.nav.cart}
-          </NavLink>
+          {isAuthenticated ? (
+            <>
+              <NavLink end to="/" className={({ isActive }) => storefrontLinkClass(isActive)}>
+                {UI.nav.catalog}
+              </NavLink>
+              <NavLink to="/cart" className={({ isActive }) => storefrontLinkClass(isActive)}>
+                {UI.nav.cart}
+              </NavLink>
+            </>
+          ) : null}
           {isAuthenticated ? (
             <NavLink to="/orders" className={({ isActive }) => storefrontLinkClass(isActive)}>
               {UI.nav.myOrders}
@@ -128,18 +132,20 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
 
         <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
-          <Link
-            to="/cart"
-            aria-label={`${UI.nav.cart} (${itemCount})`}
-            className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-muted hover:bg-background hover:text-text"
-          >
-            <CartIcon className="h-[18px] w-[18px]" />
-            {itemCount > 0 ? (
-              <span className="absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-surface">
-                {itemCount}
-              </span>
-            ) : null}
-          </Link>
+          {isAuthenticated ? (
+            <Link
+              to="/cart"
+              aria-label={`${UI.nav.cart} (${itemCount})`}
+              className="relative flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-muted hover:bg-background hover:text-text"
+            >
+              <CartIcon className="h-[18px] w-[18px]" />
+              {itemCount > 0 ? (
+                <span className="absolute -top-1 -end-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-surface">
+                  {itemCount}
+                </span>
+              ) : null}
+            </Link>
+          ) : null}
           {isAuthenticated ? (
             <>
               {demoMode ? (

@@ -58,11 +58,6 @@ export default function AdminOrders() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-text">{UI.nav.orders}</h1>
-        <p className="mt-1 text-sm text-text-muted">{UI.admin.ordersDescription}</p>
-      </div>
-
       <form
         className="grid gap-3 rounded-card border border-border bg-surface p-4 shadow-card sm:grid-cols-2 lg:grid-cols-5"
         onSubmit={(event) => {

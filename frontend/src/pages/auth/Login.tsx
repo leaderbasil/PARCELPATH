@@ -104,12 +104,12 @@ export default function Login() {
   };
 
   return (
-    <main className="mx-auto max-w-md p-4 py-10">
-      <div className="relative rounded-card border border-border bg-surface p-6 shadow-card">
-        <ThemeToggle className="absolute end-3 top-3" />
-        <div className="mb-6 flex flex-col items-center gap-3 text-center">
+    <main className="mx-auto w-full max-w-xl p-4 py-12 sm:px-6">
+      <div className="relative rounded-card border border-border bg-surface p-8 shadow-card sm:p-10">
+        <ThemeToggle className="absolute end-4 top-4" />
+        <div className="mb-8 flex flex-col items-center gap-4 text-center">
           <BrandLogo showTagline />
-          <h1 className="text-2xl font-bold text-text">{UI.auth.loginTitle}</h1>
+          <h1 className="text-3xl font-bold text-text">{UI.auth.loginTitle}</h1>
         </div>
         <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
           <Input

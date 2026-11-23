@@ -103,11 +103,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-text">{UI.admin.dashboard}</h1>
-        <p className="mt-1 text-sm text-text-muted">{UI.admin.dashboardDescription}</p>
-      </div>
-
       {isLoading ? (
         <LoadingState />
       ) : error ? (
