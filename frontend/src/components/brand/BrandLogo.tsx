@@ -1,4 +1,3 @@
-import { PackageIcon } from "@/components/common/Icons";
 import { cn } from "@/utils/cn";
 
 interface BrandLogoProps {
@@ -6,6 +5,33 @@ interface BrandLogoProps {
   compact?: boolean;
   showTagline?: boolean;
   inverse?: boolean;
+}
+
+function BrandMark({ inverse }: { inverse: boolean }) {
+  return (
+    <span className="relative inline-flex h-10 w-10 shrink-0 overflow-hidden rounded-xl">
+      {/* Light theme asset: white background. */}
+      <img
+        src="/brand/parcelpath-logo-light.png"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        loading="eager"
+        decoding="async"
+        className={cn("h-full w-full object-cover", inverse ? "block" : "block dark:hidden")}
+      />
+      {/* Dark theme asset: deep-purple background. */}
+      <img
+        src="/brand/parcelpath-logo-dark.png"
+        alt=""
+        aria-hidden="true"
+        draggable={false}
+        loading="eager"
+        decoding="async"
+        className={cn("h-full w-full object-cover", inverse ? "hidden" : "hidden dark:block")}
+      />
+    </span>
+  );
 }
 
 export function BrandLogo({
@@ -16,14 +42,7 @@ export function BrandLogo({
 }: BrandLogoProps) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <span
-        className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
-          inverse ? "bg-surface/15 text-surface" : "bg-primary-soft text-primary-strong"
-        )}
-      >
-        <PackageIcon className="h-5 w-5" />
-      </span>
+      <BrandMark inverse={inverse} />
       {compact ? null : (
         <span className="flex min-w-0 flex-col leading-tight">
           <span
