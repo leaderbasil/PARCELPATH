@@ -8,6 +8,10 @@ import { UI } from "@/constants/ui";
 import { useCart } from "@/context/CartContext";
 import { ApiRequestError } from "@/services/api";
 import { productsService } from "@/services/products.service";
+import { cn } from "@/utils/cn";
+
+const continueShoppingClass =
+  "inline-flex h-10 items-center justify-center rounded-lg border border-border bg-surface px-4 text-sm font-medium text-text transition-colors hover:bg-background";
 
 export default function Cart() {
   const cart = useCart();
@@ -96,7 +100,7 @@ export default function Cart() {
         <h1 className="mb-6 text-2xl font-bold text-text">{UI.cart.title}</h1>
         <EmptyState message={UI.cart.empty} />
         <div className="mt-6 text-center">
-          <Link to="/" className="text-sm font-medium text-primary-strong underline">
+          <Link to="/" className={continueShoppingClass}>
             {UI.cart.continueShopping}
           </Link>
         </div>
@@ -125,7 +129,7 @@ export default function Cart() {
           <p className="text-center text-sm text-text-muted">
             {UI.orders.items}: {cart.itemCount}
           </p>
-          <Link to="/" className="block text-center text-sm text-primary-strong underline">
+          <Link to="/" className={cn(continueShoppingClass, "w-full")}>
             {UI.cart.continueShopping}
           </Link>
         </div>
