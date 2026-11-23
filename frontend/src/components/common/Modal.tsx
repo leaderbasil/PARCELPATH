@@ -13,8 +13,13 @@ interface ModalProps {
 export function Modal({ open, title, onClose, children, footer }: ModalProps) {
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/45 p-4">
-      <div role="dialog" aria-modal="true" aria-label={title} className="w-full max-w-md rounded-card bg-surface p-6 shadow-card">
+    <div className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-overlay/40 p-4 backdrop-blur-md">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="modal-card w-full max-w-md rounded-card bg-surface p-6 shadow-xl ring-1 ring-border/60"
+      >
         <div className="mb-4 flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-text">{title}</h2>
           <Button variant="ghost" aria-label={UI.common.close} onClick={onClose}>

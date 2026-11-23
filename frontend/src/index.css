@@ -171,6 +171,14 @@
   .auth-rise-delay-2 {
     animation-delay: 0.2s;
   }
+
+  .modal-overlay {
+    animation: modal-fade 0.2s ease-out both;
+  }
+
+  .modal-card {
+    animation: modal-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 @keyframes auth-float {
@@ -202,6 +210,26 @@
   }
 }
 
+@keyframes modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modal-pop {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -213,7 +241,9 @@
   }
 
   .auth-orb,
-  .auth-rise {
+  .auth-rise,
+  .modal-overlay,
+  .modal-card {
     animation: none !important;
   }
 }
