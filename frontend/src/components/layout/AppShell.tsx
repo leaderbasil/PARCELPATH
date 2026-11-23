@@ -19,7 +19,7 @@ export function AppShell() {
             className={
               isAdmin
                 ? "mx-auto w-full max-w-none flex-1 p-4 md:p-6 lg:p-8"
-                : "mx-auto w-full max-w-none flex-1 p-4 md:p-6"
+                : "mx-auto w-full max-w-none flex-1 p-4 pb-24 md:p-6 md:pb-24 lg:pb-6"
             }
           >
             <Outlet />
