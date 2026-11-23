@@ -19,7 +19,7 @@ export function ProductImage({ src, alt, className, imgClassName }: ProductImage
     <div className={cn("relative overflow-hidden bg-background", className)}>
       {showImage ? (
         <>
-          {!loaded ? <div className="absolute inset-0 animate-pulse bg-primary-soft/70" aria-hidden="true" /> : null}
+          {!loaded ? <div className="skeleton absolute inset-0" aria-hidden="true" /> : null}
           <img
             src={src ?? undefined}
             alt={alt}
