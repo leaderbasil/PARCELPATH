@@ -2,14 +2,20 @@ import { cn } from "@/utils/cn";
 
 interface BrandLogoProps {
   className?: string;
+  markClassName?: string;
   compact?: boolean;
   showTagline?: boolean;
   inverse?: boolean;
 }
 
-function BrandMark({ inverse }: { inverse: boolean }) {
+function BrandMark({ className }: { className?: string }) {
   return (
-    <span className="relative inline-flex h-10 w-10 shrink-0 overflow-hidden rounded-xl">
+    <span
+      className={cn(
+        "relative inline-flex h-10 w-10 shrink-0 overflow-hidden rounded-xl",
+        className
+      )}
+    >
       {/* Light theme asset: white background. */}
       <img
         src="/brand/parcelpath-logo-light.png"
@@ -18,7 +24,7 @@ function BrandMark({ inverse }: { inverse: boolean }) {
         draggable={false}
         loading="eager"
         decoding="async"
-        className={cn("h-full w-full object-cover", inverse ? "block" : "block dark:hidden")}
+        className="h-full w-full object-cover block dark:hidden"
       />
       {/* Dark theme asset: deep-purple background. */}
       <img
@@ -28,7 +34,7 @@ function BrandMark({ inverse }: { inverse: boolean }) {
         draggable={false}
         loading="eager"
         decoding="async"
-        className={cn("h-full w-full object-cover", inverse ? "hidden" : "hidden dark:block")}
+        className="h-full w-full object-cover hidden dark:block"
       />
     </span>
   );
@@ -36,13 +42,14 @@ function BrandMark({ inverse }: { inverse: boolean }) {
 
 export function BrandLogo({
   className,
+  markClassName,
   compact = false,
   showTagline = false,
   inverse = false,
 }: BrandLogoProps) {
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      <BrandMark inverse={inverse} />
+      <BrandMark className={markClassName} />
       {compact ? null : (
         <span className="flex min-w-0 flex-col leading-tight">
           <span

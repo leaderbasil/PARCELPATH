@@ -37,8 +37,8 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <div className="absolute end-4 top-4 sm:end-6 sm:top-6">
               <ThemeToggle />
             </div>
-            <div className="mb-5 flex justify-center lg:hidden">
-              <BrandLogo compact />
+            <div className="mb-6 flex justify-center lg:hidden">
+              <BrandLogo compact markClassName="h-16 w-16 rounded-2xl" />
             </div>
             {children}
           </div>
