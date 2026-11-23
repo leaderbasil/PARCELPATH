@@ -103,7 +103,7 @@ export default function AdminProducts() {
               setCategory(event.target.value);
               setPage(1);
             }}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
             <option value="">{UI.common.all}</option>
             {(categories.data ?? []).map((item) => (
@@ -124,7 +124,7 @@ export default function AdminProducts() {
               setActiveFilter(event.target.value as "all" | "active" | "inactive");
               setPage(1);
             }}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
             <option value="all">{UI.common.all}</option>
             <option value="active">{UI.admin.active}</option>

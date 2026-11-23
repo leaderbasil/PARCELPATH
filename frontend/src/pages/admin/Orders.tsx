@@ -73,7 +73,7 @@ export default function AdminOrders() {
             id="status"
             value={draft.status}
             onChange={(event) => setDraft((current) => ({ ...current, status: parseStatus(event.target.value) }))}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
             <option value="">{UI.common.all}</option>
             {STATUS_OPTIONS.map((status) => (

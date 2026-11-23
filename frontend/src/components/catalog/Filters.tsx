@@ -19,7 +19,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
       />
       <select
         aria-label={UI.catalog.categories}
-        className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+        className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
         value={value.category ?? ""}
         onChange={(event) => onChange({ ...value, category: event.target.value || undefined, page: 1 })}
       >
@@ -50,7 +50,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
       />
       <select
         aria-label={UI.catalog.sort}
-        className="rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+        className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
         value={value.sort ?? "newest"}
         onChange={(event) =>
           onChange({ ...value, sort: event.target.value as NonNullable<ProductQuery["sort"]>, page: 1 })

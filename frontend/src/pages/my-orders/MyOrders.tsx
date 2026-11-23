@@ -38,7 +38,7 @@ export default function MyOrders() {
       <div className="mb-6 grid grid-cols-1 gap-3 rounded-card border border-border bg-surface p-4 sm:grid-cols-3">
         <select
           aria-label={UI.orders.status}
-          className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text"
+          className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           value={status}
           onChange={(event) => {
             setStatus(event.target.value as OrderStatus | "");
@@ -61,7 +61,7 @@ export default function MyOrders() {
               setFrom(event.target.value);
               setPage(1);
             }}
-            className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text"
+            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           />
         </label>
         <label className="text-sm text-text-muted">
@@ -73,7 +73,7 @@ export default function MyOrders() {
               setTo(event.target.value);
               setPage(1);
             }}
-            className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text"
+            className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           />
         </label>
       </div>

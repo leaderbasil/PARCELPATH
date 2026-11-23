@@ -154,7 +154,7 @@ export function ProductForm({ open, product, onClose }: ProductFormProps) {
           <textarea
             id="description"
             rows={3}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30"
             {...register("description")}
           />
           {errors.description?.message ? (

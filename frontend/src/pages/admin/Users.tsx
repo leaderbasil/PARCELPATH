@@ -138,7 +138,7 @@ export default function AdminUsers() {
               setRoleFilter(parseRole(event.target.value) ?? "");
               setPage(1);
             }}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
             <option value="">{UI.common.all}</option>
             <option value="ADMIN">ADMIN</option>
@@ -156,7 +156,7 @@ export default function AdminUsers() {
               setActiveFilter(event.target.value as "all" | "active" | "inactive");
               setPage(1);
             }}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
             <option value="all">{UI.common.all}</option>
             <option value="active">{UI.admin.active}</option>
@@ -218,7 +218,7 @@ export default function AdminUsers() {
                           updateUser.mutate({ id: user.id, payload: { role } });
                         }
                       }}
-                      className="rounded-lg border border-border bg-surface px-2 py-1 text-sm text-text outline-none focus:border-primary"
+                      className="rounded-lg border border-border bg-background px-2 py-1 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
                     >
                       <option value="ADMIN">ADMIN</option>
                       <option value="CUSTOMER">CUSTOMER</option>
@@ -321,7 +321,7 @@ export default function AdminUsers() {
             <select
               id="role"
               {...register("role")}
-              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary-soft"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
             >
               <option value="CUSTOMER">CUSTOMER</option>
               <option value="ADMIN">ADMIN</option>
