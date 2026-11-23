@@ -354,6 +354,18 @@ export function getDemoAdminUser(): User {
   return admin ? clone(admin) : ensureDemoAdmin();
 }
 
+export function getDemoCustomerUser(): User {
+  const users = getStoredDemoUsers();
+  const customer =
+    users.find((user) => user.id === DEMO_CUSTOMER_ID) ??
+    users.find((user) => user.role === "CUSTOMER" && user.is_active);
+  if (customer) return clone(customer);
+  const fallback = INITIAL_DEMO_USERS[1] as User;
+  users.unshift(clone(fallback));
+  saveDemoUsers(users);
+  return clone(fallback);
+}
+
 export function toCustomerBrief(user: User): CustomerBrief {
   return demoCustomer(user);
 }

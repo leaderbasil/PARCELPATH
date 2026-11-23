@@ -27,15 +27,18 @@ The test suite uses jsdom and MSW v2, so it needs Node but **does not** need Pos
 
 ## Browser-only demo mode
 
-Open `/login` and press **الدخول بالوضع التجريبي**. The demo signs in as a local ADMIN user, lands on the catalog, and runs entirely in the browser:
+First-time visitors enter the demo automatically as a CUSTOMER and land on the catalog. To switch roles, open `/login`, press **الدخول بالوضع التجريبي**, and choose **دخول كزبون** or **دخول كمدير**. The demo runs entirely in the browser:
 
-- `sessionStorage` holds a local demo token (`parcelpath-demo-token-v1`).
-- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v1.*`.
+- `sessionStorage` holds a local demo token (`parcelpath-demo-token-v1`) and the selected demo user.
+- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v2.*`.
+- Product cards use lazy-loaded remote images with a local icon fallback.
 - Every service checks `isDemoMode()` first; non-demo sessions continue to call `/api/v1` exactly as before.
 - Catalog search/filtering, product details, cart, checkout, idempotent order creation, stock deduction, order tracking, cancellation, admin status changes, shipping, product/user management and reports all work offline.
-- Demo role guards are relaxed so the single demo admin can use both the storefront and the admin screens.
+- Roles remain real: `/admin` routes are ADMIN-only. The only demo exception is redirecting a demo ADMIN away from checkout.
+- An explicit logout disables auto-login for later visits; the one-click demo button can restore it.
+- If the API health check fails (server stopped or unhealthy), the app automatically switches to the demo instead of showing a network error.
 
-Set `VITE_DEMO_LOGIN_ENABLED=false` at build time to hide the demo button in a production deployment. See `.env.example` for the optional demo credentials override.
+Set `VITE_DEMO_LOGIN_ENABLED=false` to hide the demo button, or `VITE_DEMO_AUTO_LOGIN_ENABLED=false` to keep first-time visitors logged out. See `.env.example` for the optional demo credentials override.
 
 ## Architecture
 

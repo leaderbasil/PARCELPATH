@@ -37,6 +37,17 @@ const STATUS_ORDER: readonly OrderStatus[] = [
   "CANCELLED",
 ];
 
+// Recharts renders inline SVG styles, so CSS tokens must be wrapped in rgb().
+const CHART = {
+  grid: "rgb(var(--color-border))",
+  muted: "rgb(var(--color-text-muted))",
+  text: "rgb(var(--color-text))",
+  surface: "rgb(var(--color-surface))",
+  primary: "rgb(var(--color-primary))",
+  primaryStrong: "rgb(var(--color-primary-strong))",
+  primarySoft: "rgb(var(--color-primary-soft))",
+} as const;
+
 function lastThirtyDays(): DateRange {
   const today = new Date();
   const from = new Date(today);
@@ -92,38 +103,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-text">{UI.admin.dashboard}</h1>
-          <p className="mt-1 text-sm text-text-muted">
-            {UI.admin.dashboardDescription} · {range.from} — {range.to}
-          </p>
-        </div>
-        <form
-          className="flex flex-wrap items-end gap-2"
-          onSubmit={(event) => {
-            event.preventDefault();
-            setRange(draft);
-          }}
-        >
-          <Input
-            type="date"
-            name="from"
-            label="من"
-            value={draft.from}
-            max={draft.to || undefined}
-            onChange={(event) => setDraft((current) => ({ ...current, from: event.target.value }))}
-          />
-          <Input
-            type="date"
-            name="to"
-            label="إلى"
-            value={draft.to}
-            min={draft.from || undefined}
-            onChange={(event) => setDraft((current) => ({ ...current, to: event.target.value }))}
-          />
-          <Button type="submit">{UI.common.search}</Button>
-        </form>
+      <div>
+        <h1 className="text-2xl font-semibold text-text">{UI.admin.dashboard}</h1>
+        <p className="mt-1 text-sm text-text-muted">{UI.admin.dashboardDescription}</p>
       </div>
 
       {isLoading ? (
@@ -146,6 +128,37 @@ export default function AdminDashboard() {
             </KpiCard>
           </section>
 
+          <form
+            className="flex flex-wrap items-end gap-3 rounded-card border border-border bg-surface p-4 shadow-card"
+            onSubmit={(event) => {
+              event.preventDefault();
+              setRange(draft);
+            }}
+          >
+            <div className="w-40">
+              <Input
+                type="date"
+                name="from"
+                label="من"
+                value={draft.from}
+                max={draft.to || undefined}
+                onChange={(event) => setDraft((current) => ({ ...current, from: event.target.value }))}
+              />
+            </div>
+            <div className="w-40">
+              <Input
+                type="date"
+                name="to"
+                label="إلى"
+                value={draft.to}
+                min={draft.from || undefined}
+                onChange={(event) => setDraft((current) => ({ ...current, to: event.target.value }))}
+              />
+            </div>
+            <Button type="submit">{UI.common.search}</Button>
+            <span className="text-xs text-text-muted">{range.from} — {range.to}</span>
+          </form>
+
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-card border border-border bg-surface p-4 shadow-card">
               <h2 className="mb-4 text-base font-semibold text-text">{UI.admin.sales}</h2>
@@ -155,31 +168,35 @@ export default function AdminDashboard() {
                 <div dir="ltr" className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={dailySales} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                      <CartesianGrid stroke="var(--color-border)" vertical={false} />
+                      <CartesianGrid stroke={CHART.grid} vertical={false} />
                       <XAxis
                         dataKey="date"
-                        tick={{ fill: "var(--color-text-muted)", fontSize: 11 }}
+                        tick={{ fill: CHART.muted, fontSize: 11 }}
                         tickLine={false}
-                        axisLine={{ stroke: "var(--color-border)" }}
+                        axisLine={{ stroke: CHART.grid }}
                       />
                       <YAxis
                         allowDecimals={false}
-                        tick={{ fill: "var(--color-text-muted)", fontSize: 11 }}
+                        tick={{ fill: CHART.muted, fontSize: 11 }}
                         tickLine={false}
                         axisLine={false}
                       />
                       <Tooltip
                         contentStyle={{
-                          background: "var(--color-surface)",
-                          border: "1px solid var(--color-border)",
+                          background: CHART.surface,
+                          border: `1px solid ${CHART.grid}`,
                           borderRadius: 8,
+                          color: CHART.text,
+                          fontSize: 12,
                         }}
-                        cursor={{ fill: "var(--color-primary-soft)" }}
+                        labelStyle={{ color: CHART.muted }}
+                        itemStyle={{ color: CHART.text }}
+                        cursor={{ fill: CHART.primarySoft }}
                       />
                       <Bar
                         dataKey="total"
                         name={UI.admin.sales}
-                        fill="var(--color-primary)"
+                        fill={CHART.primary}
                         radius={[4, 4, 0, 0]}
                       />
                     </BarChart>
@@ -193,31 +210,35 @@ export default function AdminDashboard() {
               <div dir="ltr" className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={statusBars} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                    <CartesianGrid stroke="var(--color-border)" vertical={false} />
+                    <CartesianGrid stroke={CHART.grid} vertical={false} />
                     <XAxis
                       dataKey="label"
-                      tick={{ fill: "var(--color-text-muted)", fontSize: 11 }}
+                      tick={{ fill: CHART.muted, fontSize: 11 }}
                       tickLine={false}
-                      axisLine={{ stroke: "var(--color-border)" }}
+                      axisLine={{ stroke: CHART.grid }}
                     />
                     <YAxis
                       allowDecimals={false}
-                      tick={{ fill: "var(--color-text-muted)", fontSize: 11 }}
+                      tick={{ fill: CHART.muted, fontSize: 11 }}
                       tickLine={false}
                       axisLine={false}
                     />
                     <Tooltip
                       contentStyle={{
-                        background: "var(--color-surface)",
-                        border: "1px solid var(--color-border)",
+                        background: CHART.surface,
+                        border: `1px solid ${CHART.grid}`,
                         borderRadius: 8,
+                        color: CHART.text,
+                        fontSize: 12,
                       }}
-                      cursor={{ fill: "var(--color-primary-soft)" }}
+                      labelStyle={{ color: CHART.muted }}
+                      itemStyle={{ color: CHART.text }}
+                      cursor={{ fill: CHART.primarySoft }}
                     />
                     <Bar
                       dataKey="count"
                       name={UI.orders.status}
-                      fill="var(--color-primary-strong)"
+                      fill={CHART.primaryStrong}
                       radius={[4, 4, 0, 0]}
                     />
                   </BarChart>

@@ -8,7 +8,10 @@ import {
   type ReactNode,
 } from "react";
 import type { User } from "@/types/domain";
+import { config } from "@/config";
+import { DEMO_AUTO_LOGIN_DISABLED_KEY, demoAutoLoginEnabled, demoLoginEnabled } from "@/constants/demo";
 import { authService } from "@/services/auth.service";
+import { isDemoMode } from "@/services/demoMode";
 
 const TOKEN_KEY = "access_token";
 const USER_KEY = "user";
@@ -67,6 +70,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(USER_KEY);
     sessionStorage.removeItem(EXPIRY_KEY);
+    try {
+      localStorage.setItem(DEMO_AUTO_LOGIN_DISABLED_KEY, "1");
+    } catch {
+      // Storage may be unavailable; the manual demo button still works.
+    }
   }, []);
 
   const login = useCallback((accessToken: string, userData: User, expiresIn: number) => {
@@ -76,6 +84,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.setItem(USER_KEY, JSON.stringify(userData));
     sessionStorage.setItem(EXPIRY_KEY, String(Date.now() + expiresIn * 1000));
   }, []);
+
+  const activateDemo = useCallback(async () => {
+    if (!demoLoginEnabled || isDemoMode()) return;
+    try {
+      localStorage.removeItem(DEMO_AUTO_LOGIN_DISABLED_KEY);
+    } catch {
+      // Ignore storage failures.
+    }
+    const session = await authService.loginDemo("CUSTOMER");
+    login(session.access_token, session.user, session.expires_in);
+  }, [login]);
 
   const refresh = useCallback(async () => {
     if (!sessionStorage.getItem(TOKEN_KEY)) return;
@@ -89,6 +108,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.addEventListener("auth:unauthorized", onUnauthorized);
     return () => window.removeEventListener("auth:unauthorized", onUnauthorized);
   }, [logout]);
+
+  // First visit opens the demo, and an unreachable backend always falls back to it.
+  useEffect(() => {
+    if (!demoLoginEnabled || import.meta.env.MODE === "test" || isDemoMode()) return;
+
+    let cancelled = false;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 2500);
+
+    const apiIsReachable = async (): Promise<boolean> => {
+      try {
+        const response = await fetch(config.healthUrl, { signal: controller.signal });
+        return response.ok;
+      } catch {
+        return false;
+      }
+    };
+
+    const start = async () => {
+      let optedOut = false;
+      try {
+        optedOut = localStorage.getItem(DEMO_AUTO_LOGIN_DISABLED_KEY) === "1";
+      } catch {
+        // Ignore storage failures.
+      }
+      const firstVisit = demoAutoLoginEnabled && !token && !user && !optedOut;
+      if (firstVisit || !(await apiIsReachable())) {
+        if (!cancelled) await activateDemo().catch(() => undefined);
+      }
+    };
+
+    const onUnreachable = () => {
+      void activateDemo().catch(() => undefined);
+    };
+
+    void start();
+    window.addEventListener("api:unreachable", onUnreachable);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      controller.abort();
+      window.removeEventListener("api:unreachable", onUnreachable);
+    };
+  }, [token, user, activateDemo]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

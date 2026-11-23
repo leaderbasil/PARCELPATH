@@ -136,6 +136,12 @@ export const UI = {
     demoHint: "جرّب المتجر بالكامل في متصفحك فقط — بدون خادم أو قاعدة بيانات.",
     demoDivider: "أو",
     demoBadge: "وضع تجريبي",
+    demoRoleTitle: "اختر نوع الحساب التجريبي",
+    demoRoleHint: "اختر طريقة التجربة، ويمكنك تسجيل الخروج والتبديل في أي وقت.",
+    demoCustomer: "دخول كزبون",
+    demoCustomerDesc: "تصفّح المنتجات، أضف للسلة، وأكمل الطلب.",
+    demoAdmin: "دخول كمدير",
+    demoAdminDesc: "لوحة التحكم، الطلبات، المنتجات، والمستخدمون.",
   },
   errors: {
     forbiddenTitle: "غير مسموح",

@@ -17,11 +17,12 @@ export function ProtectedRoute({ roles, children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
 
-  if (isDemoMode()) return <>{children}</>;
+  // Demo admins are redirected away from checkout, but every other protected
+  // route still honours the real role (dashboard remains ADMIN-only).
+  if (isDemoMode() && user.role === "ADMIN" && location.pathname.startsWith("/checkout")) {
+    return <Navigate to="/admin" replace />;
+  }
   if (!roles.includes(user.role)) {
-    if (user.role === "ADMIN" && location.pathname.startsWith("/checkout")) {
-      return <Navigate to="/admin" replace />;
-    }
     return <Navigate to="/403" replace />;
   }
 

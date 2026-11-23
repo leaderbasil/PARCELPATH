@@ -6,14 +6,17 @@ import { z } from "zod";
 
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/common/Button";
+import { DashboardIcon, UsersIcon } from "@/components/common/Icons";
+import { Modal } from "@/components/common/Modal";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { Input } from "@/components/common/Input";
 import { getErrorMessage } from "@/constants/messages";
-import { demoLoginEnabled } from "@/constants/demo";
+import { DEMO_AUTO_LOGIN_DISABLED_KEY, demoLoginEnabled } from "@/constants/demo";
 import { UI } from "@/constants/ui";
 import { useAuth } from "@/context/AuthContext";
 import { ApiRequestError } from "@/services/api";
 import { authService } from "@/services/auth.service";
+import type { Role } from "@/types/domain";
 
 const loginSchema = z.object({
   email: z
@@ -39,7 +42,8 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formError, setFormError] = useState<string | null>(null);
-  const [demoLoading, setDemoLoading] = useState(false);
+  const [demoPickerOpen, setDemoPickerOpen] = useState(false);
+  const [demoLoadingRole, setDemoLoadingRole] = useState<Role | null>(null);
 
   const {
     register,
@@ -60,6 +64,17 @@ export default function Login() {
         (token.user.role === "ADMIN" ? "/admin" : "/");
       navigate(target, { replace: true });
     } catch (error: unknown) {
+      if (error instanceof ApiRequestError && error.code === "NETWORK_ERROR" && demoLoginEnabled) {
+        const demo = await authService.loginDemo("CUSTOMER");
+        try {
+          localStorage.removeItem(DEMO_AUTO_LOGIN_DISABLED_KEY);
+        } catch {
+          // Ignore storage failures.
+        }
+        login(demo.access_token, demo.user, demo.expires_in);
+        navigate("/", { replace: true });
+        return;
+      }
       if (error instanceof ApiRequestError) {
         setFormError(getErrorMessage(error.code, error.message));
       } else {
@@ -67,17 +82,24 @@ export default function Login() {
       }
     }
   };
-  const onDemoLogin = async (): Promise<void> => {
+  const onDemoLogin = async (role: Role): Promise<void> => {
     setFormError(null);
-    setDemoLoading(true);
+    setDemoLoadingRole(role);
     try {
-      const token = await authService.loginDemo();
+      const token = await authService.loginDemo(role);
+      try {
+        localStorage.removeItem(DEMO_AUTO_LOGIN_DISABLED_KEY);
+      } catch {
+        // Ignore storage failures.
+      }
       login(token.access_token, token.user, token.expires_in);
-      navigate(readRedirectTarget(location.state) ?? "/", { replace: true });
+      setDemoPickerOpen(false);
+      const fallback = role === "ADMIN" ? "/admin" : "/";
+      navigate(readRedirectTarget(location.state) ?? fallback, { replace: true });
     } catch (error: unknown) {
       setFormError(error instanceof ApiRequestError ? getErrorMessage(error.code, error.message) : getErrorMessage("INTERNAL_ERROR"));
     } finally {
-      setDemoLoading(false);
+      setDemoLoadingRole(null);
     }
   };
 
@@ -116,11 +138,48 @@ export default function Login() {
         {demoLoginEnabled ? (
           <div className="mt-6 border-t border-border pt-5">
             <p className="mb-3 text-center text-xs leading-relaxed text-text-muted">{UI.auth.demoHint}</p>
-            <Button variant="secondary" loading={demoLoading} disabled={isSubmitting} onClick={() => void onDemoLogin()} className="w-full">
+            <Button
+              variant="secondary"
+              loading={demoLoadingRole !== null}
+              disabled={isSubmitting}
+              onClick={() => setDemoPickerOpen(true)}
+              className="w-full"
+            >
               {UI.auth.demoLogin}
             </Button>
           </div>
         ) : null}
+
+        <Modal
+          open={demoPickerOpen}
+          title={UI.auth.demoRoleTitle}
+          onClose={() => setDemoPickerOpen(false)}
+        >
+          <p className="text-sm text-text-muted">{UI.auth.demoRoleHint}</p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              disabled={demoLoadingRole !== null}
+              onClick={() => void onDemoLogin("CUSTOMER")}
+              className="flex flex-col items-start gap-2 rounded-xl border border-border bg-background p-4 text-start transition-colors hover:border-primary hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <UsersIcon className="text-primary-strong" />
+              <span className="font-semibold text-text">{UI.auth.demoCustomer}</span>
+              <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoCustomerDesc}</span>
+            </button>
+            <button
+              type="button"
+              disabled={demoLoadingRole !== null}
+              onClick={() => void onDemoLogin("ADMIN")}
+              className="flex flex-col items-start gap-2 rounded-xl border border-border bg-background p-4 text-start transition-colors hover:border-primary hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <DashboardIcon className="text-primary-strong" />
+              <span className="font-semibold text-text">{UI.auth.demoAdmin}</span>
+              <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoAdminDesc}</span>
+            </button>
+          </div>
+        </Modal>
+
         <p className="mt-6 text-center text-sm text-text-muted">
           {UI.auth.noAccount}{" "}
           <Link to="/register" className="text-primary-strong underline">

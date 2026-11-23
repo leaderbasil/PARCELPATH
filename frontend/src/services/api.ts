@@ -48,6 +48,10 @@ api.interceptors.response.use(
         clearSession();
         window.dispatchEvent(new CustomEvent("auth:unauthorized"));
       }
+      if (status === 0) {
+        // AuthProvider turns an unreachable API into the browser-only demo.
+        window.dispatchEvent(new CustomEvent("api:unreachable"));
+      }
       const normalized = new ApiRequestError(status, {
         detail: body?.detail ?? (status === 0 ? "تعذّر الاتصال بالخادم." : "فشل الطلب."),
         code: body?.code ?? (status === 0 ? "NETWORK_ERROR" : "INTERNAL_ERROR"),

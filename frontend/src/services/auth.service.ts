@@ -1,18 +1,21 @@
 import { demoCredentials, demoLoginEnabled } from "@/constants/demo";
-import type { LoginIn, RegisterIn, TokenOut, User } from "@/types/domain";
+import type { LoginIn, RegisterIn, Role, TokenOut, User } from "@/types/domain";
 
 import { ApiRequestError, api, unwrap } from "./api";
 import { DEMO_TOKEN, demoError, isDemoMode } from "./demoMode";
 import {
   ensureDemoAdmin,
-  getDemoAdminUser,
+  getDemoCustomerUser,
   getStoredDemoUsers,
   makeDemoId,
   saveDemoUsers,
 } from "./mockDemoData";
 
-function demoSession(email?: string): TokenOut {
-  const user = ensureDemoAdmin(email ?? demoCredentials?.email ?? "demo@parcelpath.local");
+function demoSession(role: Role = "CUSTOMER", email?: string): TokenOut {
+  const user =
+    role === "ADMIN"
+      ? ensureDemoAdmin(email ?? demoCredentials?.email ?? "demo@parcelpath.local")
+      : getDemoCustomerUser();
   return {
     access_token: DEMO_TOKEN,
     token_type: "bearer",
@@ -29,19 +32,19 @@ export async function login(payload: LoginIn): Promise<TokenOut> {
     email === demoCredentials.email.trim().toLowerCase() &&
     payload.password === demoCredentials.password
   ) {
-    return demoSession(demoCredentials.email);
+    return demoSession("ADMIN", demoCredentials.email);
   }
   return unwrap(api.post<{ data: TokenOut }>("/auth/login", payload));
 }
 
-export function loginDemo(): Promise<TokenOut> {
+export function loginDemo(role: Role = "CUSTOMER"): Promise<TokenOut> {
   if (!demoLoginEnabled || !demoCredentials) {
     throw new ApiRequestError(403, {
       detail: "الوضع التجريبي غير مفعّل في هذا النشر.",
       code: "FORBIDDEN",
     });
   }
-  return Promise.resolve(demoSession(demoCredentials.email));
+  return Promise.resolve(demoSession(role, demoCredentials.email));
 }
 
 export async function register(payload: RegisterIn): Promise<User> {
@@ -68,7 +71,15 @@ export async function register(payload: RegisterIn): Promise<User> {
 }
 
 export async function me(): Promise<User> {
-  if (isDemoMode()) return getDemoAdminUser();
+  if (isDemoMode()) {
+    try {
+      const raw = sessionStorage.getItem("user");
+      if (raw) return JSON.parse(raw) as User;
+    } catch {
+      // Fall back to the seeded customer below.
+    }
+    return getDemoCustomerUser();
+  }
   return unwrap(api.get<{ data: User }>("/auth/me"));
 }
 
