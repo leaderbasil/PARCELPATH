@@ -5,6 +5,7 @@ import type { ReactElement, ReactNode } from "react";
 
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import type { CartItem, User } from "@/types/domain";
 
 /** A QueryClient that never retries so failing requests settle immediately. */
@@ -38,11 +39,13 @@ export function renderWithProviders(
 ) {
   return render(
     <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
       <MemoryRouter initialEntries={[route]}>
         <AuthProvider>
           <CartProvider>{ui}</CartProvider>
         </AuthProvider>
       </MemoryRouter>
+          </ThemeProvider>
     </QueryClientProvider>
   );
 }

@@ -6,6 +6,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Input } from "@/components/common/Input";
 import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
+import { ProductImage } from "@/components/common/ProductImage";
 import { config } from "@/config";
 import { UI } from "@/constants/ui";
 import { getErrorMessage } from "@/constants/messages";
@@ -68,7 +69,10 @@ export default function AdminProducts() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-text">{UI.nav.products}</h1>
+        <div>
+          <h1 className="text-2xl font-semibold text-text">{UI.nav.products}</h1>
+          <p className="mt-1 text-sm text-text-muted">{UI.admin.productsDescription}</p>
+        </div>
         <Button
           onClick={() => {
             setEditing(undefined);
@@ -180,7 +184,16 @@ export default function AdminProducts() {
                 const admin = "stock_quantity" in product ? product : undefined;
                 return (
                   <tr key={product.id} className="text-text">
-                    <td className="px-4 py-3 font-medium">{product.name}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <ProductImage
+                          src={product.image_url}
+                          alt={product.name}
+                          className="h-10 w-10 shrink-0 rounded-lg border border-border"
+                        />
+                        <span className="font-medium">{product.name}</span>
+                      </div>
+                    </td>
                     <td className="px-4 py-3 text-text-muted" dir="ltr">
                       {product.sku}
                     </td>

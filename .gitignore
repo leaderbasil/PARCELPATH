@@ -29,3 +29,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Frontend build metadata
+frontend/*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts

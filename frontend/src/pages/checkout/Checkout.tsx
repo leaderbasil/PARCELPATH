@@ -14,6 +14,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { ApiRequestError } from "@/services/api";
+import { isDemoMode } from "@/services/demoMode";
 import { clearIdempotencyKey, getIdempotencyKey } from "@/utils/idempotency";
 
 const checkoutSchema = z.object({
@@ -58,7 +59,7 @@ export default function Checkout() {
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace state={{ from: "/checkout" }} />;
   }
-  if (user.role === "ADMIN") {
+  if (user.role === "ADMIN" && !isDemoMode()) {
     return <Navigate to="/admin" replace />;
   }
 

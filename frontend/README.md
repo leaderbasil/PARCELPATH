@@ -25,6 +25,18 @@ npm run lint         # eslint
 
 The test suite uses jsdom and MSW v2, so it needs Node but **does not** need PostgreSQL, Docker, or a live backend.
 
+## Browser-only demo mode
+
+Open `/login` and press **الدخول بالوضع التجريبي**. The demo signs in as a local ADMIN user, lands on the catalog, and runs entirely in the browser:
+
+- `sessionStorage` holds a local demo token (`parcelpath-demo-token-v1`).
+- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v1.*`.
+- Every service checks `isDemoMode()` first; non-demo sessions continue to call `/api/v1` exactly as before.
+- Catalog search/filtering, product details, cart, checkout, idempotent order creation, stock deduction, order tracking, cancellation, admin status changes, shipping, product/user management and reports all work offline.
+- Demo role guards are relaxed so the single demo admin can use both the storefront and the admin screens.
+
+Set `VITE_DEMO_LOGIN_ENABLED=false` at build time to hide the demo button in a production deployment. See `.env.example` for the optional demo credentials override.
+
 ## Architecture
 
 | Area | Location | Notes |
@@ -41,6 +53,7 @@ The test suite uses jsdom and MSW v2, so it needs Node but **does not** need Pos
 | Copy | `src/constants/` | `ui.ts` holds all Arabic UI text; `messages.ts` maps error codes and status labels |
 
 Tailwind is used with **semantic design tokens only** (`bg-surface`, `text-text`, `bg-danger-soft`, `rounded-card`, `shadow-card`, …) defined in `tailwind.config.ts`; components do not hard-code raw color scales. `index.html` sets `lang="ar" dir="rtl"`, and all product-facing copy is Arabic.
+ Light and dark themes share these tokens: ThemeProvider stores parcelpath-theme in localStorage and sets both data-theme and the Tailwind dark class on html. The toggle appears in the header and on the login screen.
 
 ## Money, stock and idempotency
 

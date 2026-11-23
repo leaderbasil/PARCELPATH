@@ -4,8 +4,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { getErrorMessage } from "@/constants/messages";
 import { UI } from "@/constants/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -29,9 +31,6 @@ const registerSchema = z
   });
 
 type RegisterValues = z.infer<typeof registerSchema>;
-
-const PARCELPATH_LOGO =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 120'><rect width='420' height='120' rx='20' fill='%23EEF2FF'/><text x='28' y='78' font-family='Segoe UI,sans-serif' font-size='42' font-weight='700' fill='%234F46E5'>PARCELPATH</text></svg>";
 
 export default function Register() {
   const { login } = useAuth();
@@ -74,13 +73,12 @@ export default function Register() {
 
   return (
     <main className="mx-auto max-w-md p-4 py-10">
-      <div className="rounded-card border border-border bg-surface p-6 shadow-card">
-        <img
-          src={PARCELPATH_LOGO}
-          alt="PARCELPATH"
-          className="mx-auto mb-4 h-16 w-auto object-contain"
-        />
-        <h1 className="mb-6 text-center text-2xl font-bold text-text">{UI.auth.registerTitle}</h1>
+      <div className="relative rounded-card border border-border bg-surface p-6 shadow-card">
+        <ThemeToggle className="absolute end-3 top-3" />
+        <div className="mb-6 flex flex-col items-center gap-3 text-center">
+          <BrandLogo showTagline />
+          <h1 className="text-2xl font-bold text-text">{UI.auth.registerTitle}</h1>
+        </div>
         <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
           <Input
             label={UI.auth.fullName}

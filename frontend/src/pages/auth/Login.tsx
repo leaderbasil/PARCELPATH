@@ -4,9 +4,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/common/Button";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { Input } from "@/components/common/Input";
 import { getErrorMessage } from "@/constants/messages";
+import { demoLoginEnabled } from "@/constants/demo";
 import { UI } from "@/constants/ui";
 import { useAuth } from "@/context/AuthContext";
 import { ApiRequestError } from "@/services/api";
@@ -25,9 +28,6 @@ const loginSchema = z.object({
 
 type LoginValues = z.infer<typeof loginSchema>;
 
-const PARCELPATH_LOGO =
-  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 120'><rect width='420' height='120' rx='20' fill='%23EEF2FF'/><text x='28' y='78' font-family='Segoe UI,sans-serif' font-size='42' font-weight='700' fill='%234F46E5'>PARCELPATH</text></svg>";
-
 function readRedirectTarget(state: unknown): string | undefined {
   if (typeof state !== "object" || state === null || !("from" in state)) return undefined;
   const from: unknown = state.from;
@@ -39,6 +39,7 @@ export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [formError, setFormError] = useState<string | null>(null);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   const {
     register,
@@ -66,16 +67,28 @@ export default function Login() {
       }
     }
   };
+  const onDemoLogin = async (): Promise<void> => {
+    setFormError(null);
+    setDemoLoading(true);
+    try {
+      const token = await authService.loginDemo();
+      login(token.access_token, token.user, token.expires_in);
+      navigate(readRedirectTarget(location.state) ?? "/", { replace: true });
+    } catch (error: unknown) {
+      setFormError(error instanceof ApiRequestError ? getErrorMessage(error.code, error.message) : getErrorMessage("INTERNAL_ERROR"));
+    } finally {
+      setDemoLoading(false);
+    }
+  };
 
   return (
     <main className="mx-auto max-w-md p-4 py-10">
-      <div className="rounded-card border border-border bg-surface p-6 shadow-card">
-        <img
-          src={PARCELPATH_LOGO}
-          alt="PARCELPATH"
-          className="mx-auto mb-4 h-16 w-auto object-contain"
-        />
-        <h1 className="mb-6 text-2xl font-bold text-text">{UI.auth.loginTitle}</h1>
+      <div className="relative rounded-card border border-border bg-surface p-6 shadow-card">
+        <ThemeToggle className="absolute end-3 top-3" />
+        <div className="mb-6 flex flex-col items-center gap-3 text-center">
+          <BrandLogo showTagline />
+          <h1 className="text-2xl font-bold text-text">{UI.auth.loginTitle}</h1>
+        </div>
         <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
           <Input
             label={UI.auth.email}
@@ -100,6 +113,14 @@ export default function Login() {
             {UI.nav.login}
           </Button>
         </form>
+        {demoLoginEnabled ? (
+          <div className="mt-6 border-t border-border pt-5">
+            <p className="mb-3 text-center text-xs leading-relaxed text-text-muted">{UI.auth.demoHint}</p>
+            <Button variant="secondary" loading={demoLoading} disabled={isSubmitting} onClick={() => void onDemoLogin()} className="w-full">
+              {UI.auth.demoLogin}
+            </Button>
+          </div>
+        ) : null}
         <p className="mt-6 text-center text-sm text-text-muted">
           {UI.auth.noAccount}{" "}
           <Link to="/register" className="text-primary-strong underline">

@@ -96,7 +96,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-2xl font-semibold text-text">{UI.admin.dashboard}</h1>
           <p className="mt-1 text-sm text-text-muted">
-            {range.from} — {range.to}
+            {UI.admin.dashboardDescription} · {range.from} — {range.to}
           </p>
         </div>
         <form

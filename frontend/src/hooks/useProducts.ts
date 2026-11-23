@@ -19,7 +19,7 @@ export function useProduct(id: string | undefined) {
 }
 
 export function useCategories() {
-  return useQuery({ queryKey: queryKeys.categories(), queryFn: productsService.categories });
+  return useQuery({ queryKey: queryKeys.categories(), queryFn: () => productsService.categories() });
 }
 
 export function useLowStock(threshold = 5) {

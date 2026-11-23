@@ -1,6 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { isDemoMode } from "@/services/demoMode";
 import type { Role } from "@/types/domain";
 
 interface ProtectedRouteProps {
@@ -16,6 +17,7 @@ export function ProtectedRoute({ roles, children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace state={{ from: location.pathname + location.search }} />;
   }
 
+  if (isDemoMode()) return <>{children}</>;
   if (!roles.includes(user.role)) {
     if (user.role === "ADMIN" && location.pathname.startsWith("/checkout")) {
       return <Navigate to="/admin" replace />;

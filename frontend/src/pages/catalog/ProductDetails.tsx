@@ -7,6 +7,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { Input } from "@/components/common/Input";
 import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
+import { ProductImage } from "@/components/common/ProductImage";
 import { UI } from "@/constants/ui";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/hooks/useProducts";
@@ -66,13 +67,11 @@ export default function ProductDetails() {
       </nav>
 
       <div className="grid grid-cols-1 gap-6 rounded-card border border-border bg-surface p-6 shadow-card sm:grid-cols-2">
-        <div className="flex h-64 items-center justify-center rounded-lg bg-background text-5xl text-text-muted">
-          {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="h-full w-full rounded-lg object-cover" />
-          ) : (
-            "◫"
-          )}
-        </div>
+        <ProductImage
+          src={product.image_url}
+          alt={product.name}
+          className="h-72 w-full rounded-xl border border-border"
+        />
         <div className="flex flex-col gap-4">
           <h1 className="text-2xl font-bold text-text">{product.name}</h1>
           <MoneyText value={product.price} className="text-2xl font-bold text-primary-strong" />

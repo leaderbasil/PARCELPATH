@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { ThemeProvider } from "@/context/ThemeContext";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
 
@@ -37,6 +38,7 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <ErrorBoundary>
+      <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
@@ -125,6 +127,7 @@ export default function App() {
           </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

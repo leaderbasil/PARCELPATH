@@ -4,19 +4,14 @@ import type { Product } from "@/types/domain";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/common/Button";
 import { MoneyText } from "@/components/common/MoneyText";
+import { ProductImage } from "@/components/common/ProductImage";
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
 
   return (
     <article className="flex flex-col overflow-hidden rounded-card border border-border bg-surface shadow-card">
-      <div className="flex h-40 items-center justify-center bg-background text-4xl text-text-muted">
-        {product.image_url ? (
-          <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-        ) : (
-          "◫"
-        )}
-      </div>
+      <ProductImage src={product.image_url} alt={product.name} className="h-44 w-full" />
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="font-semibold text-text">{product.name}</h3>
         <p className="line-clamp-2 text-xs text-text-muted">{product.description ?? product.category ?? "—"}</p>
@@ -41,8 +36,10 @@ export function ProductCard({ product }: { product: Product }) {
           >
             {product.in_stock ? UI.catalog.addToCart : UI.catalog.outOfStock}
           </Button>
-          <Link to={`/products/${product.id}`} className="text-xs text-primary underline">
-            {UI.catalog.viewDetails}
+          <Link to={`/products/${product.id}`}>
+            <Button variant="secondary" className="px-3">
+              {UI.catalog.viewDetails}
+            </Button>
           </Link>
         </div>
       </div>

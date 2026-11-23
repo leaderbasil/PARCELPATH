@@ -1,5 +1,6 @@
 import { Button } from "@/components/common/Button";
 import { MoneyText } from "@/components/common/MoneyText";
+import { ProductImage } from "@/components/common/ProductImage";
 import { UI } from "@/constants/ui";
 import { useCart } from "@/context/CartContext";
 import type { CartItem } from "@/types/domain";
@@ -17,13 +18,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
 
   return (
     <article className="flex flex-wrap items-center gap-4 rounded-card border border-border bg-surface p-4 shadow-card">
-      <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-background text-2xl text-text-muted">
-        {item.image_url ? (
-          <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" />
-        ) : (
-          "◫"
-        )}
-      </div>
+      <ProductImage src={item.image_url} alt={item.name} className="h-16 w-16 shrink-0 rounded-lg border border-border" />
 
       <div className="min-w-0 flex-1">
         <h3 className="truncate font-semibold text-text">{item.name}</h3>
