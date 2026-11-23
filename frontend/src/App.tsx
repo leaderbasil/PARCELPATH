@@ -43,7 +43,7 @@ export default function App() {
         <BrowserRouter>
           <AuthProvider>
             <CartProvider>
-              <Suspense fallback={<LoadingState />}>
+              <Suspense fallback={<LoadingState variant="page" />}>
                 <Routes>
                   <Route path="login" element={<Login />} />
                   <Route path="register" element={<Register />} />

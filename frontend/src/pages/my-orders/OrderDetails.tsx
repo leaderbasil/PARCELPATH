@@ -25,7 +25,7 @@ export default function OrderDetails() {
   );
   const [copied, setCopied] = useState(false);
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <LoadingState variant="detail" />;
   if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
   if (!order) return <EmptyState message={UI.orders.empty} />;
 
@@ -182,7 +182,7 @@ export default function OrderDetails() {
           onRetry={() => void trackingQuery.refetch()}
         />
       ) : trackingQuery.isLoading ? (
-        <LoadingState />
+        <LoadingState variant="rows" count={3} />
       ) : (
         <OrderTimeline
           events={trackingQuery.data?.events ?? []}

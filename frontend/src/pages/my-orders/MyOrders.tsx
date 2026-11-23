@@ -79,7 +79,7 @@ export default function MyOrders() {
       </div>
 
       {isLoading ? (
-        <LoadingState />
+        <LoadingState variant="rows" />
       ) : isError ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : (

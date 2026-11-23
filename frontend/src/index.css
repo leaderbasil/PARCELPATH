@@ -179,6 +179,26 @@
   .modal-card {
     animation: modal-pop 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
+
+  .skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: rgb(var(--color-border) / 0.55);
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--color-surface) / 0.65),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: skeleton-shimmer 1.5s infinite;
+  }
 }
 
 @keyframes auth-float {
@@ -230,6 +250,12 @@
   }
 }
 
+@keyframes skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   ::before,
@@ -243,7 +269,8 @@
   .auth-orb,
   .auth-rise,
   .modal-overlay,
-  .modal-card {
+  .modal-card,
+  .skeleton::after {
     animation: none !important;
   }
 }

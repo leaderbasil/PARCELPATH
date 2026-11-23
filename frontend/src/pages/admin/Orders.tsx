@@ -122,7 +122,7 @@ export default function AdminOrders() {
       </form>
 
       {orders.isLoading ? (
-        <LoadingState />
+        <LoadingState variant="rows" />
       ) : orders.error ? (
         <ErrorState error={orders.error} onRetry={() => void orders.refetch()} />
       ) : !orders.data || orders.data.items.length === 0 ? (

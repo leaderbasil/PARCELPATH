@@ -104,7 +104,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {isLoading ? (
-        <LoadingState />
+        <LoadingState variant="dashboard" />
       ) : error ? (
         <ErrorState error={error} onRetry={refetchAll} />
       ) : !dashboard.data ? (

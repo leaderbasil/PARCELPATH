@@ -182,7 +182,7 @@ export default function AdminUsers() {
       </form>
 
       {users.isLoading ? (
-        <LoadingState />
+        <LoadingState variant="rows" />
       ) : users.error ? (
         <ErrorState error={users.error} onRetry={() => void users.refetch()} />
       ) : !users.data || users.data.items.length === 0 ? (

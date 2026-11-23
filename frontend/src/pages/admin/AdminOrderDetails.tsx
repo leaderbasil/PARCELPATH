@@ -68,7 +68,7 @@ export default function AdminOrderDetails() {
     });
   }, [order, reset]);
 
-  if (orderQuery.isLoading) return <LoadingState />;
+  if (orderQuery.isLoading) return <LoadingState variant="detail" />;
   if (orderQuery.isError) {
     return <ErrorState error={orderQuery.error} onRetry={() => void orderQuery.refetch()} />;
   }
@@ -274,7 +274,7 @@ export default function AdminOrderDetails() {
       {trackingQuery.isError ? (
         <ErrorState error={trackingQuery.error} onRetry={() => void trackingQuery.refetch()} />
       ) : trackingQuery.isLoading ? (
-        <LoadingState />
+        <LoadingState variant="rows" count={3} />
       ) : (
         <OrderTimeline
           events={trackingQuery.data?.events ?? []}

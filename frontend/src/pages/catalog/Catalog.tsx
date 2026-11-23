@@ -54,7 +54,7 @@ export default function Catalog() {
       />
 
       {isLoading ? (
-        <LoadingState />
+        <LoadingState variant="cards" />
       ) : isError ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : (

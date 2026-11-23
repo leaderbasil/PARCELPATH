@@ -22,7 +22,7 @@ export default function ProductDetails() {
   const [quantityInput, setQuantityInput] = useState(1);
   const [added, setAdded] = useState(false);
 
-  if (isLoading) return <LoadingState />;
+  if (isLoading) return <LoadingState variant="detail" />;
   if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
   if (!product) return <EmptyState message="المنتج غير موجود." />;
 
