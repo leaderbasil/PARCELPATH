@@ -11,13 +11,15 @@ export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
 
   return (
-    <article className="flex flex-col overflow-hidden rounded-card border border-border bg-surface shadow-card">
-      <ProductImage
-        src={product.image_url}
-        alt={product.name}
-        className="aspect-[4/3] w-full"
-      />
-      <div className="flex flex-1 flex-col gap-2 p-4">
+    <article className="flex flex-col overflow-hidden rounded-card border border-border bg-surface shadow-card transition-shadow duration-200 hover:shadow-md">
+      <div className="p-3 pb-0">
+        <ProductImage
+          src={product.image_url}
+          alt={product.name}
+          className="aspect-[4/3] w-full rounded-xl border border-border"
+        />
+      </div>
+      <div className="flex flex-1 flex-col gap-2 p-4 pt-3">
         <h3 className="font-semibold text-text">{product.name}</h3>
         <p className="line-clamp-2 text-xs text-text-muted">{product.description ?? product.category ?? "—"}</p>
         <MoneyText value={product.price} className="mt-auto text-lg font-bold text-primary-strong" />

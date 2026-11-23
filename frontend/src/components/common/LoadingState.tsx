@@ -20,8 +20,10 @@ function CardsSkeleton({ count }: { count: number }) {
           key={index}
           className="overflow-hidden rounded-card border border-border bg-surface shadow-card"
         >
-          <Skeleton className="aspect-[4/3] w-full rounded-none" />
-          <div className="space-y-3 p-4">
+          <div className="p-3 pb-0">
+            <Skeleton className="aspect-[4/3] w-full rounded-xl" />
+          </div>
+          <div className="space-y-3 p-4 pt-3">
             <Skeleton className="h-4 w-4/5" />
             <Skeleton className="h-3 w-full" />
             <Skeleton className="h-3 w-2/3" />
