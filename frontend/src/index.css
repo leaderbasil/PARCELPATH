@@ -83,4 +83,122 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  .auth-orb {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    will-change: transform;
+  }
+
+  .auth-orb-one {
+    top: -12rem;
+    inset-inline-start: -10rem;
+    width: 32rem;
+    height: 32rem;
+    background: radial-gradient(
+      circle at center,
+      rgb(var(--color-surface) / 0.28) 0%,
+      rgb(var(--color-surface) / 0) 68%
+    );
+    animation: auth-float 20s ease-in-out infinite alternate;
+  }
+
+  .auth-orb-two {
+    bottom: -14rem;
+    inset-inline-end: -11rem;
+    width: 36rem;
+    height: 36rem;
+    background: radial-gradient(
+      circle at center,
+      rgb(var(--color-primary) / 0.45) 0%,
+      rgb(var(--color-primary) / 0) 70%
+    );
+    animation: auth-float 26s ease-in-out infinite alternate;
+    animation-delay: -8s;
+  }
+
+  .auth-orb-three {
+    top: 22%;
+    inset-inline-start: 42%;
+    width: 22rem;
+    height: 22rem;
+    background: radial-gradient(
+      circle at center,
+      rgb(var(--color-surface) / 0.18) 0%,
+      rgb(var(--color-surface) / 0) 70%
+    );
+    animation: auth-drift 32s ease-in-out infinite alternate;
+    animation-delay: -13s;
+  }
+
+  .auth-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.16;
+    background-image:
+      linear-gradient(rgb(var(--color-surface) / 0.35) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--color-surface) / 0.35) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
+    mask-image: radial-gradient(circle at 70% 30%, #000 0%, transparent 72%);
+  }
+
+  .auth-rise {
+    animation: auth-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .auth-rise-delay-1 {
+    animation-delay: 0.1s;
+  }
+
+  .auth-rise-delay-2 {
+    animation-delay: 0.2s;
+  }
+}
+
+@keyframes auth-float {
+  from {
+    transform: translate3d(-1rem, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2.5rem, 2rem, 0) scale(1.08);
+  }
+}
+
+@keyframes auth-drift {
+  from {
+    transform: translate3d(1.5rem, 0, 0) scale(1.05);
+  }
+  to {
+    transform: translate3d(-2rem, -1.5rem, 0) scale(0.98);
+  }
+}
+
+@keyframes auth-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .auth-orb,
+  .auth-rise {
+    animation: none !important;
+  }
 }

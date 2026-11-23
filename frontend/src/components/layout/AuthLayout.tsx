@@ -11,10 +11,17 @@ interface AuthLayoutProps {
 export function AuthLayout({ children }: AuthLayoutProps) {
   return (
     <div dir="rtl" className="flex min-h-screen bg-background font-sans text-text">
-      <aside className="hidden w-[45%] shrink-0 flex-col justify-between bg-gradient-to-br from-primary via-primary-strong to-primary px-10 py-10 text-surface lg:flex xl:px-14">
-        <BrandLogo inverse showTagline />
+      <aside className="relative hidden w-[45%] shrink-0 flex-col justify-between overflow-hidden bg-gradient-to-br from-primary via-primary-strong to-primary px-10 py-10 text-surface lg:flex xl:px-14">
+        <span className="auth-orb auth-orb-one" aria-hidden="true" />
+        <span className="auth-orb auth-orb-two" aria-hidden="true" />
+        <span className="auth-orb auth-orb-three" aria-hidden="true" />
+        <span className="auth-grid" aria-hidden="true" />
 
-        <div className="max-w-lg">
+        <div className="auth-rise relative z-10">
+          <BrandLogo inverse showTagline />
+        </div>
+
+        <div className="auth-rise auth-rise-delay-1 relative z-10 max-w-lg">
           <h2 className="text-4xl font-bold leading-snug text-balance xl:text-[2.75rem]">
             {UI.auth.heroTitle}
           </h2>
@@ -23,7 +30,9 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </p>
         </div>
 
-        <p className="text-xs text-surface/65">© {new Date().getFullYear()} PARCELPATH</p>
+        <p className="auth-rise auth-rise-delay-2 relative z-10 text-xs text-surface/65">
+          © {new Date().getFullYear()} PARCELPATH
+        </p>
       </aside>
 
       <main className="flex min-w-0 flex-1 items-center justify-center px-4 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
