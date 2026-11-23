@@ -2,7 +2,14 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/common/Button";
-import { CartIcon, LogoutIcon, MenuIcon } from "@/components/common/Icons";
+import {
+  CartIcon,
+  DashboardIcon,
+  LogoutIcon,
+  MenuIcon,
+  OrdersIcon,
+  ProductsIcon,
+} from "@/components/common/Icons";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { UI } from "@/constants/ui";
 import { useAuth } from "@/context/AuthContext";
@@ -25,10 +32,12 @@ function initials(name = ""): string {
     .join("");
 }
 
-function storefrontLinkClass(isActive: boolean): string {
+function storefrontButtonClass(isActive: boolean): string {
   return cn(
-    "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-    isActive ? "bg-primary-soft text-primary-strong" : "text-text-muted hover:bg-background hover:text-text"
+    "inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border px-3 text-sm font-medium transition-colors",
+    isActive
+      ? "border-primary bg-primary text-surface"
+      : "border-border bg-surface text-text-muted hover:bg-background hover:text-text"
   );
 }
 
@@ -42,7 +51,7 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
 
   const handleLogout = (): void => {
     logout();
-    navigate("/", { replace: true });
+    navigate("/login", { replace: true });
   };
 
   if (isAdmin) {
@@ -102,33 +111,38 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 md:px-6">
-        <Link to="/" className="flex shrink-0 items-center" aria-label="PARCELPATH">
-          <BrandLogo showTagline />
-        </Link>
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 md:px-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <Link to="/" className="flex shrink-0 items-center" aria-label="PARCELPATH">
+            <BrandLogo showTagline />
+          </Link>
 
-        <nav className="mx-auto hidden items-center gap-1 lg:flex" aria-label={UI.appName}>
           {isAuthenticated ? (
-            <>
-              <NavLink end to="/" className={({ isActive }) => storefrontLinkClass(isActive)}>
+            <nav
+              className="hidden items-center gap-2 border-s border-border ps-3 lg:flex"
+              aria-label={UI.appName}
+            >
+              <NavLink end to="/" className={({ isActive }) => storefrontButtonClass(isActive)}>
+                <ProductsIcon className="h-4 w-4" />
                 {UI.nav.catalog}
               </NavLink>
-              <NavLink to="/cart" className={({ isActive }) => storefrontLinkClass(isActive)}>
+              <NavLink to="/cart" className={({ isActive }) => storefrontButtonClass(isActive)}>
+                <CartIcon className="h-4 w-4" />
                 {UI.nav.cart}
               </NavLink>
-            </>
+              <NavLink to="/orders" className={({ isActive }) => storefrontButtonClass(isActive)}>
+                <OrdersIcon className="h-4 w-4" />
+                {UI.nav.myOrders}
+              </NavLink>
+              {user?.role === "ADMIN" ? (
+                <NavLink to="/admin" className={({ isActive }) => storefrontButtonClass(isActive)}>
+                  <DashboardIcon className="h-4 w-4" />
+                  {UI.nav.dashboard}
+                </NavLink>
+              ) : null}
+            </nav>
           ) : null}
-          {isAuthenticated ? (
-            <NavLink to="/orders" className={({ isActive }) => storefrontLinkClass(isActive)}>
-              {UI.nav.myOrders}
-            </NavLink>
-          ) : null}
-          {user?.role === "ADMIN" ? (
-            <NavLink to="/admin" className={({ isActive }) => storefrontLinkClass(isActive)}>
-              {UI.nav.dashboard}
-            </NavLink>
-          ) : null}
-        </nav>
+        </div>
 
         <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
