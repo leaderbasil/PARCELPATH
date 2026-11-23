@@ -83,12 +83,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     sessionStorage.setItem(TOKEN_KEY, accessToken);
     sessionStorage.setItem(USER_KEY, JSON.stringify(userData));
     sessionStorage.setItem(EXPIRY_KEY, String(Date.now() + expiresIn * 1000));
+    try {
+      // An explicit sign-in (real or demo) re-enables automatic demo fallback.
+      localStorage.removeItem(DEMO_AUTO_LOGIN_DISABLED_KEY);
+    } catch {
+      // Ignore storage failures.
+    }
   }, []);
 
   const activateDemo = useCallback(async () => {
     if (!demoLoginEnabled || isDemoMode()) return;
     try {
-      localStorage.removeItem(DEMO_AUTO_LOGIN_DISABLED_KEY);
+      // Respect an explicit logout so it is actually possible to leave demo mode.
+      if (localStorage.getItem(DEMO_AUTO_LOGIN_DISABLED_KEY) === "1") return;
     } catch {
       // Ignore storage failures.
     }

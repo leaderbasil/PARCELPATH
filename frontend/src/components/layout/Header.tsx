@@ -150,6 +150,15 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
               <Button variant="secondary" onClick={handleLogout} className="hidden sm:inline-flex">
                 {UI.nav.logout}
               </Button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                aria-label={UI.nav.logout}
+                title={UI.nav.logout}
+                className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-muted hover:bg-danger-soft hover:text-danger-strong sm:hidden"
+              >
+                <LogoutIcon className="h-4 w-4" />
+              </button>
             </>
           ) : (
             <>

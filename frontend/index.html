@@ -14,6 +14,21 @@
       href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <script>
+      // Apply the saved theme before first paint so dark mode never flashes light.
+      (function () {
+        try {
+          var stored = localStorage.getItem("parcelpath-theme");
+          var theme = stored === "dark" || stored === "light" ? stored : "light";
+          var root = document.documentElement;
+          root.setAttribute("data-theme", theme);
+          root.style.colorScheme = theme;
+          root.classList.toggle("dark", theme === "dark");
+        } catch (error) {
+          /* Storage may be unavailable; light theme remains the default. */
+        }
+      })();
+    </script>
     <title>PARCELPATH — متجر الطلبات والتتبّع</title>
   </head>
   <body>
