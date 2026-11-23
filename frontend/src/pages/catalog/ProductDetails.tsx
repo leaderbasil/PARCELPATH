@@ -52,7 +52,7 @@ export default function ProductDetails() {
   };
 
   return (
-    <main className="mx-auto max-w-4xl p-4 py-8">
+    <main className="mx-auto max-w-6xl p-4 py-8">
       <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-text-muted" aria-label="breadcrumb">
         <Link to="/" className="text-primary-strong underline">
           {UI.catalog.title}

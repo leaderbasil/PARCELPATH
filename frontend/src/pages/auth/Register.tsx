@@ -72,8 +72,12 @@ export default function Register() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-2xl p-4 py-12 sm:px-6">
-      <div className="relative rounded-card border border-border bg-surface p-8 shadow-card sm:p-10">
+    <main className="relative mx-auto w-full max-w-2xl p-4 py-12 sm:px-6">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-16 right-1/4 h-64 w-64 rounded-full bg-primary/20 blur-3xl" />
+        <div className="absolute -bottom-16 left-1/4 h-64 w-64 rounded-full bg-primary-soft blur-3xl" />
+      </div>
+      <div className="relative z-10 rounded-card border border-border bg-surface/90 p-8 shadow-card backdrop-blur sm:p-10">
         <ThemeToggle className="absolute end-4 top-4" />
         <div className="mb-8 flex flex-col items-center gap-4 text-center">
           <BrandLogo showTagline />

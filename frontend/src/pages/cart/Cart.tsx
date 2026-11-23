@@ -92,7 +92,7 @@ export default function Cart() {
 
   if (cart.items.length === 0) {
     return (
-      <main className="mx-auto max-w-4xl p-4 py-10">
+      <main className="mx-auto max-w-6xl p-4 py-10">
         <h1 className="mb-6 text-2xl font-bold text-text">{UI.cart.title}</h1>
         <EmptyState message={UI.cart.empty} />
         <div className="mt-6 text-center">
@@ -105,7 +105,7 @@ export default function Cart() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl p-4 py-10">
+    <main className="mx-auto max-w-6xl p-4 py-10">
       <h1 className="mb-6 text-2xl font-bold text-text">{UI.cart.title}</h1>
       {notices.length > 0 ? (
         <div role="status" className="mb-4 space-y-1 rounded-lg bg-warning-soft p-3 text-sm text-warning-strong">

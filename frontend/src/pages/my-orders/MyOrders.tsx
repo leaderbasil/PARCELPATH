@@ -34,7 +34,7 @@ export default function MyOrders() {
   const canGoNext = currentPage < pageCount;
 
   return (
-    <main className="mx-auto max-w-5xl p-4 py-10">
+    <main className="mx-auto max-w-6xl p-4 py-10">
       <h1 className="mb-6 text-2xl font-bold text-text">{UI.orders.title}</h1>
 
       <div className="mb-6 grid grid-cols-1 gap-3 rounded-card border border-border bg-surface p-4 sm:grid-cols-3">

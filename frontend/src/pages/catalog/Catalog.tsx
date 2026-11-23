@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 
 import { Filters } from "@/components/catalog/Filters";
 import { ProductGrid } from "@/components/catalog/ProductGrid";
@@ -47,17 +46,7 @@ export default function Catalog() {
   const canGoNext = currentPage < pageCount;
 
   return (
-    <main className="mx-auto max-w-6xl p-4 py-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-text">{UI.catalog.title}</h1>
-          <p className="mt-1 text-sm text-text-muted">{UI.catalog.subtitle}</p>
-        </div>
-        <Link to="/cart" className="text-sm font-medium text-primary-strong underline">
-          {UI.nav.cart}
-        </Link>
-      </div>
-
+    <main className="mx-auto w-full max-w-none p-4 py-8">
       <Filters
         categories={categoriesQuery.data ?? []}
         value={{ ...query, search: searchInput }}

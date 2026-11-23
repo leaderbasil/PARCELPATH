@@ -41,7 +41,7 @@ export default function OrderDetails() {
   };
 
   return (
-    <main className="mx-auto max-w-4xl space-y-6 p-4 py-10">
+    <main className="mx-auto max-w-6xl space-y-6 p-4 py-10">
       <div className="rounded-card border border-border bg-surface p-6 shadow-card">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>

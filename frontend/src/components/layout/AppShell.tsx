@@ -7,16 +7,10 @@ import { AdminSidebar } from "./AdminSidebar";
 export function AppShell() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
-  const isAuth = location.pathname === "/login" || location.pathname === "/register";
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div
-      dir="rtl"
-      className={`min-h-screen font-sans text-text ${
-        isAuth ? "bg-gradient-to-br from-primary via-primary-strong to-primary" : "bg-background"
-      }`}
-    >
+    <div dir="rtl" className="min-h-screen bg-background font-sans text-text">
       <div className="flex min-h-screen">
         {isAdmin ? <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} /> : null}
         <div className="flex min-w-0 flex-1 flex-col">
