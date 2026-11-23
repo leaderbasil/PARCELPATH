@@ -24,8 +24,8 @@ export function AppShell() {
           <main
             className={
               isAdmin
-                ? "mx-auto w-full max-w-screen-2xl flex-1 p-4 md:p-6 lg:p-8"
-                : "mx-auto w-full max-w-7xl flex-1 p-4 md:p-6"
+                ? "mx-auto w-full max-w-[112rem] flex-1 p-4 md:p-6 lg:p-8"
+                : "mx-auto w-full max-w-screen-2xl flex-1 p-4 md:p-6"
             }
           >
             <Outlet />
