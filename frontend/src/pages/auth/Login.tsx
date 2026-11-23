@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import { Button } from "@/components/common/Button";
-import { DashboardIcon, EyeIcon, EyeOffIcon, UsersIcon } from "@/components/common/Icons";
+import { DashboardIcon, EyeIcon, EyeOffIcon, SparkleIcon, UsersIcon } from "@/components/common/Icons";
 import { Input } from "@/components/common/Input";
 import { Modal } from "@/components/common/Modal";
 import { AuthLayout } from "@/components/layout/AuthLayout";
@@ -165,16 +165,28 @@ export default function Login() {
       </form>
 
       {demoLoginEnabled ? (
-        <div className="mt-7 border-t border-border pt-6">
-          <Button
-            variant="secondary"
-            loading={demoLoadingRole !== null}
-            disabled={isSubmitting}
-            onClick={() => setDemoPickerOpen(true)}
-            className="h-11 w-full text-sm"
-          >
-            {UI.auth.demoLogin}
-          </Button>
+        <div className="mt-7">
+          <div className="mb-5 flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs text-text-muted">{UI.auth.demoDivider}</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
+            <div className="mb-3 text-center">
+              <p className="text-sm font-semibold text-text">{UI.auth.demoTitle}</p>
+              <p className="mt-1 text-xs leading-5 text-text-muted">{UI.auth.demoHint}</p>
+            </div>
+            <Button
+              variant="secondary"
+              loading={demoLoadingRole !== null}
+              disabled={isSubmitting}
+              onClick={() => setDemoPickerOpen(true)}
+              className="h-12 w-full border-primary/40 bg-surface text-primary-strong hover:bg-primary-soft"
+            >
+              <SparkleIcon className="h-4 w-4" />
+              {UI.auth.demoLogin}
+            </Button>
+          </div>
         </div>
       ) : null}
 
@@ -196,21 +208,39 @@ export default function Login() {
             type="button"
             disabled={demoLoadingRole !== null}
             onClick={() => void onDemoLogin("CUSTOMER")}
-            className="flex flex-col items-start gap-2 rounded-xl border border-border bg-background p-4 text-start transition-colors hover:border-primary hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-60"
+            className="group flex flex-col items-start gap-3 rounded-2xl border border-border bg-background p-5 text-start shadow-sm transition-colors hover:border-primary hover:bg-primary-soft hover:shadow-card disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <UsersIcon className="text-primary-strong" />
-            <span className="font-semibold text-text">{UI.auth.demoCustomer}</span>
-            <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoCustomerDesc}</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary-strong transition-colors group-hover:bg-surface">
+              <UsersIcon className="h-5 w-5" />
+            </span>
+            <span className="flex flex-col gap-1">
+              <span className="flex flex-wrap items-center gap-2 font-semibold text-text">
+                {UI.auth.demoCustomer}
+                {demoLoadingRole === "CUSTOMER" ? (
+                  <span className="text-xs font-normal text-primary-strong">{UI.common.loading}</span>
+                ) : null}
+              </span>
+              <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoCustomerDesc}</span>
+            </span>
           </button>
           <button
             type="button"
             disabled={demoLoadingRole !== null}
             onClick={() => void onDemoLogin("ADMIN")}
-            className="flex flex-col items-start gap-2 rounded-xl border border-border bg-background p-4 text-start transition-colors hover:border-primary hover:bg-primary-soft disabled:cursor-not-allowed disabled:opacity-60"
+            className="group flex flex-col items-start gap-3 rounded-2xl border border-border bg-background p-5 text-start shadow-sm transition-colors hover:border-primary hover:bg-primary-soft hover:shadow-card disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <DashboardIcon className="text-primary-strong" />
-            <span className="font-semibold text-text">{UI.auth.demoAdmin}</span>
-            <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoAdminDesc}</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary-soft text-primary-strong transition-colors group-hover:bg-surface">
+              <DashboardIcon className="h-5 w-5" />
+            </span>
+            <span className="flex flex-col gap-1">
+              <span className="flex flex-wrap items-center gap-2 font-semibold text-text">
+                {UI.auth.demoAdmin}
+                {demoLoadingRole === "ADMIN" ? (
+                  <span className="text-xs font-normal text-primary-strong">{UI.common.loading}</span>
+                ) : null}
+              </span>
+              <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoAdminDesc}</span>
+            </span>
           </button>
         </div>
       </Modal>
