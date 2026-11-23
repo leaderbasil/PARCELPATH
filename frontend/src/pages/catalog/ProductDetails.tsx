@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
+import { BackIcon } from "@/components/common/Icons";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Input } from "@/components/common/Input";
@@ -128,8 +129,11 @@ export default function ProductDetails() {
         </div>
       </div>
 
-      <Link to="/" className="mt-6 inline-block text-sm text-primary-strong underline">
-        {UI.common.back}
+      <Link to="/" className="mt-6 inline-block">
+        <Button variant="secondary">
+          <BackIcon className="h-4 w-4" />
+          {UI.common.back}
+        </Button>
       </Link>
     </main>
   );

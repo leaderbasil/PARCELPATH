@@ -3,6 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { BackIcon } from "@/components/common/Icons";
 import { Button } from "@/components/common/Button";
 import { DateText } from "@/components/common/DateText";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -281,8 +282,11 @@ export default function AdminOrderDetails() {
         />
       )}
 
-      <Link to="/admin/orders" className="inline-block text-sm text-primary-strong underline">
-        {UI.common.back}
+      <Link to="/admin/orders" className="mt-6 inline-block">
+        <Button variant="secondary">
+          <BackIcon className="h-4 w-4" />
+          {UI.common.back}
+        </Button>
       </Link>
     </main>
   );

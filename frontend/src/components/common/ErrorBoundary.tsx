@@ -1,4 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Button } from "@/components/common/Button";
+import { BackIcon } from "@/components/common/Icons";
 import { UI } from "@/constants/ui";
 
 interface Props {
@@ -25,8 +27,11 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="p-8 text-center">
           <h1 className="text-xl font-semibold text-text">{UI.errors.boundaryTitle}</h1>
-          <a href="/" className="mt-4 inline-block text-primary underline">
-            {UI.common.back}
+          <a href="/" className="mt-4 inline-block">
+            <Button variant="secondary">
+              <BackIcon className="h-4 w-4" />
+              {UI.common.back}
+            </Button>
           </a>
         </div>
       );

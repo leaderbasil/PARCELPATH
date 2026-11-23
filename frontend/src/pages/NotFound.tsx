@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/common/Button";
+import { BackIcon } from "@/components/common/Icons";
 import { UI } from "@/constants/ui";
 
 export default function NotFound() {
@@ -10,7 +11,10 @@ export default function NotFound() {
         <h1 className="mt-4 text-xl font-semibold text-text">{UI.errors.notFoundTitle}</h1>
         <p className="mt-2 text-sm text-text-muted">{UI.errors.notFoundBody}</p>
         <Link to="/" className="mt-6 inline-block">
-          <Button>{UI.common.back}</Button>
+          <Button variant="secondary">
+            <BackIcon className="h-4 w-4" />
+            {UI.common.back}
+          </Button>
         </Link>
       </div>
     </div>

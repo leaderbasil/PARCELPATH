@@ -72,7 +72,7 @@ export default function Register() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-xl p-4 py-12 sm:px-6">
+    <main className="mx-auto w-full max-w-2xl p-4 py-12 sm:px-6">
       <div className="relative rounded-card border border-border bg-surface p-8 shadow-card sm:p-10">
         <ThemeToggle className="absolute end-4 top-4" />
         <div className="mb-8 flex flex-col items-center gap-4 text-center">

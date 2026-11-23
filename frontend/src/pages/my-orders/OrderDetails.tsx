@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
+import { Button } from "@/components/common/Button";
 import { DateText } from "@/components/common/DateText";
+import { BackIcon } from "@/components/common/Icons";
 import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { LoadingState } from "@/components/common/LoadingState";
@@ -188,8 +190,11 @@ export default function OrderDetails() {
         />
       )}
 
-      <Link to="/orders" className="inline-block text-sm text-primary-strong underline">
-        {UI.common.back}
+      <Link to="/orders" className="mt-6 inline-block">
+        <Button variant="secondary">
+          <BackIcon className="h-4 w-4" />
+          {UI.common.back}
+        </Button>
       </Link>
     </main>
   );
