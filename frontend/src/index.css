@@ -21,6 +21,7 @@
   --color-danger: 220 38 38;
   --color-danger-strong: 185 28 28;
   --color-danger-soft: 254 226 226;
+  --color-overlay: 15 23 42;
 }
 
 [data-theme="dark"] {
@@ -41,6 +42,7 @@
   --color-danger: 248 113 113;
   --color-danger-strong: 252 165 165;
   --color-danger-soft: 76 25 30;
+  --color-overlay: 2 6 23;
 }
 
 @layer base {

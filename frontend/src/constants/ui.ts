@@ -128,7 +128,6 @@ export const UI = {
     welcomeBack: "مرحبًا بعودتك",
     welcomeBackSubtitle: "سجّل الدخول لمتابعة طلباتك وشحناتك.",
     signingIn: "جارٍ تسجيل الدخول...",
-    rememberMe: "تذكرني",
     showPassword: "إظهار كلمة المرور",
     hidePassword: "إخفاء كلمة المرور",
     createAccount: "أنشئ حسابك",

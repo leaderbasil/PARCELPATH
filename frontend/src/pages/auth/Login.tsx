@@ -17,8 +17,6 @@ import { ApiRequestError } from "@/services/api";
 import { authService } from "@/services/auth.service";
 import type { Role } from "@/types/domain";
 
-const REMEMBER_EMAIL_KEY = "parcelpath.rememberEmail";
-
 const loginSchema = z.object({
   email: z
     .string()
@@ -38,32 +36,10 @@ function readRedirectTarget(state: unknown): string | undefined {
   return typeof from === "string" && from.length > 0 ? from : undefined;
 }
 
-function readRememberedEmail(): string {
-  try {
-    return localStorage.getItem(REMEMBER_EMAIL_KEY) ?? "";
-  } catch {
-    return "";
-  }
-}
-
-function persistRememberedEmail(email: string, remember: boolean): void {
-  try {
-    if (remember) {
-      localStorage.setItem(REMEMBER_EMAIL_KEY, email.trim());
-    } else {
-      localStorage.removeItem(REMEMBER_EMAIL_KEY);
-    }
-  } catch {
-    // Storage may be unavailable; sign-in still works without it.
-  }
-}
-
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [rememberedEmail] = useState(readRememberedEmail);
-  const [rememberMe, setRememberMe] = useState(rememberedEmail.length > 0);
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [demoPickerOpen, setDemoPickerOpen] = useState(false);
@@ -75,14 +51,13 @@ export default function Login() {
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: rememberedEmail, password: "" },
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (values: LoginValues): Promise<void> => {
     setFormError(null);
     try {
       const token = await authService.login({ email: values.email, password: values.password });
-      persistRememberedEmail(values.email, rememberMe);
       login(token.access_token, token.user, token.expires_in);
       const target =
         readRedirectTarget(location.state) ??
@@ -134,9 +109,8 @@ export default function Login() {
 
   return (
     <AuthLayout>
-      <div className="mb-7">
-        <p className="text-xs font-semibold text-primary-strong">{UI.appName}</p>
-        <h1 className="mt-2 text-2xl font-bold leading-snug text-text sm:text-3xl">
+      <div className="mb-7 text-center">
+        <h1 className="text-2xl font-bold leading-snug text-text sm:text-3xl">
           {UI.auth.welcomeBack}
         </h1>
         <p className="mt-2 text-sm leading-6 text-text-muted">{UI.auth.welcomeBackSubtitle}</p>
@@ -184,16 +158,6 @@ export default function Login() {
             </button>
           </div>
         </div>
-
-        <label className="flex items-center gap-2 text-sm text-text-muted">
-          <input
-            type="checkbox"
-            checked={rememberMe}
-            onChange={(event) => setRememberMe(event.target.checked)}
-            className="h-4 w-4 cursor-pointer"
-          />
-          {UI.auth.rememberMe}
-        </label>
 
         <Button type="submit" loading={isSubmitting} className="h-11 w-full text-base">
           {isSubmitting ? UI.auth.signingIn : UI.nav.login}

@@ -91,7 +91,7 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
             type="button"
             aria-label={UI.admin.closeMenu}
             onClick={onClose}
-            className="absolute inset-0 h-full w-full bg-text/40"
+            className="absolute inset-0 h-full w-full bg-overlay/45"
           />
           <aside className="absolute inset-y-0 start-0 flex w-72 flex-col border-e border-border bg-surface shadow-card">
             <SidebarContent onNavigate={onClose} showClose />

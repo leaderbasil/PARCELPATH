@@ -15,8 +15,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
         <BrandLogo inverse showTagline />
 
         <div className="max-w-lg">
-          <p className="text-xs font-semibold tracking-wide text-surface/80">{UI.appName}</p>
-          <h2 className="mt-3 text-4xl font-bold leading-snug text-balance xl:text-[2.75rem]">
+          <h2 className="text-4xl font-bold leading-snug text-balance xl:text-[2.75rem]">
             {UI.auth.heroTitle}
           </h2>
           <p className="mt-4 max-w-md text-base leading-8 text-surface/85">
@@ -30,8 +29,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
       <main className="flex min-w-0 flex-1 items-center justify-center px-4 py-8 sm:px-8 sm:py-10 lg:px-12 lg:py-12">
         <div className="w-full max-w-md">
           <div className="mb-6 hidden rounded-card border border-border bg-surface p-4 md:block lg:hidden">
-            <p className="text-xs font-semibold text-primary-strong">{UI.appName}</p>
-            <p className="mt-1 text-base font-bold text-text">{UI.auth.heroTitle}</p>
+            <p className="text-base font-bold text-text">{UI.auth.heroTitle}</p>
             <p className="mt-1 text-sm leading-6 text-text-muted">{UI.auth.heroDescription}</p>
           </div>
 

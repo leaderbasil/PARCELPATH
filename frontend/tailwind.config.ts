@@ -20,6 +20,7 @@ const config: Config = {
         success: { soft: token("success-soft"), DEFAULT: token("success"), strong: token("success-strong") },
         warning: { soft: token("warning-soft"), DEFAULT: token("warning"), strong: token("warning-strong") },
         danger: { soft: token("danger-soft"), DEFAULT: token("danger"), strong: token("danger-strong") },
+        overlay: token("overlay"),
       },
       fontFamily: {
         sans: ["IBM Plex Sans Arabic", "Cairo", "Tahoma", "sans-serif"],
