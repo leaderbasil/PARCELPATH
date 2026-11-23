@@ -171,7 +171,7 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
           <Link to="/" className="flex shrink-0 items-center" aria-label="PARCELPATH">
             <BrandLogo
               showTagline
-              markClassName="h-12 w-12 rounded-2xl lg:h-10 lg:w-10 lg:rounded-xl"
+              markClassName="h-14 w-14 rounded-2xl lg:h-10 lg:w-10 lg:rounded-xl"
             />
           </Link>
 

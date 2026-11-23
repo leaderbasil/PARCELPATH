@@ -50,7 +50,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
             <div className="mb-6 flex justify-center lg:mb-8">
               <BrandLogo
                 compact
-                markClassName="h-16 w-16 rounded-2xl lg:h-20 lg:w-20 lg:rounded-3xl"
+                markClassName="h-20 w-20 rounded-3xl lg:h-24 lg:w-24 lg:rounded-[1.75rem]"
               />
             </div>
             {children}
