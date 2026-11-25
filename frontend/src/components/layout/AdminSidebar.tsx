@@ -37,10 +37,7 @@ function SidebarContent({ onNavigate, showClose = false }: { onNavigate?: () => 
         ) : null}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label={UI.admin.dashboard}>
-        <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider text-text-muted">
-          {UI.admin.dashboard}
-        </p>
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label={UI.nav.dashboard}>
         {links.map((link) => {
           const Icon = link.icon;
           return (

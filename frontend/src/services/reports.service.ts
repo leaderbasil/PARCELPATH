@@ -8,7 +8,13 @@ import { getStoredDemoOrders, getStoredDemoProducts } from "./mockDemoData";
 export interface ReportQuery {
   from?: string;
   to?: string;
+}
+
+export interface SalesQuery extends ReportQuery {
   group_by?: "day" | "month";
+}
+
+export interface TopProductsQuery extends ReportQuery {
   limit?: number;
 }
 
@@ -64,7 +70,7 @@ export const reportsService = {
       daily_sales: dailySales,
     };
   },
-  async sales(params: ReportQuery = {}): Promise<SalesReport> {
+  async sales(params: SalesQuery = {}): Promise<SalesReport> {
     if (!isDemoMode()) return unwrap(api.get<{ data: SalesReport }>("/reports/sales", { params }));
     const { from, to } = resolveDemoRange(params.from, params.to);
     const completed = getStoredDemoOrders().filter(o => isCompleted(o) && inRange(o, from, to));
@@ -75,7 +81,7 @@ export const reportsService = {
     });
     return { summary: periodSummary(completed), series };
   },
-  async topProducts(params: ReportQuery = {}): Promise<TopProduct[]> {
+  async topProducts(params: TopProductsQuery = {}): Promise<TopProduct[]> {
     if (!isDemoMode()) return unwrap(api.get<{ data: TopProduct[] }>("/reports/top-products", { params }));
     const { from, to } = resolveDemoRange(params.from, params.to);
     const completed = getStoredDemoOrders().filter(o => isCompleted(o) && inRange(o, from, to));

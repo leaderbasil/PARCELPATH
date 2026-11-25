@@ -173,10 +173,11 @@ def seed() -> None:
             if existing is not None:
                 continue
             customer = customers[index % len(customers)]
-            product = products[(index - 1) % 6]
-            order, _ = order_service.create_order(
-                db, customer, _payload(product, 1 + index % 2), key
-            )
+            needed = 1 + index % 2
+            product = next((p for p in products if p.stock_quantity >= needed), None)
+            if product is None:
+                raise RuntimeError("Not enough stock to seed demo orders")
+            order, _ = order_service.create_order(db, customer, _payload(product, needed), key)
             _advance(db, admin, order, target)
             logger.info("Seeded demo order %s (%s)", order.order_number, target)
     finally:

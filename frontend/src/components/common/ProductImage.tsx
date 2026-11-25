@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { PackageIcon } from "@/components/common/Icons";
+import { getObjectUrl, isObjectRef } from "@/services/objectStorage";
 import { cn } from "@/utils/cn";
 
 interface ProductImageProps {
@@ -11,9 +12,37 @@ interface ProductImageProps {
 }
 
 export function ProductImage({ src, alt, className, imgClassName }: ProductImageProps) {
+  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const showImage = Boolean(src) && !failed;
+
+  useEffect(() => {
+    let active = true;
+    setFailed(false);
+    setLoaded(false);
+    setResolvedSrc(null);
+
+    if (!src) return () => { active = false; };
+    if (!isObjectRef(src)) {
+      setResolvedSrc(src);
+      return () => { active = false; };
+    }
+
+    void getObjectUrl(src)
+      .then((url) => {
+        if (active) setResolvedSrc(url);
+        if (!url && active) setFailed(true);
+      })
+      .catch(() => {
+        if (active) setFailed(true);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [src]);
+
+  const showImage = Boolean(resolvedSrc) && !failed;
 
   return (
     <div className={cn("relative overflow-hidden bg-background", className)}>
@@ -21,7 +50,7 @@ export function ProductImage({ src, alt, className, imgClassName }: ProductImage
         <>
           {!loaded ? <div className="skeleton absolute inset-0" aria-hidden="true" /> : null}
           <img
-            src={src ?? undefined}
+            src={resolvedSrc ?? undefined}
             alt={alt}
             loading="lazy"
             decoding="async"

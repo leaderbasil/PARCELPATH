@@ -34,8 +34,12 @@ function useOrderInvalidation() {
   const client = useQueryClient();
   return () => {
     void client.invalidateQueries({ queryKey: ["orders"] });
+    void client.invalidateQueries({ queryKey: ["order"] });
+    void client.invalidateQueries({ queryKey: ["tracking"] });
     void client.invalidateQueries({ queryKey: ["reports"] });
     void client.invalidateQueries({ queryKey: ["products"] });
+    void client.invalidateQueries({ queryKey: ["product"] });
+    void client.invalidateQueries({ queryKey: ["low-stock"] });
   };
 }
 

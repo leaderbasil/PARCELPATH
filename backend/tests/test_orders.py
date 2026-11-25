@@ -10,7 +10,7 @@ def test_create_order_calculates_totals_and_deducts_stock(
     customer_headers: dict[str, str],
     sample_products: list[dict],
 ) -> None:
-    order = create_order(client, customer_headers, sample_products[0]["id"], 2)
+    order = create_order(client, customer_headers, sample_products[0]["id"], quantity=2)
     assert order["status"] == "PENDING"
     assert order["payment_status"] == "UNPAID"
     assert order["subtotal"] == "20.00"
@@ -55,14 +55,14 @@ def test_idempotency_key_of_another_user(
         "/api/v1/auth/register",
         json={
             "full_name": "Other Customer",
-            "email": "other@test.local",
+            "email": "other@test.example",
             "password": "password123",
         },
     )
     assert second.status_code == 201
     token = client.post(
         "/api/v1/auth/login",
-        json={"email": "other@test.local", "password": "password123"},
+        json={"email": "other@test.example", "password": "password123"},
     ).json()["data"]["access_token"]
     response = client.post(
         "/api/v1/orders",
@@ -234,13 +234,13 @@ def test_customer_cannot_see_another_customers_order(
         "/api/v1/auth/register",
         json={
             "full_name": "Stranger",
-            "email": "stranger@test.local",
+            "email": "stranger@test.example",
             "password": "password123",
         },
     )
     token = client.post(
         "/api/v1/auth/login",
-        json={"email": "stranger@test.local", "password": "password123"},
+        json={"email": "stranger@test.example", "password": "password123"},
     ).json()["data"]["access_token"]
     response = client.get(
         f"/api/v1/orders/{order['id']}",

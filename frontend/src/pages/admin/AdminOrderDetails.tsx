@@ -8,9 +8,12 @@ import { Button } from "@/components/common/Button";
 import { DateText } from "@/components/common/DateText";
 import { ErrorState } from "@/components/common/ErrorState";
 import { Input } from "@/components/common/Input";
+import { MapLink } from "@/components/common/MapLink";
 import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { CourierContactButtons } from "@/components/orders/CourierContactButtons";
+import { OrderNumberBadge } from "@/components/orders/OrderNumberBadge";
 import { StatusActions } from "@/components/orders/StatusActions";
 import { OrderTimeline } from "@/components/tracking/OrderTimeline";
 import { getErrorMessage, statusLabel } from "@/constants/messages";
@@ -68,17 +71,21 @@ export default function AdminOrderDetails() {
     });
   }, [order, reset]);
 
-  if (orderQuery.isLoading) return <LoadingState variant="detail" />;
+  if (orderQuery.isLoading) return <LoadingState variant="orderDetail" />;
   if (orderQuery.isError) {
     return <ErrorState error={orderQuery.error} onRetry={() => void orderQuery.refetch()} />;
   }
   if (!order) return <ErrorState error={new Error(UI.common.error)} />;
 
-  const shippingLocked = order.status === "DELIVERED" || order.status === "CANCELLED";
+  const shippingLocked = !["SHIPPED", "OUT_FOR_DELIVERY"].includes(order.status);
 
   const onSubmit = (values: FormValues) => {
     setFormError(null);
     setSaved(false);
+    if (!values.carrier?.trim() && !values.tracking_number?.trim()) {
+      setFormError("أدخل بيانات الناقل أو رقم التتبّع على الأقل.");
+      return;
+    }
     const payload: ShippingUpdateIn = {
       carrier: optionalText(values.carrier),
       tracking_number: optionalText(values.tracking_number),
@@ -98,11 +105,8 @@ export default function AdminOrderDetails() {
       <div className="rounded-card border border-border bg-surface p-6 shadow-card">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs text-text-muted">{UI.orders.number}</p>
-            <h1 className="text-xl font-bold text-text" dir="ltr">
-              {order.order_number}
-            </h1>
-            <p className="mt-1 text-sm text-text-muted">
+            <OrderNumberBadge number={order.order_number} />
+            <p className="mt-2 text-sm text-text-muted">
               <DateText value={order.created_at} />
             </p>
             {order.customer ? (
@@ -197,6 +201,9 @@ export default function AdminOrderDetails() {
               <dt className="text-text-muted">{UI.checkout.address}</dt>
               <dd className="text-right text-text">{order.shipping.address}</dd>
             </div>
+            <div className="pt-1">
+              <MapLink query={order.shipping.map_query} url={order.shipping.map_url} />
+            </div>
           </dl>
         </div>
         <div className="rounded-card border border-border bg-surface p-6 shadow-card">
@@ -222,6 +229,12 @@ export default function AdminOrderDetails() {
                 {order.tracking_number ?? "—"}
               </dd>
             </div>
+            {order.courier_phone ? (
+              <div className="pt-1">
+                <p className="mb-2 text-text-muted">{UI.orders.courierPhone}</p>
+                <CourierContactButtons phone={order.courier_phone} />
+              </div>
+            ) : null}
           </dl>
           <p className="mt-4 text-xs text-text-muted">{statusLabel(order.status)}</p>
         </div>
@@ -274,7 +287,7 @@ export default function AdminOrderDetails() {
       {trackingQuery.isError ? (
         <ErrorState error={trackingQuery.error} onRetry={() => void trackingQuery.refetch()} />
       ) : trackingQuery.isLoading ? (
-        <LoadingState variant="rows" count={3} />
+        <LoadingState variant="tracking" count={3} />
       ) : (
         <OrderTimeline
           events={trackingQuery.data?.events ?? []}

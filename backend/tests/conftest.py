@@ -65,6 +65,7 @@ def override_db(db: Session) -> Generator[None, None, None]:
     app.dependency_overrides[get_db] = _override
     yield
     app.dependency_overrides.clear()
+    db.rollback()
     with test_engine.begin() as connection:
         connection.execute(
             text(
@@ -78,7 +79,7 @@ def override_db(db: Session) -> Generator[None, None, None]:
 @pytest.fixture
 def client() -> TestClient:
     """HTTP client for the FastAPI application."""
-    return TestClient(app)
+    return TestClient(app, raise_server_exceptions=False)
 
 
 def _token(client: TestClient, email: str, password: str) -> str:
@@ -97,7 +98,7 @@ def _token(client: TestClient, email: str, password: str) -> str:
 @pytest.fixture
 def customer_token(client: TestClient) -> str:
     """Access token for a customer."""
-    return _token(client, "customer@test.local", "Customer123!")
+    return _token(client, "customer@test.example", "Customer123!")
 
 
 @pytest.fixture
@@ -109,10 +110,10 @@ def customer_headers(customer_token: str) -> dict[str, str]:
 @pytest.fixture
 def admin_token(client: TestClient, db: Session) -> str:
     """Promote the first registered user to admin and return its token."""
-    token = _token(client, "admin@test.local", "Admin123!")
+    token = _token(client, "admin@test.example", "Admin123!")
     from app.models.user import User, UserRole
 
-    admin = db.query(User).filter(User.email == "admin@test.local").one()
+    admin = db.query(User).filter(User.email == "admin@test.example").one()
     admin.role = UserRole.ADMIN
     db.commit()
     return token

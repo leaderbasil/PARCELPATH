@@ -44,7 +44,9 @@ api.interceptors.response.use(
     if (reason instanceof AxiosError) {
       const status = reason.response?.status ?? 0;
       const body = reason.response?.data as ApiErrorBody | undefined;
-      if (status === 401) {
+      // A failed login attempt must not log out an already signed-in user.
+      const requestUrl = reason.config?.url ?? "";
+      if (status === 401 && !requestUrl.includes("/auth/login")) {
         clearSession();
         window.dispatchEvent(new CustomEvent("auth:unauthorized"));
       }

@@ -64,7 +64,7 @@ def test_shipping_correction_state_rules(
         f"/api/v1/orders/{order['id']}/tracking", headers=admin_headers
     ).json()["data"]["events"]
     assert len(events) == len(original_events) + 1
-    assert "updated" in events[-1]["note"]
+    assert "تم تحديث" in events[-1]["note"]
 
 
 def test_shipping_correction_requires_a_field(

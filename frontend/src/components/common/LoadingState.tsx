@@ -1,7 +1,19 @@
+import type { ReactNode } from "react";
 import { UI } from "@/constants/ui";
 import { cn } from "@/utils/cn";
 
-type LoadingVariant = "cards" | "rows" | "detail" | "dashboard" | "page";
+type LoadingVariant =
+  | "cards"
+  | "rows"
+  | "orders"
+  | "adminOrders"
+  | "adminProducts"
+  | "adminUsers"
+  | "detail"
+  | "orderDetail"
+  | "tracking"
+  | "dashboard"
+  | "page";
 
 interface LoadingStateProps {
   variant?: LoadingVariant;
@@ -10,6 +22,14 @@ interface LoadingStateProps {
 
 function Skeleton({ className }: { className?: string }) {
   return <span aria-hidden="true" className={cn("skeleton block rounded-lg", className)} />;
+}
+
+function TableShell({ minWidth, children }: { minWidth: string; children: ReactNode }) {
+  return (
+    <div className="overflow-x-auto rounded-card border border-border bg-surface shadow-card">
+      <div className={cn("min-w-[36rem]", minWidth)}>{children}</div>
+    </div>
+  );
 }
 
 function CardsSkeleton({ count }: { count: number }) {
@@ -59,6 +79,134 @@ function RowsSkeleton({ count }: { count: number }) {
   );
 }
 
+function OrdersSkeleton({ count }: { count: number }) {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: count }, (_, index) => (
+        <div
+          key={index}
+          className="rounded-card border border-border bg-surface p-4 text-right shadow-card"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Skeleton className="h-6 w-20 rounded-full" />
+              <Skeleton className="h-6 w-16 rounded-full" />
+            </div>
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-5 w-24" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AdminOrdersSkeleton({ count }: { count: number }) {
+  const columns = "grid-cols-[1.4fr_.9fr_.8fr_.8fr]";
+
+  return (
+    <TableShell minWidth="min-w-[42rem]">
+      <div className={cn("grid items-center gap-4 border-b border-border bg-background px-4 py-3", columns)}>
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-3 w-20" />
+      </div>
+      <div className="divide-y divide-border">
+        {Array.from({ length: count }, (_, index) => (
+          <div key={index} className={cn("grid items-center gap-4 px-4 py-4", columns)}>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-28" />
+              <Skeleton className="h-3 w-20" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-4 w-20" />
+          </div>
+        ))}
+      </div>
+    </TableShell>
+  );
+}
+
+function AdminProductsSkeleton({ count }: { count: number }) {
+  const columns = "grid-cols-[1.8fr_.8fr_.9fr_.7fr_.6fr_.5fr_.4fr]";
+
+  return (
+    <TableShell minWidth="min-w-[58rem]">
+      <div className={cn("grid items-center gap-4 border-b border-border bg-background px-4 py-3", columns)}>
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-3 w-12" />
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-3 w-14" />
+        <Skeleton className="h-3 w-12" />
+        <Skeleton className="h-3 w-10" />
+      </div>
+      <div className="divide-y divide-border">
+        {Array.from({ length: count }, (_, index) => (
+          <div key={index} className={cn("grid items-center gap-4 px-4 py-4", columns)}>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-10 w-10 shrink-0 rounded-lg" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-3 w-20" />
+              </div>
+            </div>
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-4 w-16" />
+            <Skeleton className="h-4 w-12" />
+            <Skeleton className="h-5 w-9 rounded-full" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </TableShell>
+  );
+}
+
+function AdminUsersSkeleton({ count }: { count: number }) {
+  const columns = "grid-cols-[1.3fr_1.4fr_.8fr_.7fr_.9fr_.4fr]";
+
+  return (
+    <TableShell minWidth="min-w-[48rem]">
+      <div className={cn("grid items-center gap-4 border-b border-border bg-background px-4 py-3", columns)}>
+        <Skeleton className="h-3 w-24" />
+        <Skeleton className="h-3 w-20" />
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-3 w-14" />
+        <Skeleton className="h-3 w-16" />
+        <Skeleton className="h-3 w-10" />
+      </div>
+      <div className="divide-y divide-border">
+        {Array.from({ length: count }, (_, index) => (
+          <div key={index} className={cn("grid items-center gap-4 px-4 py-4", columns)}>
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-9 w-9 shrink-0 rounded-full" />
+              <Skeleton className="h-4 w-24" />
+            </div>
+            <Skeleton className="h-3 w-36" />
+            <Skeleton className="h-7 w-20 rounded-full" />
+            <Skeleton className="h-5 w-9 rounded-full" />
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-8 w-8 rounded-full" />
+          </div>
+        ))}
+      </div>
+    </TableShell>
+  );
+}
+
 function DetailSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-6 rounded-card border border-border bg-surface p-6 shadow-card sm:grid-cols-2">
@@ -79,6 +227,83 @@ function DetailSkeleton() {
         </div>
       </div>
     </div>
+  );
+}
+
+function OrderDetailSkeleton() {
+  return (
+    <div className="space-y-6">
+      <section className="rounded-card border border-border bg-surface p-6 shadow-card">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-7 w-40" />
+            <Skeleton className="h-3 w-28" />
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <Skeleton className="h-6 w-24 rounded-full" />
+            <Skeleton className="h-7 w-28" />
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Skeleton className="h-9 w-28" />
+          <Skeleton className="h-9 w-24" />
+        </div>
+      </section>
+
+      <section className="rounded-card border border-border bg-surface p-6 shadow-card">
+        <Skeleton className="h-5 w-32" />
+        <div className="mt-4 space-y-3">
+          {Array.from({ length: 3 }, (_, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-[1fr_.6fr_.6fr] gap-4 border-b border-border pb-3 last:border-0 last:pb-0"
+            >
+              <Skeleton className="h-4 w-4/5" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-card border border-border bg-surface p-6 shadow-card">
+        <Skeleton className="h-5 w-40" />
+        <div className="mt-4 flex flex-wrap gap-2">
+          {Array.from({ length: 5 }, (_, index) => (
+            <Skeleton key={index} className="h-6 w-20 rounded-full" />
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function TrackingSkeleton({ count }: { count: number }) {
+  return (
+    <section className="rounded-card border border-border bg-surface p-5 shadow-card">
+      <Skeleton className="h-5 w-36" />
+      <div className="mt-4 flex flex-wrap gap-2">
+        {Array.from({ length: 4 }, (_, index) => (
+          <Skeleton key={index} className="h-6 w-20 rounded-full" />
+        ))}
+      </div>
+      <ol className="mt-5 flex flex-col">
+        {Array.from({ length: count }, (_, index) => (
+          <li key={index} className="flex gap-4 pb-6 last:pb-0">
+            <div className="flex flex-col items-center">
+              <Skeleton className="h-4 w-4 shrink-0 rounded-full" />
+              {index < count - 1 ? <Skeleton className="mt-1 w-px flex-1" /> : null}
+            </div>
+            <div className="flex-1 space-y-2 pt-0.5">
+              <Skeleton className="h-4 w-1/3" />
+              <Skeleton className="h-3 w-1/2" />
+              <Skeleton className="h-3 w-24" />
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
   );
 }
 
@@ -115,8 +340,26 @@ export function LoadingState({ variant = "cards", count }: LoadingStateProps) {
     case "rows":
       content = <RowsSkeleton count={count ?? 5} />;
       break;
+    case "orders":
+      content = <OrdersSkeleton count={count ?? 5} />;
+      break;
+    case "adminOrders":
+      content = <AdminOrdersSkeleton count={count ?? 6} />;
+      break;
+    case "adminProducts":
+      content = <AdminProductsSkeleton count={count ?? 6} />;
+      break;
+    case "adminUsers":
+      content = <AdminUsersSkeleton count={count ?? 6} />;
+      break;
     case "detail":
       content = <DetailSkeleton />;
+      break;
+    case "orderDetail":
+      content = <OrderDetailSkeleton />;
+      break;
+    case "tracking":
+      content = <TrackingSkeleton count={count ?? 3} />;
       break;
     case "dashboard":
       content = <DashboardSkeleton />;
@@ -131,7 +374,7 @@ export function LoadingState({ variant = "cards", count }: LoadingStateProps) {
   return (
     <div role="status" aria-label={UI.common.loading} className="w-full">
       <span className="sr-only">{UI.common.loading}</span>
-      {content}
+      <div aria-hidden="true">{content}</div>
     </div>
   );
 }

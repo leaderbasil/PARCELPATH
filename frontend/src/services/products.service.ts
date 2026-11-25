@@ -3,7 +3,13 @@ import { toSubunits } from "@/utils/money";
 
 import { api, unwrap } from "./api";
 import { demoError, isDemoMode, paginateDemoItems } from "./demoMode";
-import { getStoredDemoProducts, makeDemoId, saveDemoProducts } from "./mockDemoData";
+import {
+  getStoredDemoCategories,
+  getStoredDemoProducts,
+  makeDemoId,
+  saveDemoCategory,
+  saveDemoProducts,
+} from "./mockDemoData";
 
 export interface ProductQuery {
   page?: number;
@@ -87,7 +93,7 @@ export const productsService = {
 
   async categories(): Promise<string[]> {
     if (!isDemoMode()) return unwrap(api.get<{ data: string[] }>("/products/categories"));
-    const categories = new Set<string>();
+    const categories = new Set<string>(getStoredDemoCategories());
     getStoredDemoProducts().forEach((product) => {
       if (product.is_active && product.category) categories.add(product.category);
     });
@@ -140,6 +146,7 @@ export const productsService = {
     };
     products.unshift(product);
     saveDemoProducts(products);
+    if (product.category) saveDemoCategory(product.category);
     return product;
   },
 
@@ -177,12 +184,14 @@ export const productsService = {
     };
     products[index] = updated;
     saveDemoProducts(products);
+    if (updated.category) saveDemoCategory(updated.category);
     return updated;
   },
 
   async remove(id: string): Promise<void> {
     if (!isDemoMode()) {
-      await unwrap(api.delete<{ data: null }>(`/products/${id}`));
+      // The backend returns 204 with no body; there is no envelope to unwrap.
+      await api.delete(`/products/${id}`);
       return;
     }
     const products = getStoredDemoProducts();

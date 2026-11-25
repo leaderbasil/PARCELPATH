@@ -27,6 +27,12 @@ class Settings(BaseSettings):
 
     FRONTEND_ORIGIN: str = "http://localhost:5173"
 
+    # Product images are saved as objects on the server and served statically.
+    OBJECT_STORAGE_DIR: str = str(BACKEND_DIR / "uploads")
+    OBJECT_STORAGE_URL_PREFIX: str = "/uploads"
+    OBJECT_STORAGE_PUBLIC_BASE_URL: str = ""
+    MAX_UPLOAD_BYTES: int = 5 * 1024 * 1024
+
     SHIPPING_FEE: Decimal = Decimal("0.00")
     CURRENCY_CODE: str = "USD"
     REPORT_TIMEZONE: str = "UTC"
@@ -49,6 +55,23 @@ class Settings(BaseSettings):
         from zoneinfo import ZoneInfo
 
         ZoneInfo(value)
+        return value
+
+    @field_validator("OBJECT_STORAGE_URL_PREFIX")
+    @classmethod
+    def validate_upload_prefix(cls, value: str) -> str:
+        """Keep the static URL prefix absolute and free of a trailing slash."""
+        prefix = value.strip() or "/uploads"
+        if not prefix.startswith("/"):
+            prefix = f"/{prefix}"
+        return prefix.rstrip("/")
+
+    @field_validator("MAX_UPLOAD_BYTES")
+    @classmethod
+    def validate_max_upload_bytes(cls, value: int) -> int:
+        """Reject misconfigured upload limits."""
+        if value < 1024 or value > 50 * 1024 * 1024:
+            raise ValueError("MAX_UPLOAD_BYTES must be between 1KB and 50MB")
         return value
 
     @field_validator("SHIPPING_FEE")

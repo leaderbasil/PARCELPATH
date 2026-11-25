@@ -5,6 +5,11 @@ from uuid import uuid4
 
 from sqlalchemy import func, select
 
+# Import all models so SQLAlchemy can resolve string-based relationships.
+import app.models.order  # noqa: F401
+import app.models.order_item  # noqa: F401
+import app.models.product  # noqa: F401
+
 from app.core.config import settings
 from app.core.security import hash_password
 from app.db.session import SessionLocal

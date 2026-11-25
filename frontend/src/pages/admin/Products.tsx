@@ -156,7 +156,7 @@ export default function AdminProducts() {
       ) : null}
 
       {products.isLoading ? (
-        <LoadingState variant="rows" />
+        <LoadingState variant="adminProducts" />
       ) : products.error ? (
         <ErrorState error={products.error} onRetry={() => void products.refetch()} />
       ) : !products.data || products.data.items.length === 0 ? (

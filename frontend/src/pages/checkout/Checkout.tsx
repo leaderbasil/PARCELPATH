@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+import { LocationPicker } from "@/components/checkout/LocationPicker";
 import { Button } from "@/components/common/Button";
 import { EmptyState } from "@/components/common/EmptyState";
 import { Input } from "@/components/common/Input";
@@ -15,20 +16,47 @@ import { useCart } from "@/context/CartContext";
 import { useCreateOrder } from "@/hooks/useOrders";
 import { ApiRequestError } from "@/services/api";
 import { isDemoMode } from "@/services/demoMode";
+import { googleMapsSearchUrl, parseMapLocation } from "@/utils/googleMaps";
 import { clearIdempotencyKey, getIdempotencyKey } from "@/utils/idempotency";
 
-const checkoutSchema = z.object({
-  name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين"),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^\+?[0-9\s-]{7,30}$/, "أدخل رقم هاتف صحيحًا"),
-  city: z.string().trim().min(2, "المدينة يجب ألا تقل عن حرفين"),
-  address: z.string().trim().min(10, "العنوان يجب ألا يقل عن 10 أحرف"),
-  payment_method: z.enum(["COD", "CARD"], {
-    errorMap: () => ({ message: "يرجى اختيار طريقة الدفع" }),
-  }),
-});
+const checkoutSchema = z
+  .object({
+    name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين"),
+    phone: z
+      .string()
+      .trim()
+      .refine(
+        (value) =>
+          /^\+?[0-9\s-]{7,30}$/.test(value) &&
+          /^\+?[0-9]{7,15}$/.test(value.replace(/[\s-]/g, "")),
+        "أدخل رقم هاتف صحيحًا"
+      ),
+    city: z.string().trim().min(2, "المدينة يجب ألا تقل عن حرفين"),
+    address: z.string().trim().min(10, "العنوان يجب ألا يقل عن 10 أحرف"),
+    map_query: z.string().trim().optional(),
+    payment_method: z.enum(["COD", "CARD"], {
+      errorMap: () => ({ message: "يرجى اختيار طريقة الدفع" }),
+    }),
+  })
+  .superRefine((values, context) => {
+    if (!isDemoMode()) return;
+    const rawLocation = values.map_query?.trim() ?? "";
+    if (!rawLocation) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["map_query"],
+        message: UI.checkout.mapRequired,
+      });
+      return;
+    }
+    if (parseMapLocation(rawLocation).query.trim().length < 3) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["map_query"],
+        message: UI.checkout.mapInvalid,
+      });
+    }
+  });
 
 type CheckoutValues = z.infer<typeof checkoutSchema>;
 
@@ -42,6 +70,7 @@ export default function Checkout() {
 
   const {
     register,
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CheckoutValues>({
@@ -51,6 +80,7 @@ export default function Checkout() {
       phone: user?.phone ?? "",
       city: "",
       address: "",
+      map_query: "",
       payment_method: "COD",
     },
   });
@@ -81,6 +111,7 @@ export default function Checkout() {
     setFormError(null);
     setStockIssue(false);
     try {
+      const mapLocation = isDemoMode() ? parseMapLocation(values.map_query ?? "") : null;
       const order = await createOrder.mutateAsync({
         payload: {
           items: cart.items.map((item) => ({
@@ -93,6 +124,14 @@ export default function Checkout() {
             phone: values.phone,
             city: values.city,
             address: values.address,
+            ...(mapLocation
+              ? {
+                  map_query: mapLocation.query,
+                  map_url: mapLocation.url ?? googleMapsSearchUrl(mapLocation.query),
+                  latitude: mapLocation.latitude,
+                  longitude: mapLocation.longitude,
+                }
+              : {}),
           },
         },
         // Reused on retry so the server replays instead of creating a duplicate order.
@@ -162,6 +201,22 @@ export default function Checkout() {
             error={errors.address?.message}
             {...register("address")}
           />
+
+          {isDemoMode() ? (
+            <Controller
+              control={control}
+              name="map_query"
+              render={({ field }) => (
+                <LocationPicker
+                  value={field.value ?? ""}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  inputRef={field.ref}
+                  error={errors.map_query?.message}
+                />
+              )}
+            />
+          ) : null}
 
           <fieldset>
             <legend className="mb-2 text-sm font-medium text-text">

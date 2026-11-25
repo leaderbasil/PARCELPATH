@@ -13,6 +13,9 @@ export const STATUS_MESSAGES: Record<OrderStatus, StatusStyle> = {
 } satisfies Record<OrderStatus, StatusStyle>;
 
 const ERROR_MESSAGES: Record<string, string> = {
+  BAD_REQUEST: "يرجى التحقق من البيانات المدخلة.",
+  NOT_FOUND: "البيانات المطلوبة غير موجودة.",
+  METHOD_NOT_ALLOWED: "هذا الإجراء غير مدعوم حاليًا.",
   VALIDATION_ERROR: "يرجى التحقق من البيانات المدخلة.",
   TOKEN_INVALID: "انتهت جلستك. سجّل الدخول من جديد.",
   INVALID_CREDENTIALS: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",

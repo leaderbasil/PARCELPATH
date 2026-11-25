@@ -91,6 +91,11 @@ export interface Shipping {
   phone: string;
   city: string;
   address: string;
+  /** Demo-only Google Maps selection; optional so the real API contract stays unchanged. */
+  map_query?: string | null;
+  map_url?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface CustomerBrief {
@@ -111,6 +116,7 @@ export interface Order {
   total_amount: Money;
   shipping: Shipping;
   carrier: string | null;
+  courier_phone?: string | null;
   tracking_number: string | null;
   created_at: string;
   items: OrderItem[];
@@ -126,6 +132,7 @@ export interface OrderListItem {
   total_amount: Money;
   items_count: number;
   created_at: string;
+  courier_phone?: string | null;
   customer?: CustomerBrief | null;
 }
 
@@ -139,6 +146,7 @@ export interface TrackingOut {
   order_number: string;
   status: OrderStatus;
   carrier: string | null;
+  courier_phone?: string | null;
   tracking_number: string | null;
   events: TrackingEvent[];
 }

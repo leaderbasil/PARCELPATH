@@ -49,11 +49,11 @@ def test_duplicate_email_case_insensitive(client: TestClient) -> None:
 def test_login_success_and_me(client: TestClient, customer_headers: dict[str, str]) -> None:
     response = client.get("/api/v1/auth/me", headers=customer_headers)
     assert response.status_code == 200
-    assert response.json()["data"]["email"] == "customer@test.local"
+    assert response.json()["data"]["email"] == "customer@test.example"
 
 
 def test_login_failures_have_same_message(client: TestClient) -> None:
-    for email in ("missing@test.local", "customer@test.local"):
+    for email in ("missing@test.example", "customer@test.example"):
         response = client.post(
             "/api/v1/auth/login",
             json={"email": email, "password": "WrongPassword123"},
@@ -70,7 +70,7 @@ def test_inactive_user_cannot_login(client: TestClient, admin_headers: dict[str,
         "/api/v1/auth/register",
         json={
             "full_name": "Disabled User",
-            "email": "disabled@test.local",
+            "email": "disabled@test.example",
             "password": "password123",
         },
     )
@@ -80,7 +80,7 @@ def test_inactive_user_cannot_login(client: TestClient, admin_headers: dict[str,
             "Authorization": "Bearer "
             + client.post(
                 "/api/v1/auth/login",
-                json={"email": "disabled@test.local", "password": "password123"},
+                json={"email": "disabled@test.example", "password": "password123"},
             ).json()["data"]["access_token"]
         },
     )
@@ -93,7 +93,7 @@ def test_inactive_user_cannot_login(client: TestClient, admin_headers: dict[str,
     assert response.status_code == 200
     response = client.post(
         "/api/v1/auth/login",
-        json={"email": "disabled@test.local", "password": "password123"},
+        json={"email": "disabled@test.example", "password": "password123"},
     )
     assert response.status_code == 403
     assert response.json()["code"] == "USER_INACTIVE"
@@ -104,7 +104,7 @@ def test_token_of_deactivated_user(client: TestClient, admin_headers: dict[str, 
         "/api/v1/auth/register",
         json={
             "full_name": "Later Disabled",
-            "email": "later@test.local",
+            "email": "later@test.example",
             "password": "password123",
         },
     )
@@ -112,7 +112,7 @@ def test_token_of_deactivated_user(client: TestClient, admin_headers: dict[str, 
     user_id = token.json()["data"]["id"]
     login = client.post(
         "/api/v1/auth/login",
-        json={"email": "later@test.local", "password": "password123"},
+        json={"email": "later@test.example", "password": "password123"},
     ).json()
     headers = {"Authorization": f"Bearer {login['data']['access_token']}"}
     assert client.patch(

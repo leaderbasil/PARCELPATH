@@ -10,17 +10,20 @@ import type {
   ProductAdmin,
   User,
 } from "@/types/domain";
+import { googleMapsSearchUrl } from "@/utils/googleMaps";
 import { fromSubunits, toSubunits } from "@/utils/money";
 
-const STORAGE_NAMESPACE = "parcelpath.demo.v3";
+const STORAGE_NAMESPACE = "parcelpath.demo.v4";
 const STORAGE_KEYS = {
   products: `${STORAGE_NAMESPACE}.products`,
   orders: `${STORAGE_NAMESPACE}.orders`,
   users: `${STORAGE_NAMESPACE}.users`,
+  categories: `${STORAGE_NAMESPACE}.categories`,
 } as const;
 
 export const DEMO_ADMIN_ID = "demo-admin-id";
 export const DEMO_CUSTOMER_ID = "demo-customer-id";
+export const DEMO_COURIER_PHONE = "0501234567";
 
 const DEMO_ADMIN_NAME = "مدير التجريبة";
 const DEMO_ADMIN_EMAIL = "demo@parcelpath.local";
@@ -187,6 +190,14 @@ const INITIAL_DEMO_PRODUCTS: ProductAdmin[] = [
   },
 ];
 
+const INITIAL_DEMO_CATEGORIES = [
+  ...new Set(
+    INITIAL_DEMO_PRODUCTS.filter((product) => product.is_active && product.category).map(
+      (product) => product.category as string
+    )
+  ),
+];
+
 const INITIAL_DEMO_USERS: User[] = [
   {
     id: DEMO_ADMIN_ID,
@@ -250,6 +261,7 @@ function buildDemoOrder(input: SeedOrderInput): DemoOrder {
   const subtotalCents = items.reduce((total, item) => total + toSubunits(item.line_total), 0);
   const shippingCents = subtotalCents < 10000 ? 500 : 0;
   const tracked = ["SHIPPED", "OUT_FOR_DELIVERY", "DELIVERED"].includes(input.status);
+  const mapQuery = "الرياض، شارع التجريبة، مبنى 12";
   const year = new Date().getFullYear();
 
   return {
@@ -267,8 +279,13 @@ function buildDemoOrder(input: SeedOrderInput): DemoOrder {
       phone: customer.phone ?? "0500000002",
       city: "الرياض",
       address: "شارع التجريبة، مبنى 12",
+      map_query: mapQuery,
+      map_url: googleMapsSearchUrl(mapQuery),
+      latitude: 24.7136,
+      longitude: 46.6753,
     },
     carrier: tracked ? "PARCELPATH Express" : null,
+    courier_phone: tracked ? DEMO_COURIER_PHONE : null,
     tracking_number: tracked ? `PP${String(input.sequence).padStart(9, "0")}` : null,
     created_at: isoDaysAgo(input.daysAgo, input.hour, 15),
     items: items.map(({ id: _id, ...rest }) => rest),
@@ -295,6 +312,20 @@ export function getStoredDemoProducts(): ProductAdmin[] {
 
 export function saveDemoProducts(products: ProductAdmin[]): void {
   writeCollection(STORAGE_KEYS.products, products);
+}
+
+export function getStoredDemoCategories(): string[] {
+  return readCollection(STORAGE_KEYS.categories, INITIAL_DEMO_CATEGORIES);
+}
+
+export function saveDemoCategory(category: string): void {
+  const value = category.trim();
+  if (!value) return;
+  const categories = getStoredDemoCategories();
+  if (categories.some((item) => item.toLowerCase() === value.toLowerCase())) return;
+  categories.push(value);
+  categories.sort((a, b) => a.localeCompare(b, "ar"));
+  writeCollection(STORAGE_KEYS.categories, categories);
 }
 
 export function getStoredDemoOrders(): DemoOrder[] {
@@ -380,6 +411,7 @@ export function toOrderListItem(order: Order): OrderListItem {
     total_amount: order.total_amount,
     items_count: order.items.length,
     created_at: order.created_at,
+    courier_phone: order.courier_phone ?? null,
     customer: order.customer ?? null,
   };
 }

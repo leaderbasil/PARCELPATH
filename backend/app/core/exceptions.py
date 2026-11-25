@@ -5,6 +5,7 @@ from typing import Any
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError as PydanticValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import settings
@@ -73,6 +74,13 @@ async def validation_exception_handler(
     payload = error_payload(422, "Validation error", "VALIDATION_ERROR")
     payload["errors"] = errors
     return JSONResponse(status_code=422, content=payload)
+
+
+async def pydantic_validation_exception_handler(
+    request: Request, exc: PydanticValidationError
+) -> JSONResponse:
+    """Convert dependency-level Pydantic errors to the same 422 envelope."""
+    return await validation_exception_handler(request, RequestValidationError(exc.errors()))
 
 
 async def http_exception_handler(

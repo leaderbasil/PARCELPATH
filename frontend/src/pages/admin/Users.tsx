@@ -141,8 +141,8 @@ export default function AdminUsers() {
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
             <option value="">{UI.common.all}</option>
-            <option value="ADMIN">ADMIN</option>
-            <option value="CUSTOMER">CUSTOMER</option>
+            <option value="ADMIN">{UI.admin.roleAdmin}</option>
+            <option value="CUSTOMER">{UI.admin.roleCustomer}</option>
           </select>
         </div>
         <div className="w-full">
@@ -182,7 +182,7 @@ export default function AdminUsers() {
       </form>
 
       {users.isLoading ? (
-        <LoadingState variant="rows" />
+        <LoadingState variant="adminUsers" />
       ) : users.error ? (
         <ErrorState error={users.error} onRetry={() => void users.refetch()} />
       ) : !users.data || users.data.items.length === 0 ? (
@@ -220,8 +220,8 @@ export default function AdminUsers() {
                       }}
                       className="rounded-lg border border-border bg-background px-2 py-1 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
                     >
-                      <option value="ADMIN">ADMIN</option>
-                      <option value="CUSTOMER">CUSTOMER</option>
+                      <option value="ADMIN">{UI.admin.roleAdmin}</option>
+                      <option value="CUSTOMER">{UI.admin.roleCustomer}</option>
                     </select>
                   </td>
                   <td className="px-4 py-3">
@@ -323,8 +323,8 @@ export default function AdminUsers() {
               {...register("role")}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
             >
-              <option value="CUSTOMER">CUSTOMER</option>
-              <option value="ADMIN">ADMIN</option>
+              <option value="CUSTOMER">{UI.admin.roleCustomer}</option>
+              <option value="ADMIN">{UI.admin.roleAdmin}</option>
             </select>
           </div>
           <Input

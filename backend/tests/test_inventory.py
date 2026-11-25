@@ -9,12 +9,12 @@ def test_customer_cancel_restores_stock_once(
     client: TestClient, customer_headers: dict[str, str], sample_products: list[dict]
 ) -> None:
     product_id = sample_products[0]["id"]
-    order = create_order(client, customer_headers, product_id, 3)
+    order = create_order(client, customer_headers, product_id, quantity=3)
     admin_headers = {
         "Authorization": "Bearer "
         + client.post(
             "/api/v1/auth/login",
-            json={"email": "admin@test.local", "password": "Admin123!"},
+            json={"email": "admin@test.example", "password": "Admin123!"},
         ).json()["data"]["access_token"]
     }
     before = client.get(

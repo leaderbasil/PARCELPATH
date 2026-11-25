@@ -18,6 +18,7 @@ import { fromSubunits, toSubunits } from "@/utils/money";
 import { api, unwrap } from "./api";
 import { demoError, isDemoMode, localDateKey, paginateDemoItems } from "./demoMode";
 import {
+  DEMO_COURIER_PHONE,
   DemoOrder,
   getDemoAdminUser,
   getStoredDemoOrders,
@@ -55,15 +56,30 @@ function findOrder(orders: DemoOrder[], id: string): DemoOrder {
   return order;
 }
 
+/** The backend rejects unknown shipping fields, so only send the four contract keys. */
+function toApiOrderCreate(payload: OrderCreate): OrderCreate {
+  return {
+    ...payload,
+    shipping: {
+      name: payload.shipping.name,
+      phone: payload.shipping.phone,
+      city: payload.shipping.city,
+      address: payload.shipping.address,
+    },
+  };
+}
+
 function buildTrackingEvents(order: Order): TrackingEvent[] {
   const created = new Date(order.created_at).getTime();
+  const now = Date.now();
+  const at = (timestamp: number): string => new Date(Math.min(timestamp, now)).toISOString();
   if (order.status === "CANCELLED") {
     return [
       { status: "PENDING", note: TRACK_NOTES["PENDING"] ?? null, at: order.created_at },
       {
         status: "CANCELLED",
         note: "تم إلغاء الطلب.",
-        at: new Date(created + 2 * 60 * 60 * 1000).toISOString(),
+        at: at(created + 2 * 60 * 60 * 1000),
       },
     ];
   }
@@ -71,7 +87,7 @@ function buildTrackingEvents(order: Order): TrackingEvent[] {
   return ORDER_STEPS.slice(0, currentIndex + 1).map((status, index) => ({
     status,
     note: TRACK_NOTES[status] ?? null,
-    at: new Date(created + index * 6 * 60 * 60 * 1000).toISOString(),
+    at: at(created + index * 6 * 60 * 60 * 1000),
   }));
 }
 
@@ -79,7 +95,7 @@ export const ordersService = {
   async create(payload: OrderCreate, idempotencyKey: string): Promise<Order> {
     if (!isDemoMode()) {
       return unwrap(
-        api.post<{ data: Order }>("/orders", payload, {
+        api.post<{ data: Order }>("/orders", toApiOrderCreate(payload), {
           headers: { "Idempotency-Key": idempotencyKey },
         })
       );
@@ -149,6 +165,7 @@ export const ordersService = {
       total_amount: fromSubunits(subtotalCents + shippingCents),
       shipping: payload.shipping,
       carrier: null,
+      courier_phone: null,
       tracking_number: null,
       created_at: now,
       items: lines,
@@ -161,7 +178,16 @@ export const ordersService = {
   },
 
   async list(params: OrderQuery = {}): Promise<Page<OrderListItem>> {
-    if (!isDemoMode()) return unwrap(api.get<{ data: Page<OrderListItem> }>("/orders", { params }));
+    if (!isDemoMode()) {
+      const page = await unwrap(api.get<{ data: Page<OrderListItem> }>("/orders", { params }));
+      return {
+        ...page,
+        items: page.items.map((item) => ({
+          ...item,
+          courier_phone: item.courier_phone ?? DEMO_COURIER_PHONE,
+        })),
+      };
+    }
 
     let orders = getStoredDemoOrders();
     if (params.status) orders = orders.filter((order) => order.status === params.status);
@@ -185,17 +211,24 @@ export const ordersService = {
   },
 
   async get(id: string): Promise<Order> {
-    if (!isDemoMode()) return unwrap(api.get<{ data: Order }>(`/orders/${id}`));
+    if (!isDemoMode()) {
+      const order = await unwrap(api.get<{ data: Order }>(`/orders/${id}`));
+      return { ...order, courier_phone: order.courier_phone ?? DEMO_COURIER_PHONE };
+    }
     return findOrder(getStoredDemoOrders(), id);
   },
 
   async tracking(id: string): Promise<TrackingOut> {
-    if (!isDemoMode()) return unwrap(api.get<{ data: TrackingOut }>(`/orders/${id}/tracking`));
+    if (!isDemoMode()) {
+      const tracking = await unwrap(api.get<{ data: TrackingOut }>(`/orders/${id}/tracking`));
+      return { ...tracking, courier_phone: tracking.courier_phone ?? DEMO_COURIER_PHONE };
+    }
     const order = findOrder(getStoredDemoOrders(), id);
     return {
       order_number: order.order_number,
       status: order.status,
       carrier: order.carrier,
+      courier_phone: order.courier_phone ?? null,
       tracking_number: order.tracking_number,
       events: buildTrackingEvents(order),
     };
@@ -233,6 +266,9 @@ export const ordersService = {
       throw demoError("INVALID_STATUS_TRANSITION", 409);
     }
     order.status = payload.status;
+    if (payload.status === "OUT_FOR_DELIVERY" && !order.courier_phone) {
+      order.courier_phone = DEMO_COURIER_PHONE;
+    }
     if (payload.status === "DELIVERED") order.payment_status = "PAID";
     saveDemoOrders(orders);
     return order;
@@ -257,6 +293,7 @@ export const ordersService = {
     }
     order.status = "SHIPPED";
     order.carrier = carrier;
+    order.courier_phone = DEMO_COURIER_PHONE;
     order.tracking_number = trackingNumber;
     saveDemoOrders(orders);
     return order;
@@ -266,8 +303,11 @@ export const ordersService = {
     if (!isDemoMode()) return unwrap(api.patch<{ data: Order }>(`/orders/${id}/shipping`, payload));
     const orders = getStoredDemoOrders();
     const order = findOrder(orders, id);
-    if (!["PENDING", "CONFIRMED"].includes(order.status)) {
+    if (!["SHIPPED", "OUT_FOR_DELIVERY"].includes(order.status)) {
       throw demoError("SHIPPING_NOT_EDITABLE", 409);
+    }
+    if (!payload.carrier?.trim() && !payload.tracking_number?.trim()) {
+      throw demoError("VALIDATION_ERROR", 422);
     }
     if (payload.carrier !== undefined) order.carrier = payload.carrier.trim() || null;
     if (payload.tracking_number !== undefined) {

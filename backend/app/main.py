@@ -3,11 +3,14 @@
 import logging
 import time
 import uuid
+from pathlib import Path
 
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError as PydanticValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Import models so Alembic and SQLAlchemy see every table.
@@ -20,11 +23,12 @@ from app.core.exceptions import (
     AppException,
     app_exception_handler,
     http_exception_handler,
+    pydantic_validation_exception_handler,
     unhandled_exception_handler,
     validation_exception_handler,
 )
 from app.db.session import check_database_connection
-from app.routers import auth, orders, products, reports, users
+from app.routers import auth, orders, products, reports, uploads, users
 
 logging.basicConfig(
     level=logging.INFO,
@@ -73,6 +77,7 @@ async def request_context(request: Request, call_next):  # noqa: ANN001, ANN201
 
 app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(PydanticValidationError, pydantic_validation_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(Exception, unhandled_exception_handler)
 
@@ -93,3 +98,14 @@ app.include_router(users.router, prefix=settings.API_V1_PREFIX)
 app.include_router(products.router, prefix=settings.API_V1_PREFIX)
 app.include_router(orders.router, prefix=settings.API_V1_PREFIX)
 app.include_router(reports.router, prefix=settings.API_V1_PREFIX)
+app.include_router(uploads.router, prefix=settings.API_V1_PREFIX)
+
+# Object storage is served from a dedicated non-API path so it never shadows
+# any existing /api/v1 route.
+storage_directory = Path(settings.OBJECT_STORAGE_DIR)
+storage_directory.mkdir(parents=True, exist_ok=True)
+app.mount(
+    settings.OBJECT_STORAGE_URL_PREFIX,
+    StaticFiles(directory=storage_directory),
+    name="uploads",
+)

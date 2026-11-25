@@ -1,5 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { reportsService, type ReportQuery } from "@/services/reports.service";
+import {
+  reportsService,
+  type ReportQuery,
+  type SalesQuery,
+  type TopProductsQuery,
+} from "@/services/reports.service";
 import { queryKeys } from "./queryKeys";
 
 export function useDashboard(params: ReportQuery = {}) {
@@ -9,14 +14,14 @@ export function useDashboard(params: ReportQuery = {}) {
   });
 }
 
-export function useSales(params: ReportQuery = {}) {
+export function useSales(params: SalesQuery = {}) {
   return useQuery({
     queryKey: queryKeys.reports("sales", params),
     queryFn: () => reportsService.sales(params),
   });
 }
 
-export function useTopProducts(params: ReportQuery = {}) {
+export function useTopProducts(params: TopProductsQuery = {}) {
   return useQuery({
     queryKey: queryKeys.reports("top-products", params),
     queryFn: () => reportsService.topProducts(params),

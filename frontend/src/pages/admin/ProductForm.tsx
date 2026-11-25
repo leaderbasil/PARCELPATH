@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Modal } from "@/components/common/Modal";
+import { ProductImage } from "@/components/common/ProductImage";
 import { UI } from "@/constants/ui";
 import { getErrorMessage } from "@/constants/messages";
-import { useCreateProduct, useUpdateProduct } from "@/hooks/useProducts";
+import { useCategories, useCreateProduct, useUpdateProduct } from "@/hooks/useProducts";
 import { ApiRequestError } from "@/services/api";
+import { isDemoMode } from "@/services/demoMode";
+import { isObjectRef, putImage } from "@/services/objectStorage";
 import type { ProductAdmin, ProductCreate } from "@/types/domain";
 
 interface ProductFormProps {
@@ -17,23 +20,46 @@ interface ProductFormProps {
   onClose: () => void;
 }
 
-const schema = z.object({
-  name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين"),
-  sku: z.string().trim().min(1, "رمز المنتج مطلوب"),
-  category: z.string(),
-  description: z.string(),
-  price: z
-    .string()
-    .trim()
-    .regex(/^\d+(\.\d{1,2})?$/, "أدخل سعرًا صحيحًا بحد أقصى منزلتين عشريتين")
-    .refine((value) => Number(value) > 0, "يجب أن يكون السعر أكبر من صفر"),
-  stock_quantity: z.coerce
-    .number({ invalid_type_error: "أدخل كمية صحيحة" })
-    .int("الكمية يجب أن تكون عددًا صحيحًا")
-    .min(0, "لا يمكن أن تكون الكمية سالبة"),
-  image_url: z.string(),
-  is_active: z.boolean(),
-});
+const NEW_CATEGORY_VALUE = "__new_category__";
+
+function isImageReference(value: string): boolean {
+  if (isObjectRef(value)) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+const schema = z
+  .object({
+    name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين"),
+    sku: z.string().trim().min(1, "رمز المنتج مطلوب"),
+    category: z.string().min(1, "اختر الفئة أو أضف فئة جديدة"),
+    newCategory: z.string().trim().max(60, "اسم الفئة طويل جدًا").optional(),
+    description: z.string(),
+    price: z
+      .string()
+      .trim()
+      .regex(/^\d+(\.\d{1,2})?$/, "أدخل سعرًا صحيحًا بحد أقصى منزلتين عشريتين")
+      .refine((value) => Number(value) > 0, "يجب أن يكون السعر أكبر من صفر"),
+    stock_quantity: z.coerce
+      .number({ invalid_type_error: "أدخل كمية صحيحة" })
+      .int("الكمية يجب أن تكون عددًا صحيحًا")
+      .min(0, "لا يمكن أن تكون الكمية سالبة"),
+    image_url: z.union([z.literal(""), z.string().refine(isImageReference, "أرفق صورة صالحة")]),
+    is_active: z.boolean(),
+  })
+  .superRefine((values, ctx) => {
+    if (values.category === NEW_CATEGORY_VALUE && !values.newCategory?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["newCategory"],
+        message: "أدخل اسم الفئة الجديدة",
+      });
+    }
+  });
 
 type FormValues = z.infer<typeof schema>;
 
@@ -41,6 +67,7 @@ const EMPTY_VALUES: FormValues = {
   name: "",
   sku: "",
   category: "",
+  newCategory: "",
   description: "",
   price: "",
   stock_quantity: 0,
@@ -61,29 +88,43 @@ function errorText(error: unknown): string {
 
 export function ProductForm({ open, product, onClose }: ProductFormProps) {
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
-  const pending = createProduct.isPending || updateProduct.isPending;
+  const categories = useCategories();
+  const pending = createProduct.isPending || updateProduct.isPending || uploading;
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: EMPTY_VALUES,
   });
 
+  const imageValue = watch("image_url");
+  const selectedCategory = watch("category");
+  const categoryField = register("category");
+  const categoryOptions = Array.from(
+    new Set([...(categories.data ?? []), ...(product?.category ? [product.category] : [])])
+  ).filter((value) => value.length > 0);
+
   useEffect(() => {
     if (!open) return;
     setSubmitError(null);
+    setUploadError(null);
     reset(
       product
         ? {
             name: product.name,
             sku: product.sku,
             category: product.category ?? "",
+            newCategory: "",
             description: product.description ?? "",
             price: product.price,
             stock_quantity: product.stock_quantity,
@@ -94,8 +135,28 @@ export function ProductForm({ open, product, onClose }: ProductFormProps) {
     );
   }, [open, product, reset]);
 
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>): Promise<void> => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const reference = await putImage(file);
+      setValue("image_url", reference, { shouldValidate: true, shouldDirty: true });
+    } catch (error: unknown) {
+      setUploadError(error instanceof Error ? error.message : "تعذّر حفظ الصورة.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const onSubmit = (values: FormValues) => {
     setSubmitError(null);
+    const category =
+      values.category === NEW_CATEGORY_VALUE
+        ? values.newCategory?.trim() ?? ""
+        : values.category.trim();
     const payload: ProductCreate = {
       name: values.name.trim(),
       sku: values.sku.trim(),
@@ -103,7 +164,7 @@ export function ProductForm({ open, product, onClose }: ProductFormProps) {
       stock_quantity: values.stock_quantity,
       is_active: values.is_active,
       description: optionalText(values.description),
-      category: optionalText(values.category),
+      category,
       image_url: optionalText(values.image_url),
     };
     if (product) {
@@ -146,8 +207,46 @@ export function ProductForm({ open, product, onClose }: ProductFormProps) {
       >
         <Input label="الاسم" error={errors.name?.message} {...register("name")} />
         <Input label="رمز المنتج" error={errors.sku?.message} {...register("sku")} />
-        <Input label="الفئة" error={errors.category?.message} {...register("category")} />
-        <div className="w-full">
+
+        <div className="w-full min-w-0">
+          <label htmlFor="category" className="mb-1 block text-sm font-medium text-text">
+            {UI.catalog.categories}
+          </label>
+          <select
+            id="category"
+            aria-invalid={errors.category ? true : undefined}
+            className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+            {...categoryField}
+            onChange={(event) => {
+              void categoryField.onChange(event);
+              if (event.target.value !== NEW_CATEGORY_VALUE) {
+                setValue("newCategory", "", { shouldValidate: true, shouldDirty: true });
+              }
+            }}
+          >
+            <option value="">{UI.admin.chooseCategory}</option>
+            {categoryOptions.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+            <option value={NEW_CATEGORY_VALUE}>{UI.admin.newCategory}</option>
+          </select>
+          {errors.category?.message ? (
+            <p className="mt-1 text-xs text-danger">{errors.category.message}</p>
+          ) : null}
+          {selectedCategory === NEW_CATEGORY_VALUE ? (
+            <div className="mt-3">
+              <Input
+                label={UI.admin.newCategoryName}
+                error={errors.newCategory?.message}
+                {...register("newCategory")}
+              />
+            </div>
+          ) : null}
+        </div>
+
+        <div className="w-full min-w-0">
           <label htmlFor="description" className="mb-1 block text-sm font-medium text-text">
             الوصف
           </label>
@@ -161,6 +260,7 @@ export function ProductForm({ open, product, onClose }: ProductFormProps) {
             <p className="mt-1 text-xs text-danger">{errors.description.message}</p>
           ) : null}
         </div>
+
         <Input
           label="السعر"
           inputMode="decimal"
@@ -173,11 +273,58 @@ export function ProductForm({ open, product, onClose }: ProductFormProps) {
           error={errors.stock_quantity?.message}
           {...register("stock_quantity")}
         />
-        <Input
-          label="رابط الصورة"
-          error={errors.image_url?.message}
-          {...register("image_url")}
-        />
+
+        <div className="w-full min-w-0">
+          <span className="mb-1 block text-sm font-medium text-text">{UI.admin.attachImage}</span>
+          <input type="hidden" {...register("image_url")} />
+          <ProductImage
+            src={imageValue}
+            alt={product ? `صورة ${product.name}` : "معاينة الصورة"}
+            className="h-24 w-full rounded-lg border border-border"
+          />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <label
+              htmlFor="product-image"
+              className="inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-text hover:bg-primary-soft focus-within:ring-2 focus-within:ring-primary/30"
+            >
+              {uploading ? UI.admin.uploadingImage : imageValue ? UI.admin.changeImage : UI.admin.attachImage}
+            </label>
+            <input
+              id="product-image"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              disabled={uploading}
+              onChange={(event) => void handleImageChange(event)}
+            />
+            {imageValue ? (
+              <Button
+                type="button"
+                variant="ghost"
+                disabled={uploading}
+                onClick={() =>
+                  setValue("image_url", "", { shouldValidate: true, shouldDirty: true })
+                }
+              >
+                {UI.admin.removeImage}
+              </Button>
+            ) : null}
+          </div>
+          <p className="mt-1 text-xs leading-5 text-text-muted">
+            {isDemoMode()
+              ? UI.admin.imageHint
+              : "تُرفع الصورة إلى مخزن الكائنات على الخادم."}
+          </p>
+          {uploadError ? (
+            <p role="alert" className="mt-1 text-xs text-danger">
+              {uploadError}
+            </p>
+          ) : null}
+          {errors.image_url?.message ? (
+            <p className="mt-1 text-xs text-danger">{errors.image_url.message}</p>
+          ) : null}
+        </div>
+
         <label htmlFor="is_active" className="flex items-center gap-2 text-sm text-text">
           <input id="is_active" type="checkbox" {...register("is_active")} />
           {UI.admin.active}

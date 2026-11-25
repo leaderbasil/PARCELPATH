@@ -33,7 +33,10 @@ export function useCreateProduct() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (payload: ProductCreate) => productsService.create(payload),
-    onSuccess: () => client.invalidateQueries({ queryKey: ["products"] }),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ["products"] });
+      void client.invalidateQueries({ queryKey: ["low-stock"] });
+    },
   });
 }
 
@@ -45,6 +48,7 @@ export function useUpdateProduct() {
     onSuccess: (_result, variables) => {
       void client.invalidateQueries({ queryKey: ["products"] });
       void client.invalidateQueries({ queryKey: queryKeys.product(variables.id) });
+      void client.invalidateQueries({ queryKey: ["low-stock"] });
     },
   });
 }
@@ -53,7 +57,10 @@ export function useDisableProduct() {
   const client = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => productsService.remove(id),
-    onSuccess: () => client.invalidateQueries({ queryKey: ["products"] }),
+    onSuccess: () => {
+      void client.invalidateQueries({ queryKey: ["products"] });
+      void client.invalidateQueries({ queryKey: ["low-stock"] });
+    },
   });
 }
 

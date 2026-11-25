@@ -51,7 +51,7 @@ export const usersService = {
     const users = getStoredDemoUsers();
     const user = findUser(users, id);
     if (payload.role === "CUSTOMER" && id === DEMO_ADMIN_ID) {
-      throw demoError("CANNOT_MODIFY_SELF", 403);
+      throw demoError("CANNOT_MODIFY_SELF", 409);
     }
     if (user.role === "ADMIN" && payload.role === "CUSTOMER" && activeAdminCount(users) <= 1) {
       throw demoError("LAST_ADMIN", 409);
@@ -78,7 +78,7 @@ export const usersService = {
     const users = getStoredDemoUsers();
     const user = findUser(users, id);
     if (!payload.is_active && id === DEMO_ADMIN_ID) {
-      throw demoError("CANNOT_MODIFY_SELF", 403);
+      throw demoError("CANNOT_MODIFY_SELF", 409);
     }
     if (!payload.is_active && user.role === "ADMIN" && activeAdminCount(users) <= 1) {
       throw demoError("LAST_ADMIN", 409);

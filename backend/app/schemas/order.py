@@ -4,7 +4,7 @@ from datetime import date, datetime
 from typing import Annotated, Literal
 from uuid import UUID
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator
 
 from app.schemas.auth import PHONE_PATTERN
 from app.schemas.common import BaseIn, BaseOut, Money, PageParams
@@ -175,6 +175,8 @@ class TrackingOut(BaseOut):
 
 class OrderListParams(PageParams):
     """Order listing filters."""
+
+    model_config = ConfigDict(extra="forbid", populate_by_name=True)
 
     status: OrderStatus | None = None
     from_: Annotated[date | None, Field(alias="from")] = None

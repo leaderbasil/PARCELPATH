@@ -22,7 +22,15 @@ const registerSchema = z
       .email("أدخل بريدًا إلكترونيًا صحيحًا"),
     password: z.string().min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
     confirmPassword: z.string().min(1, "يرجى تأكيد كلمة المرور"),
-    phone: z.string().optional(),
+    phone: z
+      .string()
+      .trim()
+      .refine(
+        (value) =>
+          !value || /^\+?[0-9]{7,15}$/.test(value.replace(/[\s-]/g, "")),
+        "أدخل رقم هاتف صحيحًا"
+      )
+      .optional(),
   })
   .refine((values) => values.password === values.confirmPassword, {
     message: "كلمتا المرور غير متطابقتين",

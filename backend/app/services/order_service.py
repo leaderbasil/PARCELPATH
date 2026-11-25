@@ -219,7 +219,7 @@ def create_order(db: Session, user: User, payload: OrderCreate, key: str) -> tup
         shipping_city=payload.shipping.city,
         shipping_address=payload.shipping.address,
         idempotency_key=key,
-        tracking_events=[new_event("PENDING", "Order placed", user.id)],
+        tracking_events=[new_event("PENDING", "تم إنشاء الطلب", user.id)],
     )
     order.items = [
         OrderItem(
@@ -434,15 +434,15 @@ def update_shipping(
     fields: list[str] = []
     if payload.carrier is not None:
         order.carrier = payload.carrier
-        fields.append("carrier")
+        fields.append("الناقل")
     if payload.tracking_number is not None:
         order.tracking_number = payload.tracking_number
-        fields.append("tracking number")
+        fields.append("رقم التتبّع")
     append_event(
         order,
         new_event(
             order.status,
-            payload.note or f"Shipping info updated: {', '.join(fields)}",
+            payload.note or f"تم تحديث بيانات الشحن: {', '.join(fields)}",
             actor.id,
         ),
     )
@@ -494,7 +494,7 @@ def cancel_order(db: Session, actor: User, order_id: UUID) -> Order:
 
     order.status = "CANCELLED"
     order.cancelled_at = datetime.now(timezone.utc)
-    append_event(order, new_event("CANCELLED", "Order cancelled", actor.id))
+    append_event(order, new_event("CANCELLED", "تم إلغاء الطلب", actor.id))
     try:
         db.commit()
     except Exception:

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
 import { ErrorState } from "@/components/common/ErrorState";
@@ -13,6 +14,7 @@ import type { OrderStatus } from "@/types/domain";
 const statuses = Object.keys(STATUS_MESSAGES) as OrderStatus[];
 
 export default function MyOrders() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<OrderStatus | "">("");
   const [from, setFrom] = useState("");
@@ -79,13 +81,16 @@ export default function MyOrders() {
       </div>
 
       {isLoading ? (
-        <LoadingState variant="rows" />
+        <LoadingState variant="orders" />
       ) : isError ? (
         <ErrorState error={error} onRetry={() => void refetch()} />
       ) : (
         <>
           <div className={isFetching ? "opacity-60" : undefined}>
-            <OrderList orders={data?.items ?? []} />
+            <OrderList
+              orders={data?.items ?? []}
+              onOpen={(id) => navigate(`/orders/${id}`)}
+            />
           </div>
           <nav className="mt-6 flex items-center justify-center gap-4" aria-label="pagination">
             <Button

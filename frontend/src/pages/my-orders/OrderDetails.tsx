@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { Button } from "@/components/common/Button";
+import { MapLink } from "@/components/common/MapLink";
 import { DateText } from "@/components/common/DateText";
 import { BackIcon } from "@/components/common/Icons";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -9,6 +10,8 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
 import { StatusBadge } from "@/components/common/StatusBadge";
+import { CourierContactButtons } from "@/components/orders/CourierContactButtons";
+import { OrderNumberBadge } from "@/components/orders/OrderNumberBadge";
 import { StatusActions } from "@/components/orders/StatusActions";
 import { OrderTimeline } from "@/components/tracking/OrderTimeline";
 import { statusLabel } from "@/constants/messages";
@@ -25,7 +28,7 @@ export default function OrderDetails() {
   );
   const [copied, setCopied] = useState(false);
 
-  if (isLoading) return <LoadingState variant="detail" />;
+  if (isLoading) return <LoadingState variant="orderDetail" />;
   if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
   if (!order) return <EmptyState message={UI.orders.empty} />;
 
@@ -45,11 +48,8 @@ export default function OrderDetails() {
       <div className="rounded-card border border-border bg-surface p-6 shadow-card">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="text-xs text-text-muted">{UI.orders.number}</p>
-            <h1 className="text-xl font-bold text-text" dir="ltr">
-              {order.order_number}
-            </h1>
-            <p className="mt-1 text-sm text-text-muted">
+            <OrderNumberBadge number={order.order_number} />
+            <p className="mt-2 text-sm text-text-muted">
               <DateText value={order.created_at} />
             </p>
           </div>
@@ -131,6 +131,9 @@ export default function OrderDetails() {
               <dt className="text-text-muted">{UI.checkout.address}</dt>
               <dd className="text-right text-text">{order.shipping.address}</dd>
             </div>
+            <div className="pt-1">
+              <MapLink query={order.shipping.map_query} url={order.shipping.map_url} />
+            </div>
           </dl>
         </div>
         <div className="rounded-card border border-border bg-surface p-6 shadow-card">
@@ -170,6 +173,13 @@ export default function OrderDetails() {
               </button>
             </div>
           ) : null}
+          {order.courier_phone &&
+          (order.status === "OUT_FOR_DELIVERY" || order.status === "DELIVERED") ? (
+            <div className="mt-4 rounded-lg border border-primary-soft bg-primary-soft/40 p-3 text-sm">
+              <p className="mb-2 font-medium text-text">{UI.orders.courierPhone}</p>
+              <CourierContactButtons phone={order.courier_phone} />
+            </div>
+          ) : null}
           <p className="mt-4 text-xs text-text-muted">
             {statusLabel(order.status)}
           </p>
@@ -182,7 +192,7 @@ export default function OrderDetails() {
           onRetry={() => void trackingQuery.refetch()}
         />
       ) : trackingQuery.isLoading ? (
-        <LoadingState variant="rows" count={3} />
+        <LoadingState variant="tracking" count={3} />
       ) : (
         <OrderTimeline
           events={trackingQuery.data?.events ?? []}

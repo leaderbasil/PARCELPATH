@@ -1,6 +1,18 @@
 /** Single source of truth for runtime configuration. */
-const rawBaseUrl = import.meta.env["VITE_API_BASE_URL"];
+const env = import.meta.env as Record<string, unknown>;
+
+function readEnv(name: string): string | undefined {
+  const value = env[name];
+  return typeof value === "string" ? value : undefined;
+}
+
+const rawBaseUrl = readEnv("VITE_API_BASE_URL");
 const apiBaseUrl = rawBaseUrl && rawBaseUrl.length > 0 ? rawBaseUrl : "http://localhost:8000/api/v1";
+const rawUploadUrl = readEnv("VITE_OBJECT_STORAGE_UPLOAD_URL");
+const objectStorageUploadUrl =
+  rawUploadUrl?.trim() || `${apiBaseUrl.replace(/\/+$/, "")}/uploads`;
+const rawWhatsappCode = readEnv("VITE_WHATSAPP_COUNTRY_CODE");
+const whatsappCountryCode = rawWhatsappCode?.replace(/\D/g, "") || "966";
 
 let healthUrl = "http://localhost:8000/health";
 try {
@@ -12,6 +24,8 @@ try {
 export const config = {
   apiBaseUrl,
   healthUrl,
+  objectStorageUploadUrl,
+  whatsappCountryCode,
   appName: "متجر الطلبات والتتبّع",
   trackingPollMs: 30_000,
   pageSize: 12,
