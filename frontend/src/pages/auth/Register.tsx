@@ -8,38 +8,38 @@ import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { getErrorMessage } from "@/constants/messages";
-import { UI } from "@/constants/ui";
+import { getCurrentLocale, getTranslation, useUI, type Locale } from "@/i18n";
 import { useAuth } from "@/context/AuthContext";
 import { ApiRequestError } from "@/services/api";
 import { authService } from "@/services/auth.service";
 
-const registerSchema = z
-  .object({
-    full_name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين"),
-    email: z
-      .string()
-      .min(1, "البريد الإلكتروني مطلوب")
-      .email("أدخل بريدًا إلكترونيًا صحيحًا"),
-    password: z.string().min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
-    confirmPassword: z.string().min(1, "يرجى تأكيد كلمة المرور"),
-    phone: z
-      .string()
-      .trim()
-      .refine(
-        (value) =>
-          !value || /^\+?[0-9]{7,15}$/.test(value.replace(/[\s-]/g, "")),
-        "أدخل رقم هاتف صحيحًا"
-      )
-      .optional(),
-  })
-  .refine((values) => values.password === values.confirmPassword, {
-    message: "كلمتا المرور غير متطابقتين",
-    path: ["confirmPassword"],
-  });
+function buildSchema(locale: Locale) {
+  const messages = getTranslation(locale).validation;
+  return z
+    .object({
+      full_name: z.string().trim().min(2, messages.nameTooShort),
+      email: z.string().min(1, messages.emailRequired).email(messages.emailInvalid),
+      password: z.string().min(8, messages.passwordTooShort),
+      confirmPassword: z.string().min(1, messages.confirmPasswordRequired),
+      phone: z
+        .string()
+        .trim()
+        .refine(
+          (value) => !value || /^\+?[0-9]{7,15}$/.test(value.replace(/[\s-]/g, "")),
+          messages.phoneInvalid
+        )
+        .optional(),
+    })
+    .refine((values) => values.password === values.confirmPassword, {
+      message: messages.passwordsMismatch,
+      path: ["confirmPassword"],
+    });
+}
 
-type RegisterValues = z.infer<typeof registerSchema>;
+type RegisterValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export default function Register() {
+  const ui = useUI();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [formError, setFormError] = useState<string | null>(null);
@@ -49,7 +49,8 @@ export default function Register() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: (values, context, options) =>
+      zodResolver(buildSchema(getCurrentLocale()))(values, context, options),
     defaultValues: { full_name: "", email: "", password: "", confirmPassword: "", phone: "" },
   });
 
@@ -81,56 +82,56 @@ export default function Register() {
   return (
     <AuthLayout>
       <div className="mb-7 text-center">
-        <p className="text-sm font-medium text-primary-strong">{UI.appName}</p>
+        <p className="text-sm font-medium text-primary-strong">{ui.appName}</p>
         <h1 className="mt-2 text-2xl font-bold leading-snug text-text sm:text-3xl">
-          {UI.auth.createAccount}
+          {ui.auth.createAccount}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-text-muted">{UI.auth.createAccountSubtitle}</p>
+        <p className="mt-2 text-sm leading-6 text-text-muted">{ui.auth.createAccountSubtitle}</p>
       </div>
 
       <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-5">
         <Input
-          label={UI.auth.fullName}
+          label={ui.auth.fullName}
           autoComplete="name"
           error={errors.full_name?.message}
           {...register("full_name")}
         />
         <Input
-          label={UI.auth.email}
+          label={ui.auth.email}
           type="email"
           autoComplete="email"
           error={errors.email?.message}
           {...register("email")}
         />
         <Input
-          label={UI.auth.password}
+          label={ui.auth.password}
           type="password"
           autoComplete="new-password"
           error={errors.password?.message}
           {...register("password")}
         />
         <Input
-          label={UI.auth.confirmPassword}
+          label={ui.auth.confirmPassword}
           type="password"
           autoComplete="new-password"
           error={errors.confirmPassword?.message}
           {...register("confirmPassword")}
         />
-        <Input label={UI.checkout.phone} type="tel" error={errors.phone?.message} {...register("phone")} />
+        <Input label={ui.checkout.phone} type="tel" error={errors.phone?.message} {...register("phone")} />
         {formError ? (
           <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger">
             {formError}
           </p>
         ) : null}
         <Button type="submit" loading={isSubmitting} className="h-11 w-full text-base">
-          {UI.nav.register}
+          {ui.nav.register}
         </Button>
       </form>
 
       <p className="mt-8 text-center text-sm text-text-muted">
-        {UI.auth.haveAccount}{" "}
+        {ui.auth.haveAccount}{" "}
         <Link to="/login" className="font-medium text-primary-strong underline">
-          {UI.nav.login}
+          {ui.nav.login}
         </Link>
       </p>
     </AuthLayout>

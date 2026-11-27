@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import type { Product } from "@/types/domain";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/common/Button";
@@ -8,6 +8,7 @@ import { MoneyText } from "@/components/common/MoneyText";
 import { ProductImage } from "@/components/common/ProductImage";
 
 export function ProductCard({ product }: { product: Product }) {
+  const ui = useUI();
   const { addItem } = useCart();
 
   return (
@@ -42,11 +43,11 @@ export function ProductCard({ product }: { product: Product }) {
             }
           >
             <CartIcon className="h-4 w-4" aria-hidden="true" />
-            {product.in_stock ? UI.catalog.addToCart : UI.catalog.outOfStock}
+            {product.in_stock ? ui.catalog.addToCart : ui.catalog.outOfStock}
           </Button>
           <Link to={`/products/${product.id}`}>
             <Button variant="secondary" className="h-11 w-full px-3 sm:w-auto">
-              {UI.catalog.viewDetails}
+              {ui.catalog.viewDetails}
             </Button>
           </Link>
         </div>

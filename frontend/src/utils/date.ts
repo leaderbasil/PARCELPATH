@@ -1,24 +1,30 @@
-const dateTimeFormatter = new Intl.DateTimeFormat("ar-EG", {
-  dateStyle: "medium",
-  timeStyle: "short",
-  numberingSystem: "latn",
-});
+import { getCurrentLocale, type Locale } from "@/i18n";
 
-const dateFormatter = new Intl.DateTimeFormat("ar-EG", {
-  dateStyle: "medium",
-  numberingSystem: "latn",
-});
-
-export function formatDateTime(value: string | null | undefined): string {
-  if (!value) return "—";
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "—" : dateTimeFormatter.format(parsed);
+function formatters(locale: Locale) {
+  const tag = locale === "en" ? "en-US" : "ar-EG";
+  return {
+    dateTime: new Intl.DateTimeFormat(tag, {
+      dateStyle: "medium",
+      timeStyle: "short",
+      numberingSystem: "latn",
+    }),
+    date: new Intl.DateTimeFormat(tag, {
+      dateStyle: "medium",
+      numberingSystem: "latn",
+    }),
+  };
 }
 
-export function formatDate(value: string | null | undefined): string {
+export function formatDateTime(value: string | null | undefined, locale: Locale = getCurrentLocale()): string {
   if (!value) return "—";
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? "—" : dateFormatter.format(parsed);
+  return Number.isNaN(parsed.getTime()) ? "—" : formatters(locale).dateTime.format(parsed);
+}
+
+export function formatDate(value: string | null | undefined, locale: Locale = getCurrentLocale()): string {
+  if (!value) return "—";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? "—" : formatters(locale).date.format(parsed);
 }
 
 export function toDateInputValue(value: Date): string {

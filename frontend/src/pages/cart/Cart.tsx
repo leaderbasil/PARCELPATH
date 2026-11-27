@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { CartItemRow } from "@/components/cart/CartItemRow";
 import { CartSummary } from "@/components/cart/CartSummary";
 import { EmptyState } from "@/components/common/EmptyState";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { useCart } from "@/context/CartContext";
 import { ApiRequestError } from "@/services/api";
 import { productsService } from "@/services/products.service";
@@ -14,6 +14,7 @@ const continueShoppingClass =
   "inline-flex h-10 items-center justify-center rounded-lg border border-border bg-surface px-4 text-sm font-medium text-text transition-colors hover:bg-background";
 
 export default function Cart() {
+  const ui = useUI();
   const cart = useCart();
   const { items: cartItems, removeItem, syncItem } = cart;
   const navigate = useNavigate();
@@ -51,7 +52,7 @@ export default function Cart() {
           if (cancelled) return;
           if (!fresh.in_stock) {
             removeItem(item.product_id);
-            messages.push(UI.cart.itemRemoved);
+            messages.push(ui.cart.itemRemoved);
             continue;
           }
           const stock =
@@ -71,13 +72,13 @@ export default function Cart() {
               image_url: fresh.image_url,
               stock_quantity: stock,
             });
-            messages.push(UI.cart.priceUpdated);
+            messages.push(ui.cart.priceUpdated);
           }
         } catch (error: unknown) {
           if (cancelled) return;
           if (error instanceof ApiRequestError && error.code === "PRODUCT_NOT_FOUND") {
             removeItem(item.product_id);
-            messages.push(UI.cart.itemRemoved);
+            messages.push(ui.cart.itemRemoved);
           }
           // Transient/network errors keep the line so the customer can retry checkout.
         }
@@ -92,16 +93,16 @@ export default function Cart() {
     return () => {
       cancelled = true;
     };
-  }, [signature, cartItems, removeItem, syncItem]);
+  }, [signature, cartItems, removeItem, syncItem, ui.cart.priceUpdated, ui.cart.itemRemoved]);
 
   if (cart.items.length === 0) {
     return (
       <main className="mx-auto w-full max-w-none p-4 py-10">
-        <h1 className="mb-6 text-2xl font-bold text-text">{UI.cart.title}</h1>
-        <EmptyState message={UI.cart.empty} />
+        <h1 className="mb-6 text-2xl font-bold text-text">{ui.cart.title}</h1>
+        <EmptyState message={ui.cart.empty} />
         <div className="mt-6 text-center">
           <Link to="/" className={continueShoppingClass}>
-            {UI.cart.continueShopping}
+            {ui.cart.continueShopping}
           </Link>
         </div>
       </main>
@@ -110,7 +111,7 @@ export default function Cart() {
 
   return (
     <main className="mx-auto w-full max-w-none p-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-text">{UI.cart.title}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-text">{ui.cart.title}</h1>
       {notices.length > 0 ? (
         <div role="status" className="mb-4 space-y-1 rounded-lg bg-warning-soft p-3 text-sm text-warning-strong">
           {notices.map((message, index) => (
@@ -119,7 +120,7 @@ export default function Cart() {
         </div>
       ) : null}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_20rem]">
-        <section className="space-y-3" aria-label={UI.cart.title}>
+        <section className="space-y-3" aria-label={ui.cart.title}>
           {cart.items.map((item) => (
             <CartItemRow key={item.product_id} item={item} />
           ))}
@@ -127,10 +128,10 @@ export default function Cart() {
         <div className="space-y-4">
           <CartSummary subtotal={cart.getTotal()} onCheckout={() => navigate("/checkout")} />
           <p className="text-center text-sm text-text-muted">
-            {UI.orders.items}: {cart.itemCount}
+            {ui.orders.items}: {cart.itemCount}
           </p>
           <Link to="/" className={cn(continueShoppingClass, "w-full")}>
-            {UI.cart.continueShopping}
+            {ui.cart.continueShopping}
           </Link>
         </div>
       </div>

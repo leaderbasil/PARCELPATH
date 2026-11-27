@@ -1,6 +1,7 @@
 import { useRef, type PointerEvent, type ReactNode } from "react";
 
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { LanguageToggle } from "@/components/common/LanguageToggle";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import {
   OrdersIcon,
@@ -8,13 +9,14 @@ import {
   SparkleIcon,
   UsersIcon,
 } from "@/components/common/Icons";
-import { UI } from "@/constants/ui";
+import { useI18n } from "@/i18n";
 
 interface AuthLayoutProps {
   children: ReactNode;
 }
 
 function AuthHeroTitle({ compact = false }: { compact?: boolean }) {
+  const { ui } = useI18n();
   const colours = compact
     ? ["text-primary-strong", "text-warning-strong", "text-success-strong"]
     : ["text-surface", "auth-title-accent", "auth-title-glow"];
@@ -24,14 +26,15 @@ function AuthHeroTitle({ compact = false }: { compact?: boolean }) {
 
   return (
     <h2 className={sizes}>
-      <span className={colours[0]}>{UI.auth.heroTitleLead}</span>{" "}
-      <span className={colours[1]}>{UI.auth.heroTitleAccent}</span>{" "}
-      <span className={colours[2]}>{UI.auth.heroTitleTail}</span>
+      <span className={colours[0]}>{ui.auth.heroTitleLead}</span>{" "}
+      <span className={colours[1]}>{ui.auth.heroTitleAccent}</span>{" "}
+      <span className={colours[2]}>{ui.auth.heroTitleTail}</span>
     </h2>
   );
 }
 
 function AuthHeroDescription({ compact = false }: { compact?: boolean }) {
+  const { ui } = useI18n();
   return (
     <p
       className={
@@ -40,7 +43,7 @@ function AuthHeroDescription({ compact = false }: { compact?: boolean }) {
           : "mt-4 max-w-md text-base leading-8 text-surface/85"
       }
     >
-      {UI.auth.heroDescriptionLines.map((line) => (
+      {ui.auth.heroDescriptionLines.map((line) => (
         <span key={line} className="block">
           {line}
         </span>
@@ -50,6 +53,7 @@ function AuthHeroDescription({ compact = false }: { compact?: boolean }) {
 }
 
 function AuthHeroCard() {
+  const { ui, dir } = useI18n();
   return (
     <div className="auth-parallax relative z-10 w-full max-w-sm" aria-hidden="true">
       <div className="auth-float-card relative rounded-[1.75rem] border border-surface/25 bg-surface/10 p-5 shadow-2xl backdrop-blur-md">
@@ -59,9 +63,9 @@ function AuthHeroCard() {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] tracking-wide text-surface/70" dir="ltr">
-              {UI.auth.heroCardTag}
+              {ui.auth.heroCardTag}
             </p>
-            <p className="text-base font-bold text-surface">{UI.auth.heroCardTitle}</p>
+            <p className="text-base font-bold text-surface">{ui.auth.heroCardTitle}</p>
           </div>
           <span className="auth-pulse h-2.5 w-2.5 rounded-full bg-success-soft" />
         </div>
@@ -81,8 +85,8 @@ function AuthHeroCard() {
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-surface/80">
-          <span>{UI.auth.heroCardRoute}</span>
-          <span dir="rtl">{UI.auth.heroCardUpdated}</span>
+          <span>{ui.auth.heroCardRoute}</span>
+          <span dir={dir}>{ui.auth.heroCardUpdated}</span>
         </div>
       </div>
     </div>
@@ -91,6 +95,7 @@ function AuthHeroCard() {
 
 export function AuthLayout({ children }: AuthLayoutProps) {
   const asideRef = useRef<HTMLElement>(null);
+  const { dir } = useI18n();
 
   const handlePointerMove = (event: PointerEvent<HTMLElement>): void => {
     const panel = asideRef.current;
@@ -110,7 +115,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   };
 
   return (
-    <div dir="rtl" className="flex min-h-screen bg-background font-sans text-text">
+    <div dir={dir} className="flex min-h-screen bg-background font-sans text-text">
       <aside
         ref={asideRef}
         onPointerMove={handlePointerMove}
@@ -146,8 +151,9 @@ export function AuthLayout({ children }: AuthLayoutProps) {
           </div>
 
           <div className="relative rounded-card border border-border bg-surface p-6 shadow-card sm:p-8">
-            <div className="absolute end-4 top-4 sm:end-6 sm:top-6">
+            <div className="absolute end-4 top-4 flex items-center gap-1 sm:end-6 sm:top-6">
               <ThemeToggle />
+              <LanguageToggle />
             </div>
             <div className="mb-6 flex justify-center lg:mb-8">
               <BrandLogo

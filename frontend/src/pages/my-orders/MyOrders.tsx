@@ -5,8 +5,8 @@ import { Button } from "@/components/common/Button";
 import { ErrorState } from "@/components/common/ErrorState";
 import { LoadingState } from "@/components/common/LoadingState";
 import { OrderList } from "@/components/orders/OrderList";
-import { STATUS_MESSAGES } from "@/constants/messages";
-import { UI } from "@/constants/ui";
+import { STATUS_MESSAGES, statusLabel } from "@/constants/messages";
+import { useI18n } from "@/i18n";
 import { config } from "@/config";
 import { useOrders } from "@/hooks/useOrders";
 import type { OrderStatus } from "@/types/domain";
@@ -14,6 +14,7 @@ import type { OrderStatus } from "@/types/domain";
 const statuses = Object.keys(STATUS_MESSAGES) as OrderStatus[];
 
 export default function MyOrders() {
+  const { ui, locale } = useI18n();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [status, setStatus] = useState<OrderStatus | "">("");
@@ -39,7 +40,7 @@ export default function MyOrders() {
     <main className="mx-auto w-full max-w-none p-4 py-10">
       <div className="mb-6 grid grid-cols-1 gap-3 rounded-card border border-border bg-surface p-4 sm:grid-cols-3">
         <select
-          aria-label={UI.orders.status}
+          aria-label={ui.orders.status}
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           value={status}
           onChange={(event) => {
@@ -47,15 +48,15 @@ export default function MyOrders() {
             setPage(1);
           }}
         >
-          <option value="">{UI.common.all}</option>
+          <option value="">{ui.common.all}</option>
           {statuses.map((entry) => (
             <option key={entry} value={entry}>
-              {STATUS_MESSAGES[entry].label}
+              {statusLabel(entry, locale)}
             </option>
           ))}
         </select>
         <label className="text-sm text-text-muted">
-          من
+          {ui.admin.from}
           <input
             type="date"
             value={from}
@@ -67,7 +68,7 @@ export default function MyOrders() {
           />
         </label>
         <label className="text-sm text-text-muted">
-          إلى
+          {ui.admin.to}
           <input
             type="date"
             value={to}
@@ -98,7 +99,7 @@ export default function MyOrders() {
               disabled={!canGoPrevious || isFetching}
               onClick={() => setPage((previous) => Math.max(1, previous - 1))}
             >
-              {UI.common.previous}
+              {ui.common.previous}
             </Button>
             <span className="text-sm text-text-muted">
               {currentPage} / {pageCount}
@@ -108,7 +109,7 @@ export default function MyOrders() {
               disabled={!canGoNext || isFetching}
               onClick={() => setPage((previous) => previous + 1)}
             >
-              {UI.common.next}
+              {ui.common.next}
             </Button>
           </nav>
         </>

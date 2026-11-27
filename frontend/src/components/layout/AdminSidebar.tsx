@@ -2,16 +2,9 @@ import { NavLink } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { CloseIcon, DashboardIcon, OrdersIcon, ProductsIcon, UsersIcon } from "@/components/common/Icons";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { isDemoMode } from "@/services/demoMode";
 import { cn } from "@/utils/cn";
-
-const links = [
-  { to: "/admin", label: UI.admin.dashboard, icon: DashboardIcon, end: true },
-  { to: "/admin/orders", label: UI.nav.orders, icon: OrdersIcon, end: false },
-  { to: "/admin/products", label: UI.nav.products, icon: ProductsIcon, end: false },
-  { to: "/admin/users", label: UI.nav.users, icon: UsersIcon, end: false },
-] as const;
 
 interface AdminSidebarProps {
   open: boolean;
@@ -19,6 +12,13 @@ interface AdminSidebarProps {
 }
 
 function SidebarContent({ onNavigate, showClose = false }: { onNavigate?: () => void; showClose?: boolean }) {
+  const ui = useUI();
+  const links = [
+    { to: "/admin", label: ui.admin.dashboard, icon: DashboardIcon, end: true },
+    { to: "/admin/orders", label: ui.nav.orders, icon: OrdersIcon, end: false },
+    { to: "/admin/products", label: ui.nav.products, icon: ProductsIcon, end: false },
+    { to: "/admin/users", label: ui.nav.users, icon: UsersIcon, end: false },
+  ] as const;
   return (
     <>
       <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-border px-4">
@@ -29,7 +29,7 @@ function SidebarContent({ onNavigate, showClose = false }: { onNavigate?: () => 
           <button
             type="button"
             onClick={onNavigate}
-            aria-label={UI.admin.closeMenu}
+            aria-label={ui.admin.closeMenu}
             className="flex h-9 w-9 items-center justify-center rounded-lg text-text-muted hover:bg-background hover:text-text"
           >
             <CloseIcon className="h-4 w-4" />
@@ -37,7 +37,7 @@ function SidebarContent({ onNavigate, showClose = false }: { onNavigate?: () => 
         ) : null}
       </div>
 
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label={UI.nav.dashboard}>
+      <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label={ui.nav.dashboard}>
         {links.map((link) => {
           const Icon = link.icon;
           return (
@@ -65,7 +65,7 @@ function SidebarContent({ onNavigate, showClose = false }: { onNavigate?: () => 
       <div className="border-t border-border p-4 text-xs text-text-muted">
         {isDemoMode() ? (
           <span className="inline-flex rounded-full bg-primary-soft px-2.5 py-1 font-medium text-primary-strong">
-            {UI.auth.demoBadge}
+            {ui.auth.demoBadge}
           </span>
         ) : (
           <span>PARCELPATH · 1.0</span>
@@ -76,6 +76,7 @@ function SidebarContent({ onNavigate, showClose = false }: { onNavigate?: () => 
 }
 
 export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
+  const ui = useUI();
   return (
     <>
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-e border-border bg-surface md:flex">
@@ -86,7 +87,7 @@ export function AdminSidebar({ open, onClose }: AdminSidebarProps) {
         <div className="fixed inset-0 z-40 md:hidden">
           <button
             type="button"
-            aria-label={UI.admin.closeMenu}
+            aria-label={ui.admin.closeMenu}
             onClick={onClose}
             className="absolute inset-0 h-full w-full bg-overlay/40 backdrop-blur-sm"
           />

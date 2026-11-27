@@ -1,4 +1,4 @@
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { Button } from "./Button";
 import { Modal } from "./Modal";
 
@@ -19,6 +19,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const ui = useUI();
   return (
     <Modal
       open={open}
@@ -27,10 +28,10 @@ export function ConfirmDialog({
       footer={
         <>
           <Button variant="secondary" onClick={onCancel} disabled={loading}>
-            {UI.common.cancel}
+            {ui.common.cancel}
           </Button>
           <Button variant="danger" onClick={onConfirm} loading={loading}>
-            {UI.common.confirm}
+            {ui.common.confirm}
           </Button>
         </>
       }

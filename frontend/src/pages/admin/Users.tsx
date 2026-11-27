@@ -10,21 +10,24 @@ import { Input } from "@/components/common/Input";
 import { LoadingState } from "@/components/common/LoadingState";
 import { Modal } from "@/components/common/Modal";
 import { config } from "@/config";
-import { UI } from "@/constants/ui";
+import { getCurrentLocale, getTranslation, useUI, type Locale } from "@/i18n";
 import { getErrorMessage } from "@/constants/messages";
 import { useCreateUser, useSetUserStatus, useUpdateUser, useUsers } from "@/hooks/useUsers";
 import { ApiRequestError } from "@/services/api";
 import type { Role, UserCreate } from "@/types/domain";
 
-const schema = z.object({
-  full_name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين").max(150),
-  email: z.string().trim().email("أدخل بريدًا إلكترونيًا صحيحًا"),
-  password: z.string().min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف").max(72),
-  role: z.enum(["ADMIN", "CUSTOMER"]),
-  phone: z.string(),
-});
+function buildSchema(locale: Locale) {
+  const messages = getTranslation(locale).validation;
+  return z.object({
+    full_name: z.string().trim().min(2, messages.nameTooShort).max(150),
+    email: z.string().trim().email(messages.emailInvalid),
+    password: z.string().min(8, messages.passwordTooShort).max(72),
+    role: z.enum(["ADMIN", "CUSTOMER"]),
+    phone: z.string(),
+  });
+}
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 const EMPTY_VALUES: FormValues = {
   full_name: "",
@@ -50,6 +53,7 @@ function errorText(error: unknown): string {
 }
 
 export default function AdminUsers() {
+  const ui = useUI();
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
@@ -75,7 +79,11 @@ export default function AdminUsers() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<FormValues>({ resolver: zodResolver(schema), defaultValues: EMPTY_VALUES });
+  } = useForm<FormValues>({
+    resolver: (values, context, options) =>
+      zodResolver(buildSchema(getCurrentLocale()))(values, context, options),
+    defaultValues: EMPTY_VALUES,
+  });
 
   useEffect(() => {
     if (!formOpen) return;
@@ -110,7 +118,7 @@ export default function AdminUsers() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center gap-4">
-        <Button onClick={() => setFormOpen(true)}>{UI.admin.newUser}</Button>
+        <Button onClick={() => setFormOpen(true)}>{ui.admin.newUser}</Button>
       </div>
 
       <form
@@ -123,13 +131,13 @@ export default function AdminUsers() {
       >
         <Input
           name="search"
-          label={UI.common.search}
+          label={ui.common.search}
           value={searchDraft}
           onChange={(event) => setSearchDraft(event.target.value)}
         />
         <div className="w-full">
           <label htmlFor="role-filter" className="mb-1 block text-sm font-medium text-text">
-            {UI.nav.users}
+            {ui.nav.users}
           </label>
           <select
             id="role-filter"
@@ -140,14 +148,14 @@ export default function AdminUsers() {
             }}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">{UI.common.all}</option>
-            <option value="ADMIN">{UI.admin.roleAdmin}</option>
-            <option value="CUSTOMER">{UI.admin.roleCustomer}</option>
+            <option value="">{ui.common.all}</option>
+            <option value="ADMIN">{ui.admin.roleAdmin}</option>
+            <option value="CUSTOMER">{ui.admin.roleCustomer}</option>
           </select>
         </div>
         <div className="w-full">
           <label htmlFor="active-filter" className="mb-1 block text-sm font-medium text-text">
-            {UI.admin.active}
+            {ui.admin.active}
           </label>
           <select
             id="active-filter"
@@ -158,13 +166,13 @@ export default function AdminUsers() {
             }}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
-            <option value="all">{UI.common.all}</option>
-            <option value="active">{UI.admin.active}</option>
-            <option value="inactive">{UI.admin.inactive}</option>
+            <option value="all">{ui.common.all}</option>
+            <option value="active">{ui.admin.active}</option>
+            <option value="inactive">{ui.admin.inactive}</option>
           </select>
         </div>
         <div className="flex items-end gap-2">
-          <Button type="submit">{UI.common.search}</Button>
+          <Button type="submit">{ui.common.search}</Button>
           <Button
             type="button"
             variant="secondary"
@@ -176,7 +184,7 @@ export default function AdminUsers() {
               setPage(1);
             }}
           >
-            {UI.common.cancel}
+            {ui.common.cancel}
           </Button>
         </div>
       </form>
@@ -186,17 +194,17 @@ export default function AdminUsers() {
       ) : users.error ? (
         <ErrorState error={users.error} onRetry={() => void users.refetch()} />
       ) : !users.data || users.data.items.length === 0 ? (
-        <EmptyState message={UI.common.noResults} />
+        <EmptyState message={ui.common.noResults} />
       ) : (
         <div className="overflow-x-auto rounded-card border border-border bg-surface shadow-card">
           <table className="w-full text-right text-sm">
             <thead className="bg-background text-text-muted">
               <tr>
-                <th className="px-4 py-3 font-medium">{UI.auth.fullName}</th>
-                <th className="px-4 py-3 font-medium">{UI.auth.email}</th>
-                <th className="px-4 py-3 font-medium">{UI.nav.users}</th>
-                <th className="px-4 py-3 font-medium">{UI.admin.active}</th>
-                <th className="px-4 py-3 font-medium">{UI.orders.date}</th>
+                <th className="px-4 py-3 font-medium">{ui.auth.fullName}</th>
+                <th className="px-4 py-3 font-medium">{ui.auth.email}</th>
+                <th className="px-4 py-3 font-medium">{ui.nav.users}</th>
+                <th className="px-4 py-3 font-medium">{ui.admin.active}</th>
+                <th className="px-4 py-3 font-medium">{ui.orders.date}</th>
                 <th className="px-4 py-3 font-medium" />
               </tr>
             </thead>
@@ -209,7 +217,7 @@ export default function AdminUsers() {
                   </td>
                   <td className="px-4 py-3">
                     <select
-                      aria-label={`${UI.nav.users} - ${user.full_name}`}
+                      aria-label={`${ui.nav.users} - ${user.full_name}`}
                       value={user.role}
                       disabled={updateUser.isPending}
                       onChange={(event) => {
@@ -220,18 +228,18 @@ export default function AdminUsers() {
                       }}
                       className="rounded-lg border border-border bg-background px-2 py-1 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
                     >
-                      <option value="ADMIN">{UI.admin.roleAdmin}</option>
-                      <option value="CUSTOMER">{UI.admin.roleCustomer}</option>
+                      <option value="ADMIN">{ui.admin.roleAdmin}</option>
+                      <option value="CUSTOMER">{ui.admin.roleCustomer}</option>
                     </select>
                   </td>
                   <td className="px-4 py-3">
                     {user.is_active ? (
                       <span className="rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success-strong">
-                        {UI.admin.active}
+                        {ui.admin.active}
                       </span>
                     ) : (
                       <span className="rounded-full bg-danger-soft px-2.5 py-0.5 text-xs font-medium text-danger-strong">
-                        {UI.admin.inactive}
+                        {ui.admin.inactive}
                       </span>
                     )}
                   </td>
@@ -246,7 +254,7 @@ export default function AdminUsers() {
                         setUserStatus.mutate({ id: user.id, payload: { is_active: !user.is_active } })
                       }
                     >
-                      {user.is_active ? UI.admin.inactive : UI.admin.active}
+                      {user.is_active ? ui.admin.inactive : ui.admin.active}
                     </Button>
                   </td>
                 </tr>
@@ -267,14 +275,14 @@ export default function AdminUsers() {
               disabled={page <= 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
             >
-              {UI.common.previous}
+              {ui.common.previous}
             </Button>
             <Button
               variant="secondary"
               disabled={page >= totalPages}
               onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
             >
-              {UI.common.next}
+              {ui.common.next}
             </Button>
           </div>
         </div>
@@ -282,15 +290,15 @@ export default function AdminUsers() {
 
       <Modal
         open={formOpen}
-        title={`${UI.common.add} ${UI.nav.users}`}
+        title={`${ui.common.add} ${ui.nav.users}`}
         onClose={closeForm}
         footer={
           <>
             <Button variant="secondary" onClick={closeForm} disabled={createUser.isPending}>
-              {UI.common.cancel}
+              {ui.common.cancel}
             </Button>
             <Button type="submit" form="user-form" loading={createUser.isPending}>
-              {UI.common.add}
+              {ui.common.add}
             </Button>
           </>
         }
@@ -301,35 +309,35 @@ export default function AdminUsers() {
           onSubmit={(event) => void handleSubmit(onSubmit)(event)}
           noValidate
         >
-          <Input label={UI.auth.fullName} error={errors.full_name?.message} {...register("full_name")} />
+          <Input label={ui.auth.fullName} error={errors.full_name?.message} {...register("full_name")} />
           <Input
             type="email"
-            label={UI.auth.email}
+            label={ui.auth.email}
             error={errors.email?.message}
             {...register("email")}
           />
           <Input
             type="password"
-            label={UI.auth.password}
+            label={ui.auth.password}
             error={errors.password?.message}
             {...register("password")}
           />
           <div className="w-full">
             <label htmlFor="role" className="mb-1 block text-sm font-medium text-text">
-              {UI.nav.users}
+              {ui.nav.users}
             </label>
             <select
               id="role"
               {...register("role")}
               className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
             >
-              <option value="CUSTOMER">{UI.admin.roleCustomer}</option>
-              <option value="ADMIN">{UI.admin.roleAdmin}</option>
+              <option value="CUSTOMER">{ui.admin.roleCustomer}</option>
+              <option value="ADMIN">{ui.admin.roleAdmin}</option>
             </select>
           </div>
           <Input
             type="tel"
-            label={UI.checkout.phone}
+            label={ui.checkout.phone}
             error={errors.phone?.message}
             {...register("phone")}
           />

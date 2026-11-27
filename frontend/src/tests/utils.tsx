@@ -6,6 +6,7 @@ import type { ReactElement, ReactNode } from "react";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { I18nProvider } from "@/i18n";
 import type { CartItem, User } from "@/types/domain";
 
 /** A QueryClient that never retries so failing requests settle immediately. */
@@ -39,13 +40,15 @@ export function renderWithProviders(
 ) {
   return render(
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-      <MemoryRouter initialEntries={[route]}>
-        <AuthProvider>
-          <CartProvider>{ui}</CartProvider>
-        </AuthProvider>
-      </MemoryRouter>
-          </ThemeProvider>
+      <I18nProvider>
+        <ThemeProvider>
+          <MemoryRouter initialEntries={[route]}>
+            <AuthProvider>
+              <CartProvider>{ui}</CartProvider>
+            </AuthProvider>
+          </MemoryRouter>
+        </ThemeProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 }

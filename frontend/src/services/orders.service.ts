@@ -1,3 +1,4 @@
+import { getCurrentLocale, getTranslation } from "@/i18n";
 import {
   ALLOWED_TRANSITIONS,
   ORDER_STEPS,
@@ -41,14 +42,9 @@ export interface OrderQuery {
   customer_id?: string;
 }
 
-const TRACK_NOTES: Partial<Record<OrderStatus, string>> = {
-  PENDING: "تم إنشاء الطلب وانتظار التأكيد.",
-  CONFIRMED: "تم تأكيد الطلب.",
-  PACKED: "تم تجهيز الطلب.",
-  SHIPPED: "تم تسليم الطلب للناقل.",
-  OUT_FOR_DELIVERY: "الطلب خارج للتوصيل.",
-  DELIVERED: "تم تسليم الطلب بنجاح.",
-};
+function trackNote(status: OrderStatus): string | null {
+  return getTranslation(getCurrentLocale()).notes[status] ?? null;
+}
 
 function findOrder(orders: DemoOrder[], id: string): DemoOrder {
   const order = orders.find((item) => item.id === id);
@@ -75,10 +71,10 @@ function buildTrackingEvents(order: Order): TrackingEvent[] {
   const at = (timestamp: number): string => new Date(Math.min(timestamp, now)).toISOString();
   if (order.status === "CANCELLED") {
     return [
-      { status: "PENDING", note: TRACK_NOTES["PENDING"] ?? null, at: order.created_at },
+      { status: "PENDING", note: trackNote("PENDING"), at: order.created_at },
       {
         status: "CANCELLED",
-        note: "تم إلغاء الطلب.",
+        note: trackNote("CANCELLED"),
         at: at(created + 2 * 60 * 60 * 1000),
       },
     ];
@@ -86,7 +82,7 @@ function buildTrackingEvents(order: Order): TrackingEvent[] {
   const currentIndex = Math.max(0, ORDER_STEPS.indexOf(order.status));
   return ORDER_STEPS.slice(0, currentIndex + 1).map((status, index) => ({
     status,
-    note: TRACK_NOTES[status] ?? null,
+    note: trackNote(status),
     at: at(created + index * 6 * 60 * 60 * 1000),
   }));
 }

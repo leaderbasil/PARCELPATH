@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { config } from "@/config";
+import { translate } from "@/i18n";
 import type { ApiError, ApiErrorBody } from "@/types/domain";
 
 export class ApiRequestError extends Error implements ApiError {
@@ -55,7 +56,7 @@ api.interceptors.response.use(
         window.dispatchEvent(new CustomEvent("api:unreachable"));
       }
       const normalized = new ApiRequestError(status, {
-        detail: body?.detail ?? (status === 0 ? "تعذّر الاتصال بالخادم." : "فشل الطلب."),
+        detail: body?.detail ?? translate(status === 0 ? "api.network" : "api.requestFailed"),
         code: body?.code ?? (status === 0 ? "NETWORK_ERROR" : "INTERNAL_ERROR"),
         meta: body?.meta,
         errors: body?.errors,
@@ -63,7 +64,7 @@ api.interceptors.response.use(
       return Promise.reject(normalized);
     }
     return Promise.reject(
-      new ApiRequestError(0, { detail: "حدث خطأ غير متوقع.", code: "INTERNAL_ERROR" })
+      new ApiRequestError(0, { detail: translate("api.unexpected"), code: "INTERNAL_ERROR" })
     );
   }
 );

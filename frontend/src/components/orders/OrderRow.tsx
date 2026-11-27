@@ -4,14 +4,9 @@ import { MoneyText } from "@/components/common/MoneyText";
 import { StatusBadge } from "@/components/common/StatusBadge";
 import { CourierContactButtons } from "@/components/orders/CourierContactButtons";
 import { OrderNumberBadge } from "@/components/orders/OrderNumberBadge";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import type { OrderListItem, PaymentStatus } from "@/types/domain";
 import { cn } from "@/utils/cn";
-
-const PAYMENT_LABELS: Record<PaymentStatus, string> = {
-  PAID: "مدفوع",
-  UNPAID: "غير مدفوع",
-};
 
 const PAYMENT_CLASSES: Record<PaymentStatus, string> = {
   PAID: "bg-success-soft text-success-strong",
@@ -25,6 +20,11 @@ interface OrderRowProps {
 }
 
 export function OrderRow({ order, onOpen, isAdmin = false }: OrderRowProps) {
+  const ui = useUI();
+  const paymentLabels: Record<PaymentStatus, string> = {
+    PAID: ui.orders.paid,
+    UNPAID: ui.orders.unpaid,
+  };
   const showCourierPhone =
     (order.status === "OUT_FOR_DELIVERY" || order.status === "DELIVERED") &&
     Boolean(order.courier_phone);
@@ -37,7 +37,7 @@ export function OrderRow({ order, onOpen, isAdmin = false }: OrderRowProps) {
             <button
               type="button"
               onClick={() => onOpen(order.id)}
-              aria-label={`${UI.orders.details}: ${order.order_number}`}
+              aria-label={`${ui.orders.details}: ${order.order_number}`}
               className="rounded-xl text-start focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-soft"
             >
               <OrderNumberBadge
@@ -61,7 +61,7 @@ export function OrderRow({ order, onOpen, isAdmin = false }: OrderRowProps) {
               PAYMENT_CLASSES[order.payment_status]
             )}
           >
-            {PAYMENT_LABELS[order.payment_status]}
+            {paymentLabels[order.payment_status]}
           </span>
         </div>
       </div>
@@ -69,18 +69,18 @@ export function OrderRow({ order, onOpen, isAdmin = false }: OrderRowProps) {
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3 text-sm">
         <div className="flex flex-wrap items-center gap-3 text-text-muted">
           <span>
-            {order.items_count} {UI.orders.items}
+            {order.items_count} {ui.orders.items}
           </span>
           {isAdmin && order.customer?.full_name ? <span>{order.customer.full_name}</span> : null}
           {onOpen ? (
             <button
               type="button"
               onClick={() => onOpen(order.id)}
-              aria-label={UI.orders.details}
+              aria-label={ui.orders.details}
               className="inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary-strong transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <EyeIcon className="h-3.5 w-3.5" />
-              {UI.orders.details}
+              {ui.orders.details}
             </button>
           ) : null}
           {showCourierPhone ? (

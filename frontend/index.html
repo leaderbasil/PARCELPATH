@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#4F46E5" />
-    <meta
-      name="description"
-      content="متجر مصغّر لإدارة الطلبات وتتبّع الشحنات بواجهة عربية RTL."
-    />
+    <meta name="description" content="PARCELPATH order and shipment tracking." />
     <link rel="icon" type="image/png" href="/favicon-dark.png" />
     <link rel="icon" type="image/png" media="(prefers-color-scheme: light)" href="/favicon-light.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,21 +14,25 @@
       rel="stylesheet"
     />
     <script>
-      // Apply the saved theme before first paint so dark mode never flashes light.
+      // Apply saved appearance and language before first paint.
       (function () {
         try {
-          var stored = localStorage.getItem("parcelpath-theme");
-          var theme = stored === "dark" || stored === "light" ? stored : "light";
           var root = document.documentElement;
+          var storedTheme = localStorage.getItem("parcelpath-theme");
+          var theme = storedTheme === "dark" || storedTheme === "light" ? storedTheme : "light";
           root.setAttribute("data-theme", theme);
           root.style.colorScheme = theme;
           root.classList.toggle("dark", theme === "dark");
+
+          var locale = localStorage.getItem("parcelpath-locale") === "en" ? "en" : "ar";
+          root.lang = locale;
+          root.dir = locale === "ar" ? "rtl" : "ltr";
         } catch (error) {
-          /* Storage may be unavailable; light theme remains the default. */
+          /* Storage may be unavailable; light theme + Arabic RTL remain the defaults. */
         }
       })();
     </script>
-    <title>PARCELPATH — متجر الطلبات والتتبّع</title>
+    <title>PARCELPATH</title>
   </head>
   <body>
     <div id="root"></div>

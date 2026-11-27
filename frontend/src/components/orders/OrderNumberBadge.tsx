@@ -1,5 +1,5 @@
 import { PackageIcon } from "@/components/common/Icons";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { cn } from "@/utils/cn";
 
 interface OrderNumberBadgeProps {
@@ -9,6 +9,7 @@ interface OrderNumberBadgeProps {
 }
 
 export function OrderNumberBadge({ number, as = "h1", className }: OrderNumberBadgeProps) {
+  const ui = useUI();
   const Tag = as;
   return (
     <Tag
@@ -21,7 +22,7 @@ export function OrderNumberBadge({ number, as = "h1", className }: OrderNumberBa
         <PackageIcon className="h-5 w-5" />
       </span>
       <span className="min-w-0">
-        <span className="block text-[11px] font-medium text-text-muted">{UI.orders.number}</span>
+        <span className="block text-[11px] font-medium text-text-muted">{ui.orders.number}</span>
         <bdi
           dir="ltr"
           className="block truncate text-base font-bold tracking-wide text-primary-strong"

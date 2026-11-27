@@ -9,12 +9,13 @@ import { Input } from "@/components/common/Input";
 import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
 import { ProductImage } from "@/components/common/ProductImage";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { useCart } from "@/context/CartContext";
 import { useProduct } from "@/hooks/useProducts";
 import { formatDate } from "@/utils/date";
 
 export default function ProductDetails() {
+  const ui = useUI();
   const params = useParams<{ id: string }>();
   const id = params.id ?? "";
   const { data: product, isLoading, isError, error, refetch } = useProduct(id);
@@ -24,7 +25,7 @@ export default function ProductDetails() {
 
   if (isLoading) return <LoadingState variant="detail" />;
   if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
-  if (!product) return <EmptyState message="المنتج غير موجود." />;
+  if (!product) return <EmptyState message={ui.catalog.productNotFound} />;
 
   const stock =
     "stock_quantity" in product && typeof product.stock_quantity === "number"
@@ -55,7 +56,7 @@ export default function ProductDetails() {
     <main className="mx-auto w-full max-w-none p-4 py-8">
       <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-text-muted" aria-label="breadcrumb">
         <Link to="/" className="text-primary-strong underline">
-          {UI.catalog.title}
+          {ui.catalog.title}
         </Link>
         {product.category ? (
           <>
@@ -79,20 +80,20 @@ export default function ProductDetails() {
           <p className="text-sm text-text-muted">{product.description ?? "—"}</p>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4 border-b border-border pb-2">
-              <dt className="text-text-muted">{UI.catalog.name}</dt>
+              <dt className="text-text-muted">{ui.catalog.name}</dt>
               <dd className="text-text">{product.sku}</dd>
             </div>
             <div className="flex justify-between gap-4 border-b border-border pb-2">
-              <dt className="text-text-muted">{UI.catalog.categories}</dt>
+              <dt className="text-text-muted">{ui.catalog.categories}</dt>
               <dd className="text-text">{product.category ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4 border-b border-border pb-2">
-              <dt className="text-text-muted">{UI.admin.stock}</dt>
-              <dd className="text-text">{outOfStock ? UI.catalog.outOfStock : stock}</dd>
+              <dt className="text-text-muted">{ui.admin.stock}</dt>
+              <dd className="text-text">{outOfStock ? ui.catalog.outOfStock : stock}</dd>
             </div>
             {createdAt ? (
               <div className="flex justify-between gap-4 border-b border-border pb-2">
-                <dt className="text-text-muted">{UI.orders.date}</dt>
+                <dt className="text-text-muted">{ui.orders.date}</dt>
                 <dd className="text-text">{formatDate(createdAt)}</dd>
               </div>
             ) : null}
@@ -101,7 +102,7 @@ export default function ProductDetails() {
           <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="w-full sm:w-28">
               <Input
-                label="الكمية"
+                label={ui.catalog.quantity}
                 type="number"
                 className="h-12 text-base"
                 min={1}
@@ -120,15 +121,15 @@ export default function ProductDetails() {
               className="h-12 w-full text-base sm:w-auto sm:flex-1"
             >
               <CartIcon className="h-4 w-4" aria-hidden="true" />
-              {outOfStock ? UI.catalog.outOfStock : UI.catalog.addToCart}
+              {outOfStock ? ui.catalog.outOfStock : ui.catalog.addToCart}
             </Button>
           </div>
-          {outOfStock ? <p className="text-sm text-danger">{UI.catalog.outOfStock}</p> : null}
+          {outOfStock ? <p className="text-sm text-danger">{ui.catalog.outOfStock}</p> : null}
           {added ? (
             <p className="text-sm text-success-strong">
-              تمت الإضافة إلى السلة.{" "}
+              {ui.cart.added}{" "}
               <Link to="/cart" className="text-primary-strong underline">
-                {UI.nav.cart}
+                {ui.nav.cart}
               </Link>
             </p>
           ) : null}
@@ -138,7 +139,7 @@ export default function ProductDetails() {
       <Link to="/" className="mt-6 inline-block">
         <Button variant="secondary">
           <BackIcon className="h-4 w-4" />
-          {UI.common.back}
+          {ui.common.back}
         </Button>
       </Link>
     </main>

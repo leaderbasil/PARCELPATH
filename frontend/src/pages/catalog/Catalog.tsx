@@ -5,12 +5,13 @@ import { ProductGrid } from "@/components/catalog/ProductGrid";
 import { Button } from "@/components/common/Button";
 import { ErrorState } from "@/components/common/ErrorState";
 import { LoadingState } from "@/components/common/LoadingState";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { config } from "@/config";
 import { useCategories, useProducts } from "@/hooks/useProducts";
 import type { ProductQuery } from "@/services/products.service";
 
 export default function Catalog() {
+  const ui = useUI();
   const [query, setQuery] = useState<ProductQuery>({
     page: 1,
     page_size: config.pageSize,
@@ -70,7 +71,7 @@ export default function Catalog() {
                 setQuery((previous) => ({ ...previous, page: Math.max(1, currentPage - 1) }))
               }
             >
-              {UI.common.previous}
+              {ui.common.previous}
             </Button>
             <span className="text-sm text-text-muted">
               {currentPage} / {pageCount}
@@ -80,7 +81,7 @@ export default function Catalog() {
               disabled={!canGoNext || isFetching}
               onClick={() => setQuery((previous) => ({ ...previous, page: currentPage + 1 }))}
             >
-              {UI.common.next}
+              {ui.common.next}
             </Button>
           </nav>
         </>

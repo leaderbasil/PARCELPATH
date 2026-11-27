@@ -1,4 +1,5 @@
 import { config } from "@/config";
+import { translate } from "@/i18n";
 import { isDemoMode } from "@/services/demoMode";
 
 /**
@@ -36,7 +37,7 @@ function openDatabase(): Promise<IDBDatabase> {
   if (databasePromise) return databasePromise;
   databasePromise = new Promise((resolve, reject) => {
     if (typeof indexedDB === "undefined") {
-      reject(new Error("المتصفح لا يدعم مخزن الكائنات."));
+      reject(new Error(translate("storage.unsupported")));
       return;
     }
     const request = indexedDB.open(DB_NAME, 1);
@@ -47,7 +48,7 @@ function openDatabase(): Promise<IDBDatabase> {
       }
     };
     request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error ?? new Error("تعذّر فتح مخزن الكائنات."));
+    request.onerror = () => reject(request.error ?? new Error(translate("storage.openFailed")));
   });
   return databasePromise;
 }
@@ -66,8 +67,8 @@ function withStore<T>(
           result = request.result;
         };
         transaction.oncomplete = () => resolve(result);
-        transaction.onerror = () => reject(transaction.error ?? new Error("تعذّر الوصول للمخزن."));
-        transaction.onabort = () => reject(transaction.error ?? new Error("تم إلغاء عملية المخزن."));
+        transaction.onerror = () => reject(transaction.error ?? new Error(translate("storage.accessFailed")));
+        transaction.onabort = () => reject(transaction.error ?? new Error(translate("storage.operationAborted")));
       })
   );
 }
@@ -85,18 +86,18 @@ async function uploadToService(file: File): Promise<string> {
     body,
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
-  if (!response.ok) throw new Error("تعذّر رفع الصورة، حاول مرة أخرى.");
+  if (!response.ok) throw new Error(translate("storage.uploadFailed"));
   const payload: unknown = await response.json();
   const record = payload as { data?: { url?: unknown }; url?: unknown } | null;
   const url = record?.data?.url ?? record?.url;
-  if (!isHttpUrl(url)) throw new Error("أعاد مخزن الكائنات رابطًا غير صالح.");
+  if (!isHttpUrl(url)) throw new Error(translate("storage.invalidUrl"));
   return url;
 }
 
 /** Store an image and return the reference that should be saved on the product. */
 export async function putImage(file: File): Promise<string> {
-  if (!file.type.startsWith("image/")) throw new Error("يرجى اختيار ملف صورة.");
-  if (file.size > MAX_IMAGE_BYTES) throw new Error("حجم الصورة يجب ألا يتجاوز 5 ميجابايت.");
+  if (!file.type.startsWith("image/")) throw new Error(translate("storage.notAnImage"));
+  if (file.size > MAX_IMAGE_BYTES) throw new Error(translate("storage.tooLarge"));
 
   if (!isDemoMode()) return uploadToService(file);
 

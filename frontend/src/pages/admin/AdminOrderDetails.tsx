@@ -17,7 +17,7 @@ import { OrderNumberBadge } from "@/components/orders/OrderNumberBadge";
 import { StatusActions } from "@/components/orders/StatusActions";
 import { OrderTimeline } from "@/components/tracking/OrderTimeline";
 import { getErrorMessage, statusLabel } from "@/constants/messages";
-import { UI } from "@/constants/ui";
+import { useI18n } from "@/i18n";
 import { useOrder, useTracking, useUpdateShipping } from "@/hooks/useOrders";
 import { ApiRequestError } from "@/services/api";
 import type { ShippingUpdateIn } from "@/types/domain";
@@ -44,6 +44,7 @@ function errorText(error: unknown): string {
 }
 
 export default function AdminOrderDetails() {
+  const { ui, t } = useI18n();
   const params = useParams<{ id: string }>();
   const id = params.id ?? "";
   const orderQuery = useOrder(id);
@@ -75,7 +76,7 @@ export default function AdminOrderDetails() {
   if (orderQuery.isError) {
     return <ErrorState error={orderQuery.error} onRetry={() => void orderQuery.refetch()} />;
   }
-  if (!order) return <ErrorState error={new Error(UI.common.error)} />;
+  if (!order) return <ErrorState error={new Error(ui.common.error)} />;
 
   const shippingLocked = !["SHIPPED", "OUT_FOR_DELIVERY"].includes(order.status);
 
@@ -83,7 +84,7 @@ export default function AdminOrderDetails() {
     setFormError(null);
     setSaved(false);
     if (!values.carrier?.trim() && !values.tracking_number?.trim()) {
-      setFormError("أدخل بيانات الناقل أو رقم التتبّع على الأقل.");
+      setFormError(t("validation.shippingCorrectionRequired"));
       return;
     }
     const payload: ShippingUpdateIn = {
@@ -126,16 +127,16 @@ export default function AdminOrderDetails() {
       </div>
 
       <section className="rounded-card border border-border bg-surface p-6 shadow-card">
-        <h2 className="mb-4 text-lg font-semibold text-text">{UI.orders.items}</h2>
+        <h2 className="mb-4 text-lg font-semibold text-text">{ui.orders.items}</h2>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b border-border text-right text-text-muted">
-                <th className="p-2 font-medium">{UI.catalog.name}</th>
+                <th className="p-2 font-medium">{ui.catalog.name}</th>
                 <th className="p-2 font-medium">SKU</th>
-                <th className="p-2 font-medium">{UI.orders.items}</th>
-                <th className="p-2 font-medium">سعر الوحدة</th>
-                <th className="p-2 font-medium">{UI.cart.total}</th>
+                <th className="p-2 font-medium">{ui.orders.items}</th>
+                <th className="p-2 font-medium">{ui.admin.unitPrice}</th>
+                <th className="p-2 font-medium">{ui.cart.total}</th>
               </tr>
             </thead>
             <tbody>
@@ -159,19 +160,19 @@ export default function AdminOrderDetails() {
         </div>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-4">
-            <dt className="text-text-muted">{UI.cart.subtotal}</dt>
+            <dt className="text-text-muted">{ui.cart.subtotal}</dt>
             <dd>
               <MoneyText value={order.subtotal} />
             </dd>
           </div>
           <div className="flex justify-between gap-4">
-            <dt className="text-text-muted">{UI.cart.shippingFee}</dt>
+            <dt className="text-text-muted">{ui.cart.shippingFee}</dt>
             <dd>
               <MoneyText value={order.shipping_fee} />
             </dd>
           </div>
           <div className="flex justify-between gap-4 font-semibold text-primary-strong">
-            <dt>{UI.cart.total}</dt>
+            <dt>{ui.cart.total}</dt>
             <dd>
               <MoneyText value={order.total_amount} />
             </dd>
@@ -181,24 +182,24 @@ export default function AdminOrderDetails() {
 
       <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="rounded-card border border-border bg-surface p-6 shadow-card">
-          <h2 className="mb-4 text-lg font-semibold text-text">{UI.checkout.shippingInfo}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-text">{ui.checkout.shippingInfo}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.fullName}</dt>
+              <dt className="text-text-muted">{ui.checkout.fullName}</dt>
               <dd className="text-text">{order.shipping.name}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.phone}</dt>
+              <dt className="text-text-muted">{ui.checkout.phone}</dt>
               <dd className="text-text" dir="ltr">
                 {order.shipping.phone}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.city}</dt>
+              <dt className="text-text-muted">{ui.checkout.city}</dt>
               <dd className="text-text">{order.shipping.city}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.address}</dt>
+              <dt className="text-text-muted">{ui.checkout.address}</dt>
               <dd className="text-right text-text">{order.shipping.address}</dd>
             </div>
             <div className="pt-1">
@@ -207,31 +208,33 @@ export default function AdminOrderDetails() {
           </dl>
         </div>
         <div className="rounded-card border border-border bg-surface p-6 shadow-card">
-          <h2 className="mb-4 text-lg font-semibold text-text">{UI.orders.track}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-text">{ui.orders.track}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.paymentMethod}</dt>
+              <dt className="text-text-muted">{ui.checkout.paymentMethod}</dt>
               <dd className="text-text">
-                {order.payment_method === "COD" ? UI.checkout.cod : UI.checkout.card}
+                {order.payment_method === "COD" ? ui.checkout.cod : ui.checkout.card}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.orders.status}</dt>
-              <dd className="text-text">{order.payment_status === "PAID" ? "مدفوع" : "غير مدفوع"}</dd>
+              <dt className="text-text-muted">{ui.orders.status}</dt>
+              <dd className="text-text">
+                {order.payment_status === "PAID" ? ui.orders.paid : ui.orders.unpaid}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.orders.carrier}</dt>
+              <dt className="text-text-muted">{ui.orders.carrier}</dt>
               <dd className="text-text">{order.carrier ?? "—"}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.orders.trackingNumber}</dt>
+              <dt className="text-text-muted">{ui.orders.trackingNumber}</dt>
               <dd className="text-text" dir="ltr">
                 {order.tracking_number ?? "—"}
               </dd>
             </div>
             {order.courier_phone ? (
               <div className="pt-1">
-                <p className="mb-2 text-text-muted">{UI.orders.courierPhone}</p>
+                <p className="mb-2 text-text-muted">{ui.orders.courierPhone}</p>
                 <CourierContactButtons phone={order.courier_phone} />
               </div>
             ) : null}
@@ -241,27 +244,29 @@ export default function AdminOrderDetails() {
       </section>
 
       <section className="rounded-card border border-border bg-surface p-6 shadow-card">
-        <h2 className="mb-1 text-lg font-semibold text-text">{UI.admin.shipTitle}</h2>
+        <h2 className="mb-1 text-lg font-semibold text-text">{ui.admin.shipTitle}</h2>
         <p className="mb-4 text-sm text-text-muted">
-          {shippingLocked ? "لا يمكن تعديل بيانات الشحن في هذه الحالة." : "تصحيح بيانات الناقل ورقم التتبّع."}
+          {shippingLocked
+            ? getErrorMessage("SHIPPING_NOT_EDITABLE")
+            : ui.admin.shippingCorrection}
         </p>
         <form className="space-y-4" onSubmit={(event) => void handleSubmit(onSubmit)(event)} noValidate>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input
-              label={UI.orders.carrier}
+              label={ui.orders.carrier}
               disabled={shippingLocked || updateShipping.isPending}
               error={errors.carrier?.message}
               {...register("carrier")}
             />
             <Input
-              label={UI.orders.trackingNumber}
+              label={ui.orders.trackingNumber}
               disabled={shippingLocked || updateShipping.isPending}
               error={errors.tracking_number?.message}
               {...register("tracking_number")}
             />
           </div>
           <Input
-            label="ملاحظة"
+            label={ui.orders.note}
             disabled={shippingLocked || updateShipping.isPending}
             error={errors.note?.message}
             {...register("note")}
@@ -272,9 +277,9 @@ export default function AdminOrderDetails() {
               disabled={shippingLocked || updateShipping.isPending}
               loading={updateShipping.isPending}
             >
-              {UI.common.save}
+              {ui.common.save}
             </Button>
-            {saved ? <span className="text-sm text-success-strong">تم حفظ التعديلات.</span> : null}
+            {saved ? <span className="text-sm text-success-strong">{ui.admin.changesSaved}</span> : null}
           </div>
           {formError ? (
             <p role="alert" className="rounded-lg bg-danger-soft p-3 text-sm text-danger-strong">
@@ -298,7 +303,7 @@ export default function AdminOrderDetails() {
       <Link to="/admin/orders" className="mt-6 inline-block">
         <Button variant="secondary">
           <BackIcon className="h-4 w-4" />
-          {UI.common.back}
+          {ui.common.back}
         </Button>
       </Link>
     </main>

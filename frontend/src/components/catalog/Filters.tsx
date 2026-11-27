@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import type { ProductQuery } from "@/services/products.service";
 import { cn } from "@/utils/cn";
 
@@ -13,6 +13,7 @@ interface FiltersProps {
 }
 
 export function Filters({ categories, value, onChange }: FiltersProps) {
+  const ui = useUI();
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   return (
@@ -20,7 +21,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Input
           name="search"
-          placeholder={UI.common.search}
+          placeholder={ui.common.search}
           value={value.search ?? ""}
           onChange={(event) => onChange({ ...value, search: event.target.value, page: 1 })}
         />
@@ -32,7 +33,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
           aria-expanded={filtersOpen}
           className="w-full sm:hidden"
         >
-          {filtersOpen ? UI.catalog.hideFilters : UI.catalog.showFilters}
+          {filtersOpen ? ui.catalog.hideFilters : ui.catalog.showFilters}
         </Button>
 
         <div
@@ -42,14 +43,14 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
           )}
         >
           <select
-            aria-label={UI.catalog.categories}
+            aria-label={ui.catalog.categories}
             className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
             value={value.category ?? ""}
             onChange={(event) =>
               onChange({ ...value, category: event.target.value || undefined, page: 1 })
             }
           >
-            <option value="">{UI.common.all}</option>
+            <option value="">{ui.common.all}</option>
             {categories.map((category) => (
               <option key={category} value={category}>
                 {category}
@@ -62,7 +63,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
             type="number"
             min="0"
             step="0.01"
-            placeholder={UI.catalog.priceFrom}
+            placeholder={ui.catalog.priceFrom}
             value={value.min_price ?? ""}
             onChange={(event) =>
               onChange({ ...value, min_price: event.target.value || undefined, page: 1 })
@@ -74,7 +75,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
             type="number"
             min="0"
             step="0.01"
-            placeholder={UI.catalog.priceTo}
+            placeholder={ui.catalog.priceTo}
             value={value.max_price ?? ""}
             onChange={(event) =>
               onChange({ ...value, max_price: event.target.value || undefined, page: 1 })
@@ -82,7 +83,7 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
           />
 
           <select
-            aria-label={UI.catalog.sort}
+            aria-label={ui.catalog.sort}
             className="h-10 rounded-lg border border-border bg-background px-3 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
             value={value.sort ?? "newest"}
             onChange={(event) =>
@@ -93,10 +94,10 @@ export function Filters({ categories, value, onChange }: FiltersProps) {
               })
             }
           >
-            <option value="newest">{UI.catalog.newest}</option>
-            <option value="price_asc">{UI.catalog.priceAsc}</option>
-            <option value="price_desc">{UI.catalog.priceDesc}</option>
-            <option value="name">{UI.catalog.name}</option>
+            <option value="newest">{ui.catalog.newest}</option>
+            <option value="price_asc">{ui.catalog.priceAsc}</option>
+            <option value="price_desc">{ui.catalog.priceDesc}</option>
+            <option value="name">{ui.catalog.name}</option>
           </select>
         </div>
       </div>

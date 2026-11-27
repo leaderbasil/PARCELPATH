@@ -15,7 +15,7 @@ import { Input } from "@/components/common/Input";
 import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
 import { StatusBadge } from "@/components/common/StatusBadge";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { statusLabel } from "@/constants/messages";
 import { useDashboard, useOrdersByStatus, useSales } from "@/hooks/useReports";
 import { useLowStock } from "@/hooks/useProducts";
@@ -65,6 +65,7 @@ function KpiCard({ label, children }: { label: string; children: ReactNode }) {
 }
 
 export default function AdminDashboard() {
+  const ui = useUI();
   const [range, setRange] = useState<DateRange>(lastThirtyDays);
   const [draft, setDraft] = useState<DateRange>(range);
 
@@ -108,17 +109,17 @@ export default function AdminDashboard() {
       ) : error ? (
         <ErrorState error={error} onRetry={refetchAll} />
       ) : !dashboard.data ? (
-        <EmptyState message={UI.common.noResults} />
+        <EmptyState message={ui.common.noResults} />
       ) : (
         <>
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label="مؤشرات الأداء">
-            <KpiCard label={UI.admin.todayOrders}>{dashboard.data.today.order_count}</KpiCard>
-            <KpiCard label={UI.admin.todaySales}>
+          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5" aria-label={ui.admin.kpisLabel}>
+            <KpiCard label={ui.admin.todayOrders}>{dashboard.data.today.order_count}</KpiCard>
+            <KpiCard label={ui.admin.todaySales}>
               <MoneyText value={dashboard.data.today.sales_total} />
             </KpiCard>
-            <KpiCard label={UI.admin.pending}>{dashboard.data.pending_count}</KpiCard>
-            <KpiCard label={UI.admin.lowStock}>{dashboard.data.low_stock_count}</KpiCard>
-            <KpiCard label={UI.admin.sales}>
+            <KpiCard label={ui.admin.pending}>{dashboard.data.pending_count}</KpiCard>
+            <KpiCard label={ui.admin.lowStock}>{dashboard.data.low_stock_count}</KpiCard>
+            <KpiCard label={ui.admin.sales}>
               {periodSales ? <MoneyText value={periodSales} /> : "—"}
             </KpiCard>
           </section>
@@ -134,7 +135,7 @@ export default function AdminDashboard() {
               <Input
                 type="date"
                 name="from"
-                label="من"
+                label={ui.admin.from}
                 value={draft.from}
                 max={draft.to || undefined}
                 onChange={(event) => setDraft((current) => ({ ...current, from: event.target.value }))}
@@ -144,21 +145,21 @@ export default function AdminDashboard() {
               <Input
                 type="date"
                 name="to"
-                label="إلى"
+                label={ui.admin.to}
                 value={draft.to}
                 min={draft.from || undefined}
                 onChange={(event) => setDraft((current) => ({ ...current, to: event.target.value }))}
               />
             </div>
-            <Button type="submit">{UI.common.search}</Button>
+            <Button type="submit">{ui.common.search}</Button>
             <span className="text-xs text-text-muted">{range.from} — {range.to}</span>
           </form>
 
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-card border border-border bg-surface p-4 shadow-card">
-              <h2 className="mb-4 text-base font-semibold text-text">{UI.admin.sales}</h2>
+              <h2 className="mb-4 text-base font-semibold text-text">{ui.admin.sales}</h2>
               {dailySales.length === 0 ? (
-                <EmptyState message={UI.common.noResults} />
+                <EmptyState message={ui.common.noResults} />
               ) : (
                 <div dir="ltr" className="h-72 w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -190,7 +191,7 @@ export default function AdminDashboard() {
                       />
                       <Bar
                         dataKey="total"
-                        name={UI.admin.sales}
+                        name={ui.admin.sales}
                         fill={CHART.primary}
                         radius={[4, 4, 0, 0]}
                       />
@@ -201,7 +202,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="rounded-card border border-border bg-surface p-4 shadow-card">
-              <h2 className="mb-4 text-base font-semibold text-text">{UI.admin.statusDistribution}</h2>
+              <h2 className="mb-4 text-base font-semibold text-text">{ui.admin.statusDistribution}</h2>
               <div dir="ltr" className="h-72 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={statusBars} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
@@ -232,7 +233,7 @@ export default function AdminDashboard() {
                     />
                     <Bar
                       dataKey="count"
-                      name={UI.orders.status}
+                      name={ui.orders.status}
                       fill={CHART.primaryStrong}
                       radius={[4, 4, 0, 0]}
                     />
@@ -244,9 +245,9 @@ export default function AdminDashboard() {
 
           <section className="grid gap-4 lg:grid-cols-2">
             <div className="rounded-card border border-border bg-surface p-4 shadow-card">
-              <h2 className="mb-4 text-base font-semibold text-text">{UI.admin.topProducts}</h2>
+              <h2 className="mb-4 text-base font-semibold text-text">{ui.admin.topProducts}</h2>
               {topProducts.length === 0 ? (
-                <EmptyState message={UI.common.noResults} />
+                <EmptyState message={ui.common.noResults} />
               ) : (
                 <ul className="divide-y divide-border">
                   {topProducts.map((product, index) => (
@@ -267,9 +268,9 @@ export default function AdminDashboard() {
             </div>
 
             <div className="rounded-card border border-border bg-surface p-4 shadow-card">
-              <h2 className="mb-4 text-base font-semibold text-text">{UI.admin.lowStock}</h2>
+              <h2 className="mb-4 text-base font-semibold text-text">{ui.admin.lowStock}</h2>
               {(lowStock.data ?? []).length === 0 ? (
-                <EmptyState message={UI.common.noResults} />
+                <EmptyState message={ui.common.noResults} />
               ) : (
                 <ul className="divide-y divide-border">
                   {(lowStock.data ?? []).map((product) => (
@@ -279,7 +280,7 @@ export default function AdminDashboard() {
                         <p className="text-xs text-text-muted">{product.sku}</p>
                       </div>
                       <span className="whitespace-nowrap rounded-full bg-warning-soft px-2.5 py-0.5 text-xs font-medium text-warning-strong">
-                        {UI.admin.stock}: {product.stock_quantity}
+                        {ui.admin.stock}: {product.stock_quantity}
                       </span>
                     </li>
                   ))}
@@ -289,7 +290,7 @@ export default function AdminDashboard() {
           </section>
 
           <section className="rounded-card border border-border bg-surface p-4 shadow-card">
-            <h2 className="mb-4 text-base font-semibold text-text">{UI.admin.statusDistribution}</h2>
+            <h2 className="mb-4 text-base font-semibold text-text">{ui.admin.statusDistribution}</h2>
             <div className="flex flex-wrap gap-2">
               {STATUS_ORDER.map((status) => (
                 <div

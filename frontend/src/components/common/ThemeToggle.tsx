@@ -1,10 +1,11 @@
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { useTheme } from "@/hooks/useTheme";
 import { cn } from "@/utils/cn";
 
 export function ThemeToggle({ className }: { className?: string }) {
+  const ui = useUI();
   const { theme, toggleTheme } = useTheme();
-  const label = theme === "dark" ? UI.common.switchToLight : UI.common.switchToDark;
+  const label = theme === "dark" ? ui.common.switchToLight : ui.common.switchToDark;
   return (
     <button
       type="button"

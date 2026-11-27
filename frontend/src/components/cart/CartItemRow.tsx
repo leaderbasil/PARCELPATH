@@ -1,7 +1,7 @@
 import { Button } from "@/components/common/Button";
 import { MoneyText } from "@/components/common/MoneyText";
 import { ProductImage } from "@/components/common/ProductImage";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { useCart } from "@/context/CartContext";
 import type { CartItem } from "@/types/domain";
 import { multiplyMoney } from "@/utils/money";
@@ -9,6 +9,7 @@ import { multiplyMoney } from "@/utils/money";
 const MAX_QUANTITY = 99;
 
 export function CartItemRow({ item }: { item: CartItem }) {
+  const ui = useUI();
   const { updateQuantity, removeItem } = useCart();
 
   const stockLimit = item.stock_quantity > 0 ? item.stock_quantity : undefined;
@@ -70,7 +71,7 @@ export function CartItemRow({ item }: { item: CartItem }) {
             onClick={() => removeItem(item.product_id)}
             className="px-2 py-1 text-xs text-danger"
           >
-            {UI.cart.remove}
+            {ui.cart.remove}
           </Button>
         </div>
       </div>

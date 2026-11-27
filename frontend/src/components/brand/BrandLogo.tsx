@@ -1,3 +1,4 @@
+import { useUI } from "@/i18n";
 import { cn } from "@/utils/cn";
 
 interface BrandLogoProps {
@@ -47,6 +48,7 @@ export function BrandLogo({
   showTagline = false,
   inverse = false,
 }: BrandLogoProps) {
+  const ui = useUI();
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <BrandMark className={markClassName} />
@@ -67,7 +69,7 @@ export function BrandLogo({
                 inverse ? "text-surface/70" : "text-text-muted"
               )}
             >
-              متجر الطلبات والتتبّع
+              {ui.appName}
             </span>
           ) : null}
         </span>

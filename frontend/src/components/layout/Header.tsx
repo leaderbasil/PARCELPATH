@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { Button } from "@/components/common/Button";
+import { LanguageToggle } from "@/components/common/LanguageToggle";
 import {
   CartIcon,
   CloseIcon,
@@ -13,7 +14,7 @@ import {
   ProductsIcon,
 } from "@/components/common/Icons";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
-import { UI } from "@/constants/ui";
+import { useI18n } from "@/i18n";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { isDemoMode } from "@/services/demoMode";
@@ -73,12 +74,13 @@ function MobileNavLink({ to, label, icon, end, onNavigate }: MobileNavLinkProps)
 }
 
 export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
+  const { ui, locale } = useI18n();
   const { isAuthenticated, user, logout } = useAuth();
   const { itemCount } = useCart();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const demoMode = isDemoMode();
-  const page = pageMetaForPath(pathname);
+  const page = pageMetaForPath(pathname, locale);
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -121,7 +123,7 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
           <button
             type="button"
             onClick={onOpenSidebar}
-            aria-label={UI.admin.openMenu}
+            aria-label={ui.admin.openMenu}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-background hover:text-text md:hidden"
           >
             <MenuIcon />
@@ -135,10 +137,11 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
         <div className="flex shrink-0 items-center gap-2">
           {demoMode ? (
             <span className="hidden rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-strong sm:inline">
-              {UI.auth.demoBadge}
+              {ui.auth.demoBadge}
             </span>
           ) : null}
           <ThemeToggle />
+          <LanguageToggle />
           {user ? (
             <div className="flex items-center gap-2 rounded-lg border border-border bg-surface p-1 ps-2">
               <span
@@ -150,14 +153,14 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
               <div className="hidden pe-1 leading-tight sm:block">
                 <p className="text-xs font-medium text-text">{user.full_name}</p>
                 <p className="text-[11px] text-text-muted">
-                  {user.role === "ADMIN" ? UI.admin.roleAdmin : UI.admin.roleCustomer}
+                  {user.role === "ADMIN" ? ui.admin.roleAdmin : ui.admin.roleCustomer}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={handleLogout}
-                aria-label={UI.nav.logout}
-                title={UI.nav.logout}
+                aria-label={ui.nav.logout}
+                title={ui.nav.logout}
                 className="flex h-8 w-8 items-center justify-center rounded-md text-text-muted hover:bg-danger-soft hover:text-danger-strong"
               >
                 <LogoutIcon className="h-4 w-4" />
@@ -182,7 +185,7 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
           <button
             type="button"
             onClick={() => setMenuOpen(true)}
-            aria-label={UI.admin.openMenu}
+            aria-label={ui.admin.openMenu}
             aria-expanded={menuOpen}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-text-muted hover:bg-background hover:text-text lg:hidden"
           >
@@ -198,24 +201,24 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
           {isAuthenticated ? (
             <nav
               className="hidden items-center gap-2 border-s border-border ps-3 lg:flex"
-              aria-label={UI.appName}
+              aria-label={ui.appName}
             >
               <NavLink end to="/" className={({ isActive }) => storefrontButtonClass(isActive)}>
                 <ProductsIcon className="h-4 w-4" />
-                {UI.nav.catalog}
+                {ui.nav.catalog}
               </NavLink>
               <NavLink to="/cart" className={({ isActive }) => storefrontButtonClass(isActive)}>
                 <CartIcon className="h-4 w-4" />
-                {UI.nav.cart}
+                {ui.nav.cart}
               </NavLink>
               <NavLink to="/orders" className={({ isActive }) => storefrontButtonClass(isActive)}>
                 <OrdersIcon className="h-4 w-4" />
-                {UI.nav.myOrders}
+                {ui.nav.myOrders}
               </NavLink>
               {user?.role === "ADMIN" ? (
                 <NavLink to="/admin" className={({ isActive }) => storefrontButtonClass(isActive)}>
                   <DashboardIcon className="h-4 w-4" />
-                  {UI.nav.dashboard}
+                  {ui.nav.dashboard}
                 </NavLink>
               ) : null}
             </nav>
@@ -224,10 +227,11 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
 
         <div className="flex shrink-0 items-center gap-2">
           <ThemeToggle />
+          <LanguageToggle />
           {isAuthenticated ? (
             <Link
               to="/cart"
-              aria-label={`${UI.nav.cart} (${itemCount})`}
+              aria-label={`${ui.nav.cart} (${itemCount})`}
               className="relative hidden h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-muted hover:bg-background hover:text-text lg:flex"
             >
               <CartIcon className="h-[18px] w-[18px]" />
@@ -242,17 +246,17 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
             <>
               {demoMode ? (
                 <span className="hidden rounded-full bg-primary-soft px-2.5 py-1 text-xs font-medium text-primary-strong xl:inline">
-                  {UI.auth.demoBadge}
+                  {ui.auth.demoBadge}
                 </span>
               ) : null}
               <Button variant="secondary" onClick={handleLogout} className="hidden sm:inline-flex">
-                {UI.nav.logout}
+                {ui.nav.logout}
               </Button>
               <button
                 type="button"
                 onClick={handleLogout}
-                aria-label={UI.nav.logout}
-                title={UI.nav.logout}
+                aria-label={ui.nav.logout}
+                title={ui.nav.logout}
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-surface text-text-muted hover:bg-danger-soft hover:text-danger-strong sm:hidden"
               >
                 <LogoutIcon className="h-4 w-4" />
@@ -261,10 +265,10 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
           ) : (
             <>
               <Link to="/login" className="hidden sm:block">
-                <Button variant="ghost">{UI.nav.login}</Button>
+                <Button variant="ghost">{ui.nav.login}</Button>
               </Link>
               <Link to="/register">
-                <Button>{UI.nav.register}</Button>
+                <Button>{ui.nav.register}</Button>
               </Link>
             </>
           )}
@@ -275,7 +279,7 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
       {isAuthenticated ? (
         <Link
           to="/cart"
-          aria-label={`${UI.nav.cart} (${itemCount})`}
+          aria-label={`${ui.nav.cart} (${itemCount})`}
           className="fixed bottom-5 end-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-surface shadow-lg transition-colors hover:bg-primary-strong lg:hidden"
         >
           <CartIcon className="h-6 w-6" />
@@ -291,14 +295,14 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
         <div className="fixed inset-0 z-40 lg:hidden">
           <button
             type="button"
-            aria-label={UI.common.close}
+            aria-label={ui.common.close}
             onClick={() => setMenuOpen(false)}
             className="absolute inset-0 h-full w-full bg-overlay/40 backdrop-blur-sm"
           />
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={UI.admin.openMenu}
+            aria-label={ui.admin.openMenu}
             className="absolute inset-y-0 start-0 flex w-72 max-w-[85vw] flex-col border-e border-border bg-surface p-4 shadow-xl"
           >
             <div className="mb-5 flex items-center justify-between gap-2">
@@ -306,39 +310,39 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
-                aria-label={UI.common.close}
+                aria-label={ui.common.close}
                 className="flex h-9 w-9 items-center justify-center rounded-lg text-text-muted hover:bg-background hover:text-text"
               >
                 <CloseIcon />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-1" aria-label={UI.appName}>
+            <nav className="flex flex-col gap-1" aria-label={ui.appName}>
               {isAuthenticated ? (
                 <>
                   <MobileNavLink
                     to="/"
                     end
-                    label={UI.nav.catalog}
+                    label={ui.nav.catalog}
                     icon={<ProductsIcon className="h-4 w-4" />}
                     onNavigate={() => setMenuOpen(false)}
                   />
                   <MobileNavLink
                     to="/cart"
-                    label={UI.nav.cart}
+                    label={ui.nav.cart}
                     icon={<CartIcon className="h-4 w-4" />}
                     onNavigate={() => setMenuOpen(false)}
                   />
                   <MobileNavLink
                     to="/orders"
-                    label={UI.nav.myOrders}
+                    label={ui.nav.myOrders}
                     icon={<OrdersIcon className="h-4 w-4" />}
                     onNavigate={() => setMenuOpen(false)}
                   />
                   {user?.role === "ADMIN" ? (
                     <MobileNavLink
                       to="/admin"
-                      label={UI.nav.dashboard}
+                      label={ui.nav.dashboard}
                       icon={<DashboardIcon className="h-4 w-4" />}
                       onNavigate={() => setMenuOpen(false)}
                     />
@@ -348,13 +352,13 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
                 <>
                   <MobileNavLink
                     to="/login"
-                    label={UI.nav.login}
+                    label={ui.nav.login}
                     icon={null}
                     onNavigate={() => setMenuOpen(false)}
                   />
                   <MobileNavLink
                     to="/register"
-                    label={UI.nav.register}
+                    label={ui.nav.register}
                     icon={null}
                     onNavigate={() => setMenuOpen(false)}
                   />
@@ -372,7 +376,7 @@ export function Header({ isAdmin = false, onOpenSidebar }: HeaderProps) {
                 className="mt-auto flex items-center gap-3 rounded-lg px-3 py-2.5 text-start text-sm font-medium text-danger hover:bg-danger-soft"
               >
                 <LogoutIcon className="h-4 w-4" />
-                {UI.nav.logout}
+                {ui.nav.logout}
               </button>
             ) : null}
           </div>

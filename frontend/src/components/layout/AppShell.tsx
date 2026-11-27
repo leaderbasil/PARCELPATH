@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 
+import { useI18n } from "@/i18n";
 import { Header } from "./Header";
 import { AdminSidebar } from "./AdminSidebar";
 
 export function AppShell() {
   const location = useLocation();
+  const { dir } = useI18n();
   const isAdmin = location.pathname.startsWith("/admin");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div dir="rtl" className="min-h-screen bg-background font-sans text-text">
+    <div dir={dir} className="min-h-screen bg-background font-sans text-text">
       <div className="flex min-h-screen">
         {isAdmin ? <AdminSidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} /> : null}
         <div className="flex min-w-0 flex-1 flex-col">

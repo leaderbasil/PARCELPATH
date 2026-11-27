@@ -6,6 +6,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { AppShell } from "@/components/layout/AppShell";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
+import { I18nProvider } from "@/i18n";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { LoadingState } from "@/components/common/LoadingState";
 import { ProtectedRoute } from "@/routes/ProtectedRoute";
@@ -37,97 +38,99 @@ const queryClient = new QueryClient({
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <CartProvider>
-              <Suspense fallback={<LoadingState variant="page" />}>
-                <Routes>
-                  <Route path="login" element={<Login />} />
-                  <Route path="register" element={<Register />} />
-                  <Route element={<AppShell />}>
-                    <Route index element={<Catalog />} />
-                    <Route path="products/:id" element={<ProductDetails />} />
-                    <Route path="cart" element={<Cart />} />
-                    <Route path="403" element={<Forbidden />} />
+    <I18nProvider>
+      <ErrorBoundary>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClient}>
+            <BrowserRouter>
+              <AuthProvider>
+                <CartProvider>
+                  <Suspense fallback={<LoadingState variant="page" />}>
+                    <Routes>
+                      <Route path="login" element={<Login />} />
+                      <Route path="register" element={<Register />} />
+                      <Route element={<AppShell />}>
+                        <Route index element={<Catalog />} />
+                        <Route path="products/:id" element={<ProductDetails />} />
+                        <Route path="cart" element={<Cart />} />
+                        <Route path="403" element={<Forbidden />} />
 
-                    <Route
-                      path="checkout"
-                      element={
-                        <ProtectedRoute roles={["CUSTOMER"]}>
-                          <Checkout />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="orders"
-                      element={
-                        <ProtectedRoute roles={["CUSTOMER"]}>
-                          <MyOrders />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="orders/:id"
-                      element={
-                        <ProtectedRoute roles={["CUSTOMER"]}>
-                          <OrderDetails />
-                        </ProtectedRoute>
-                      }
-                    />
+                        <Route
+                          path="checkout"
+                          element={
+                            <ProtectedRoute roles={["CUSTOMER"]}>
+                              <Checkout />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="orders"
+                          element={
+                            <ProtectedRoute roles={["CUSTOMER"]}>
+                              <MyOrders />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="orders/:id"
+                          element={
+                            <ProtectedRoute roles={["CUSTOMER"]}>
+                              <OrderDetails />
+                            </ProtectedRoute>
+                          }
+                        />
 
-                    <Route
-                      path="admin"
-                      element={
-                        <ProtectedRoute roles={["ADMIN"]}>
-                          <AdminDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="admin/orders"
-                      element={
-                        <ProtectedRoute roles={["ADMIN"]}>
-                          <AdminOrders />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="admin/orders/:id"
-                      element={
-                        <ProtectedRoute roles={["ADMIN"]}>
-                          <AdminOrderDetails />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="admin/products"
-                      element={
-                        <ProtectedRoute roles={["ADMIN"]}>
-                          <AdminProducts />
-                        </ProtectedRoute>
-                      }
-                    />
-                    <Route
-                      path="admin/users"
-                      element={
-                        <ProtectedRoute roles={["ADMIN"]}>
-                          <AdminUsers />
-                        </ProtectedRoute>
-                      }
-                    />
+                        <Route
+                          path="admin"
+                          element={
+                            <ProtectedRoute roles={["ADMIN"]}>
+                              <AdminDashboard />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="admin/orders"
+                          element={
+                            <ProtectedRoute roles={["ADMIN"]}>
+                              <AdminOrders />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="admin/orders/:id"
+                          element={
+                            <ProtectedRoute roles={["ADMIN"]}>
+                              <AdminOrderDetails />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="admin/products"
+                          element={
+                            <ProtectedRoute roles={["ADMIN"]}>
+                              <AdminProducts />
+                            </ProtectedRoute>
+                          }
+                        />
+                        <Route
+                          path="admin/users"
+                          element={
+                            <ProtectedRoute roles={["ADMIN"]}>
+                              <AdminUsers />
+                            </ProtectedRoute>
+                          }
+                        />
 
-                    <Route path="*" element={<NotFound />} />
-                  </Route>
-                </Routes>
-              </Suspense>
-            </CartProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-      </ThemeProvider>
-    </ErrorBoundary>
+                        <Route path="*" element={<NotFound />} />
+                      </Route>
+                    </Routes>
+                  </Suspense>
+                </CartProvider>
+              </AuthProvider>
+            </BrowserRouter>
+          </QueryClientProvider>
+        </ThemeProvider>
+      </ErrorBoundary>
+    </I18nProvider>
   );
 }

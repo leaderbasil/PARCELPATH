@@ -1,4 +1,4 @@
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { cn } from "@/utils/cn";
 import { googleMapsSearchUrl, safeGoogleMapsHref } from "@/utils/googleMaps";
 
@@ -9,6 +9,7 @@ interface MapLinkProps {
 }
 
 export function MapLink({ query, url, className }: MapLinkProps) {
+  const ui = useUI();
   const target = safeGoogleMapsHref(url) ?? (query?.trim() ? googleMapsSearchUrl(query.trim()) : "");
   if (!target) return null;
 
@@ -17,13 +18,13 @@ export function MapLink({ query, url, className }: MapLinkProps) {
       href={target}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={`${UI.checkout.viewOnMap} - ${UI.checkout.mapNewTab}`}
+      aria-label={`${ui.checkout.viewOnMap} - ${ui.checkout.mapNewTab}`}
       className={cn(
         "inline-flex items-center gap-1 text-xs font-medium text-primary-strong underline underline-offset-2 hover:text-primary",
         className
       )}
     >
-      {UI.checkout.viewOnMap}
+      {ui.checkout.viewOnMap}
     </a>
   );
 }

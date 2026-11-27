@@ -1,3 +1,4 @@
+import { getCurrentLocale, type Locale } from "@/i18n";
 import type { Money } from "@/types/domain";
 
 /** Convert a fixed two-decimal money string into integer subunits (no float math). */
@@ -27,9 +28,9 @@ export function multiplyMoney(amount: Money, quantity: number): Money {
   return fromSubunits(toSubunits(amount) * Math.trunc(quantity));
 }
 
-/** Display money with the configured locale. */
-export function formatMoney(amount: Money): string {
-  return new Intl.NumberFormat("ar-EG", {
+/** Display money with the active interface locale. */
+export function formatMoney(amount: Money, locale: Locale = getCurrentLocale()): string {
+  return new Intl.NumberFormat(locale === "en" ? "en-US" : "ar-EG", {
     style: "currency",
     currency: "USD",
     minimumFractionDigits: 2,

@@ -1,4 +1,6 @@
 /** Single source of truth for runtime configuration. */
+import ar from "@/locales/ar.json";
+
 const env = import.meta.env as Record<string, unknown>;
 
 function readEnv(name: string): string | undefined {
@@ -26,7 +28,7 @@ export const config = {
   healthUrl,
   objectStorageUploadUrl,
   whatsappCountryCode,
-  appName: "متجر الطلبات والتتبّع",
+  appName: ar.ui.appName,
   trackingPollMs: 30_000,
   pageSize: 12,
   currency: new Intl.NumberFormat("ar-EG", {

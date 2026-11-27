@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { ConfirmDialog } from "@/components/common/ConfirmDialog";
 import { getErrorMessage } from "@/constants/messages";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { useCancelOrder, useChangeStatus } from "@/hooks/useOrders";
 import { ApiRequestError } from "@/services/api";
 import type { Order, OrderStatus, OrderStatusIn } from "@/types/domain";
@@ -11,13 +11,6 @@ import { cn } from "@/utils/cn";
 import { ShipModal } from "./ShipModal";
 
 type ChangeStatusTarget = OrderStatusIn["status"];
-
-const CHANGE_STATUS_LABELS: Record<ChangeStatusTarget, string> = {
-  CONFIRMED: UI.admin.confirmOrder,
-  PACKED: UI.admin.packOrder,
-  OUT_FOR_DELIVERY: UI.admin.outForDelivery,
-  DELIVERED: UI.admin.deliverOrder,
-};
 
 function isChangeStatusTarget(status: OrderStatus): status is ChangeStatusTarget {
   return (
@@ -28,13 +21,20 @@ function isChangeStatusTarget(status: OrderStatus): status is ChangeStatusTarget
   );
 }
 
-function describeError(error: unknown): string {
+function describeError(error: unknown, fallback: string): string {
   if (error instanceof ApiRequestError) return getErrorMessage(error.code, error.message);
   if (error instanceof Error && error.message) return error.message;
-  return UI.common.error;
+  return fallback;
 }
 
 export function StatusActions({ order, isAdmin }: { order: Order; isAdmin: boolean }) {
+  const ui = useUI();
+  const changeStatusLabels: Record<ChangeStatusTarget, string> = {
+    CONFIRMED: ui.admin.confirmOrder,
+    PACKED: ui.admin.packOrder,
+    OUT_FOR_DELIVERY: ui.admin.outForDelivery,
+    DELIVERED: ui.admin.deliverOrder,
+  };
   const cancelOrder = useCancelOrder();
   const changeStatus = useChangeStatus();
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -49,7 +49,7 @@ export function StatusActions({ order, isAdmin }: { order: Order; isAdmin: boole
 
   const isBusy = cancelOrder.isPending || changeStatus.isPending;
   const mutationError = changeStatus.error ?? cancelOrder.error;
-  const errorMessage = mutationError ? describeError(mutationError) : null;
+  const errorMessage = mutationError ? describeError(mutationError, ui.common.error) : null;
 
   const handleCancel = () => {
     cancelOrder.mutate(order.id, {
@@ -74,7 +74,7 @@ export function StatusActions({ order, isAdmin }: { order: Order; isAdmin: boole
           onClick={() => changeStatus.mutate({ id: order.id, payload: { status: target } })}
           className={cn(target === "PACKED" && "px-3 py-1.5 text-xs")}
         >
-          {CHANGE_STATUS_LABELS[target]}
+          {changeStatusLabels[target]}
         </Button>
       ))}
 
@@ -85,7 +85,7 @@ export function StatusActions({ order, isAdmin }: { order: Order; isAdmin: boole
           onClick={() => setShipOpen(true)}
           className="px-3 py-1.5 text-xs"
         >
-          {UI.admin.shipOrder}
+          {ui.admin.shipOrder}
         </Button>
       ) : null}
 
@@ -97,12 +97,12 @@ export function StatusActions({ order, isAdmin }: { order: Order; isAdmin: boole
             onClick={() => setConfirmOpen(true)}
             className="px-3 py-1.5 text-xs"
           >
-            {UI.orders.cancel}
+            {ui.orders.cancel}
           </Button>
           <ConfirmDialog
             open={confirmOpen}
-            title={UI.orders.cancel}
-            message={UI.orders.cancelConfirm}
+            title={ui.orders.cancel}
+            message={ui.orders.cancelConfirm}
             loading={cancelOrder.isPending}
             onConfirm={handleCancel}
             onCancel={() => setConfirmOpen(false)}

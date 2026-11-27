@@ -15,10 +15,11 @@ import { OrderNumberBadge } from "@/components/orders/OrderNumberBadge";
 import { StatusActions } from "@/components/orders/StatusActions";
 import { OrderTimeline } from "@/components/tracking/OrderTimeline";
 import { statusLabel } from "@/constants/messages";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { useOrder, useTracking } from "@/hooks/useOrders";
 
 export default function OrderDetails() {
+  const ui = useUI();
   const params = useParams<{ id: string }>();
   const id = params.id ?? "";
   const { data: order, isLoading, isError, error, refetch } = useOrder(id);
@@ -30,7 +31,7 @@ export default function OrderDetails() {
 
   if (isLoading) return <LoadingState variant="orderDetail" />;
   if (isError) return <ErrorState error={error} onRetry={() => void refetch()} />;
-  if (!order) return <EmptyState message={UI.orders.empty} />;
+  if (!order) return <EmptyState message={ui.orders.empty} />;
 
   const handleCopy = async (): Promise<void> => {
     const value = order.tracking_number;
@@ -64,16 +65,16 @@ export default function OrderDetails() {
       </div>
 
       <section className="rounded-card border border-border bg-surface p-6 shadow-card">
-        <h2 className="mb-4 text-lg font-semibold text-text">{UI.orders.items}</h2>
+        <h2 className="mb-4 text-lg font-semibold text-text">{ui.orders.items}</h2>
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b border-border text-right text-text-muted">
-                <th className="p-2 font-medium">{UI.catalog.name}</th>
-                <th className="p-2 font-medium">{UI.orders.items}</th>
-                <th className="p-2 font-medium">{UI.admin.stock}</th>
-                <th className="p-2 font-medium">سعر الوحدة</th>
-                <th className="p-2 font-medium">{UI.cart.total}</th>
+                <th className="p-2 font-medium">{ui.catalog.name}</th>
+                <th className="p-2 font-medium">{ui.orders.items}</th>
+                <th className="p-2 font-medium">{ui.admin.stock}</th>
+                <th className="p-2 font-medium">{ui.admin.unitPrice}</th>
+                <th className="p-2 font-medium">{ui.cart.total}</th>
               </tr>
             </thead>
             <tbody>
@@ -97,15 +98,15 @@ export default function OrderDetails() {
         </div>
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-4">
-            <dt className="text-text-muted">{UI.cart.subtotal}</dt>
+            <dt className="text-text-muted">{ui.cart.subtotal}</dt>
             <dd><MoneyText value={order.subtotal} /></dd>
           </div>
           <div className="flex justify-between gap-4">
-            <dt className="text-text-muted">{UI.cart.shippingFee}</dt>
+            <dt className="text-text-muted">{ui.cart.shippingFee}</dt>
             <dd><MoneyText value={order.shipping_fee} /></dd>
           </div>
           <div className="flex justify-between gap-4 font-semibold text-primary-strong">
-            <dt>{UI.cart.total}</dt>
+            <dt>{ui.cart.total}</dt>
             <dd><MoneyText value={order.total_amount} /></dd>
           </div>
         </dl>
@@ -113,22 +114,22 @@ export default function OrderDetails() {
 
       <section className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <div className="rounded-card border border-border bg-surface p-6 shadow-card">
-          <h2 className="mb-4 text-lg font-semibold text-text">{UI.checkout.shippingInfo}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-text">{ui.checkout.shippingInfo}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.fullName}</dt>
+              <dt className="text-text-muted">{ui.checkout.fullName}</dt>
               <dd className="text-text">{order.shipping.name}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.phone}</dt>
+              <dt className="text-text-muted">{ui.checkout.phone}</dt>
               <dd className="text-text" dir="ltr">{order.shipping.phone}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.city}</dt>
+              <dt className="text-text-muted">{ui.checkout.city}</dt>
               <dd className="text-text">{order.shipping.city}</dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.address}</dt>
+              <dt className="text-text-muted">{ui.checkout.address}</dt>
               <dd className="text-right text-text">{order.shipping.address}</dd>
             </div>
             <div className="pt-1">
@@ -137,26 +138,26 @@ export default function OrderDetails() {
           </dl>
         </div>
         <div className="rounded-card border border-border bg-surface p-6 shadow-card">
-          <h2 className="mb-4 text-lg font-semibold text-text">{UI.orders.track}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-text">{ui.orders.track}</h2>
           <dl className="space-y-2 text-sm">
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.checkout.paymentMethod}</dt>
+              <dt className="text-text-muted">{ui.checkout.paymentMethod}</dt>
               <dd className="text-text">
-                {order.payment_method === "COD" ? UI.checkout.cod : UI.checkout.card}
+                {order.payment_method === "COD" ? ui.checkout.cod : ui.checkout.card}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.orders.status}</dt>
+              <dt className="text-text-muted">{ui.orders.status}</dt>
               <dd className="text-text">
-                {order.payment_status === "PAID" ? "مدفوع" : "غير مدفوع"}
+                {order.payment_status === "PAID" ? ui.orders.paid : ui.orders.unpaid}
               </dd>
             </div>
             <div className="flex justify-between gap-4">
-              <dt className="text-text-muted">{UI.orders.carrier}</dt>
+              <dt className="text-text-muted">{ui.orders.carrier}</dt>
               <dd className="text-text">{order.carrier ?? "—"}</dd>
             </div>
             <div className="flex items-center justify-between gap-4">
-              <dt className="text-text-muted">{UI.orders.trackingNumber}</dt>
+              <dt className="text-text-muted">{ui.orders.trackingNumber}</dt>
               <dd className="text-text" dir="ltr">
                 {order.tracking_number ?? "—"}
               </dd>
@@ -169,14 +170,14 @@ export default function OrderDetails() {
                 className="rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-primary-strong hover:bg-primary-soft"
                 onClick={() => void handleCopy()}
               >
-                {copied ? "تم النسخ" : UI.orders.copy}
+                {copied ? ui.orders.copied : ui.orders.copy}
               </button>
             </div>
           ) : null}
           {order.courier_phone &&
           (order.status === "OUT_FOR_DELIVERY" || order.status === "DELIVERED") ? (
             <div className="mt-4 rounded-lg border border-primary-soft bg-primary-soft/40 p-3 text-sm">
-              <p className="mb-2 font-medium text-text">{UI.orders.courierPhone}</p>
+              <p className="mb-2 font-medium text-text">{ui.orders.courierPhone}</p>
               <CourierContactButtons phone={order.courier_phone} />
             </div>
           ) : null}
@@ -203,7 +204,7 @@ export default function OrderDetails() {
       <Link to="/orders" className="mt-6 inline-block">
         <Button variant="secondary">
           <BackIcon className="h-4 w-4" />
-          {UI.common.back}
+          {ui.common.back}
         </Button>
       </Link>
     </main>

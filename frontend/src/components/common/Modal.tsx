@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { Button } from "./Button";
 
 interface ModalProps {
@@ -38,6 +38,7 @@ function unlockPageScroll(): void {
 }
 
 export function Modal({ open, title, onClose, children, footer }: ModalProps) {
+  const ui = useUI();
   useEffect(() => {
     if (!open) return;
     lockPageScroll();
@@ -56,7 +57,7 @@ export function Modal({ open, title, onClose, children, footer }: ModalProps) {
       >
         <div className="mb-4 flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold text-text">{title}</h2>
-          <Button variant="ghost" aria-label={UI.common.close} onClick={onClose}>
+          <Button variant="ghost" aria-label={ui.common.close} onClick={onClose}>
             ×
           </Button>
         </div>

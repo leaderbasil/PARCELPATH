@@ -1,7 +1,7 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { Button } from "@/components/common/Button";
 import { BackIcon } from "@/components/common/Icons";
-import { UI } from "@/constants/ui";
+import { getUI } from "@/i18n";
 
 interface Props {
   children: ReactNode;
@@ -23,14 +23,15 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   override render(): ReactNode {
+    const ui = getUI();
     if (this.state.hasError) {
       return (
         <div className="p-8 text-center">
-          <h1 className="text-xl font-semibold text-text">{UI.errors.boundaryTitle}</h1>
+          <h1 className="text-xl font-semibold text-text">{ui.errors.boundaryTitle}</h1>
           <a href="/" className="mt-4 inline-block">
             <Button variant="secondary">
               <BackIcon className="h-4 w-4" />
-              {UI.common.back}
+              {ui.common.back}
             </Button>
           </a>
         </div>

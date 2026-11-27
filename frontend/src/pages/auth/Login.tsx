@@ -11,24 +11,21 @@ import { Modal } from "@/components/common/Modal";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { getErrorMessage } from "@/constants/messages";
 import { DEMO_AUTO_LOGIN_DISABLED_KEY, demoLoginEnabled } from "@/constants/demo";
-import { UI } from "@/constants/ui";
+import { getCurrentLocale, getTranslation, useUI, type Locale } from "@/i18n";
 import { useAuth } from "@/context/AuthContext";
 import { ApiRequestError } from "@/services/api";
 import { authService } from "@/services/auth.service";
 import type { Role } from "@/types/domain";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, "البريد الإلكتروني مطلوب")
-    .email("أدخل بريدًا إلكترونيًا صحيحًا"),
-  password: z
-    .string()
-    .min(1, "كلمة المرور مطلوبة")
-    .min(8, "كلمة المرور يجب ألا تقل عن 8 أحرف"),
-});
+function buildSchema(locale: Locale) {
+  const messages = getTranslation(locale).validation;
+  return z.object({
+    email: z.string().min(1, messages.emailRequired).email(messages.emailInvalid),
+    password: z.string().min(1, messages.passwordRequired).min(8, messages.passwordTooShort),
+  });
+}
 
-type LoginValues = z.infer<typeof loginSchema>;
+type LoginValues = z.infer<ReturnType<typeof buildSchema>>;
 
 function readRedirectTarget(state: unknown): string | undefined {
   if (typeof state !== "object" || state === null || !("from" in state)) return undefined;
@@ -37,6 +34,7 @@ function readRedirectTarget(state: unknown): string | undefined {
 }
 
 export default function Login() {
+  const ui = useUI();
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,7 +48,8 @@ export default function Login() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: (values, context, options) =>
+      zodResolver(buildSchema(getCurrentLocale()))(values, context, options),
     defaultValues: { email: "", password: "" },
   });
 
@@ -111,9 +110,9 @@ export default function Login() {
     <AuthLayout>
       <div className="mb-7 text-center">
         <h1 className="text-2xl font-bold leading-snug text-text sm:text-3xl">
-          {UI.auth.welcomeBack}
+          {ui.auth.welcomeBack}
         </h1>
-        <p className="mt-2 text-sm leading-6 text-text-muted">{UI.auth.welcomeBackSubtitle}</p>
+        <p className="mt-2 text-sm leading-6 text-text-muted">{ui.auth.welcomeBackSubtitle}</p>
       </div>
 
       <form noValidate onSubmit={(event) => void handleSubmit(onSubmit)(event)} className="space-y-4">
@@ -128,7 +127,7 @@ export default function Login() {
         ) : null}
 
         <Input
-          label={UI.auth.email}
+          label={ui.auth.email}
           type="email"
           inputMode="email"
           autoComplete="username"
@@ -140,7 +139,7 @@ export default function Login() {
         <div>
           <div className="relative">
             <Input
-              label={UI.auth.password}
+              label={ui.auth.password}
               type={showPassword ? "text" : "password"}
               autoComplete="current-password"
               className="h-11 pe-12 text-base"
@@ -149,8 +148,8 @@ export default function Login() {
             />
             <button
               type="button"
-              aria-label={showPassword ? UI.auth.hidePassword : UI.auth.showPassword}
-              title={showPassword ? UI.auth.hidePassword : UI.auth.showPassword}
+              aria-label={showPassword ? ui.auth.hidePassword : ui.auth.showPassword}
+              title={showPassword ? ui.auth.hidePassword : ui.auth.showPassword}
               onClick={() => setShowPassword((current) => !current)}
               className="absolute end-0 top-[26px] flex h-11 w-11 items-center justify-center rounded-lg text-text-muted transition-colors hover:text-text"
             >
@@ -160,7 +159,7 @@ export default function Login() {
         </div>
 
         <Button type="submit" loading={isSubmitting} className="h-11 w-full text-base">
-          {isSubmitting ? UI.auth.signingIn : UI.nav.login}
+          {isSubmitting ? ui.auth.signingIn : ui.nav.login}
         </Button>
       </form>
 
@@ -168,13 +167,13 @@ export default function Login() {
         <div className="mt-7">
           <div className="mb-5 flex items-center gap-3" aria-hidden="true">
             <span className="h-px flex-1 bg-border" />
-            <span className="text-xs text-text-muted">{UI.auth.demoDivider}</span>
+            <span className="text-xs text-text-muted">{ui.auth.demoDivider}</span>
             <span className="h-px flex-1 bg-border" />
           </div>
           <div className="rounded-2xl border border-primary/30 bg-primary-soft p-4">
             <div className="mb-3 text-center">
-              <p className="text-sm font-semibold text-text">{UI.auth.demoTitle}</p>
-              <p className="mt-1 text-xs leading-5 text-text-muted">{UI.auth.demoHint}</p>
+              <p className="text-sm font-semibold text-text">{ui.auth.demoTitle}</p>
+              <p className="mt-1 text-xs leading-5 text-text-muted">{ui.auth.demoHint}</p>
             </div>
             <Button
               variant="secondary"
@@ -184,25 +183,25 @@ export default function Login() {
               className="h-12 w-full border-primary/40 bg-surface text-primary-strong hover:bg-primary-soft"
             >
               <SparkleIcon className="h-4 w-4" />
-              {UI.auth.demoLogin}
+              {ui.auth.demoLogin}
             </Button>
           </div>
         </div>
       ) : null}
 
       <div className="mt-7 border-t border-border pt-5 text-center text-sm text-text-muted">
-        {UI.auth.noAccount}{" "}
+        {ui.auth.noAccount}{" "}
         <Link to="/register" className="font-semibold text-primary-strong hover:underline">
-          {UI.auth.registerTitle}
+          {ui.auth.registerTitle}
         </Link>
       </div>
 
       <Modal
         open={demoPickerOpen}
-        title={UI.auth.demoRoleTitle}
+        title={ui.auth.demoRoleTitle}
         onClose={() => setDemoPickerOpen(false)}
       >
-        <p className="text-sm text-text-muted">{UI.auth.demoRoleHint}</p>
+        <p className="text-sm text-text-muted">{ui.auth.demoRoleHint}</p>
         <div className="grid gap-3 sm:grid-cols-2">
           <button
             type="button"
@@ -215,12 +214,12 @@ export default function Login() {
             </span>
             <span className="flex flex-col gap-1">
               <span className="flex flex-wrap items-center gap-2 font-semibold text-text">
-                {UI.auth.demoCustomer}
+                {ui.auth.demoCustomer}
                 {demoLoadingRole === "CUSTOMER" ? (
-                  <span className="text-xs font-normal text-primary-strong">{UI.common.loading}</span>
+                  <span className="text-xs font-normal text-primary-strong">{ui.common.loading}</span>
                 ) : null}
               </span>
-              <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoCustomerDesc}</span>
+              <span className="text-xs leading-relaxed text-text-muted">{ui.auth.demoCustomerDesc}</span>
             </span>
           </button>
           <button
@@ -234,12 +233,12 @@ export default function Login() {
             </span>
             <span className="flex flex-col gap-1">
               <span className="flex flex-wrap items-center gap-2 font-semibold text-text">
-                {UI.auth.demoAdmin}
+                {ui.auth.demoAdmin}
                 {demoLoadingRole === "ADMIN" ? (
-                  <span className="text-xs font-normal text-primary-strong">{UI.common.loading}</span>
+                  <span className="text-xs font-normal text-primary-strong">{ui.common.loading}</span>
                 ) : null}
               </span>
-              <span className="text-xs leading-relaxed text-text-muted">{UI.auth.demoAdminDesc}</span>
+              <span className="text-xs leading-relaxed text-text-muted">{ui.auth.demoAdminDesc}</span>
             </span>
           </button>
         </div>

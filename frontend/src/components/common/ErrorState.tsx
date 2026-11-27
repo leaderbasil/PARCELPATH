@@ -1,4 +1,4 @@
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { getErrorMessage } from "@/constants/messages";
 import { ApiRequestError } from "@/services/api";
 import { Button } from "./Button";
@@ -9,6 +9,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ error, onRetry }: ErrorStateProps) {
+  const ui = useUI();
   const message =
     error instanceof ApiRequestError ? getErrorMessage(error.code, error.message) : getErrorMessage("INTERNAL_ERROR");
   return (
@@ -16,7 +17,7 @@ export function ErrorState({ error, onRetry }: ErrorStateProps) {
       <p className="text-sm text-danger-strong">{message}</p>
       {onRetry ? (
         <Button variant="secondary" className="mt-4" onClick={onRetry}>
-          {UI.common.retry}
+          {ui.common.retry}
         </Button>
       ) : null}
     </div>

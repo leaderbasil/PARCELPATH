@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { Input } from "@/components/common/Input";
 import { MoneyText } from "@/components/common/MoneyText";
 import { getErrorMessage } from "@/constants/messages";
-import { UI } from "@/constants/ui";
+import { getCurrentLocale, getTranslation, getUI, useUI, type Locale } from "@/i18n";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useCreateOrder } from "@/hooks/useOrders";
@@ -19,48 +19,53 @@ import { isDemoMode } from "@/services/demoMode";
 import { googleMapsSearchUrl, parseMapLocation } from "@/utils/googleMaps";
 import { clearIdempotencyKey, getIdempotencyKey } from "@/utils/idempotency";
 
-const checkoutSchema = z
-  .object({
-    name: z.string().trim().min(2, "الاسم يجب ألا يقل عن حرفين"),
-    phone: z
-      .string()
-      .trim()
-      .refine(
-        (value) =>
-          /^\+?[0-9\s-]{7,30}$/.test(value) &&
-          /^\+?[0-9]{7,15}$/.test(value.replace(/[\s-]/g, "")),
-        "أدخل رقم هاتف صحيحًا"
-      ),
-    city: z.string().trim().min(2, "المدينة يجب ألا تقل عن حرفين"),
-    address: z.string().trim().min(10, "العنوان يجب ألا يقل عن 10 أحرف"),
-    map_query: z.string().trim().optional(),
-    payment_method: z.enum(["COD", "CARD"], {
-      errorMap: () => ({ message: "يرجى اختيار طريقة الدفع" }),
-    }),
-  })
-  .superRefine((values, context) => {
-    if (!isDemoMode()) return;
-    const rawLocation = values.map_query?.trim() ?? "";
-    if (!rawLocation) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["map_query"],
-        message: UI.checkout.mapRequired,
-      });
-      return;
-    }
-    if (parseMapLocation(rawLocation).query.trim().length < 3) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["map_query"],
-        message: UI.checkout.mapInvalid,
-      });
-    }
-  });
+function buildSchema(locale: Locale) {
+  const messages = getTranslation(locale).validation;
+  const ui = getUI(locale);
+  return z
+    .object({
+      name: z.string().trim().min(2, messages.nameTooShort),
+      phone: z
+        .string()
+        .trim()
+        .refine(
+          (value) =>
+            /^\+?[0-9\s-]{7,30}$/.test(value) &&
+            /^\+?[0-9]{7,15}$/.test(value.replace(/[\s-]/g, "")),
+          messages.phoneInvalid
+        ),
+      city: z.string().trim().min(2, messages.cityTooShort),
+      address: z.string().trim().min(10, messages.addressTooShort),
+      map_query: z.string().trim().optional(),
+      payment_method: z.enum(["COD", "CARD"], {
+        errorMap: () => ({ message: messages.paymentRequired }),
+      }),
+    })
+    .superRefine((values, context) => {
+      if (!isDemoMode()) return;
+      const rawLocation = values.map_query?.trim() ?? "";
+      if (!rawLocation) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["map_query"],
+          message: ui.checkout.mapRequired,
+        });
+        return;
+      }
+      if (parseMapLocation(rawLocation).query.trim().length < 3) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["map_query"],
+          message: ui.checkout.mapInvalid,
+        });
+      }
+    });
+}
 
-type CheckoutValues = z.infer<typeof checkoutSchema>;
+type CheckoutValues = z.infer<ReturnType<typeof buildSchema>>;
 
 export default function Checkout() {
+  const ui = useUI();
   const { user, isAuthenticated } = useAuth();
   const cart = useCart();
   const navigate = useNavigate();
@@ -74,7 +79,8 @@ export default function Checkout() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<CheckoutValues>({
-    resolver: zodResolver(checkoutSchema),
+    resolver: (values, context, options) =>
+      zodResolver(buildSchema(getCurrentLocale()))(values, context, options),
     defaultValues: {
       name: user?.full_name ?? "",
       phone: user?.phone ?? "",
@@ -96,11 +102,11 @@ export default function Checkout() {
   if (cart.items.length === 0) {
     return (
       <main className="mx-auto w-full max-w-none p-4 py-10">
-        <h1 className="mb-6 text-2xl font-bold text-text">{UI.checkout.title}</h1>
-        <EmptyState message={UI.cart.empty} />
+        <h1 className="mb-6 text-2xl font-bold text-text">{ui.checkout.title}</h1>
+        <EmptyState message={ui.cart.empty} />
         <div className="mt-6 text-center">
           <Link to="/" className="text-sm font-medium text-primary-strong underline">
-            {UI.cart.continueShopping}
+            {ui.cart.continueShopping}
           </Link>
         </div>
       </main>
@@ -151,7 +157,7 @@ export default function Checkout() {
           if (first !== null && typeof first === "object" && "available" in first) {
             const available: unknown = first.available;
             if (typeof available === "number") {
-              message = `${message} (${UI.admin.stock}: ${available})`;
+              message = `${message} (${ui.admin.stock}: ${available})`;
             }
           }
         }
@@ -168,35 +174,35 @@ export default function Checkout() {
 
   return (
     <main className="mx-auto w-full max-w-none p-4 py-10">
-      <h1 className="mb-6 text-2xl font-bold text-text">{UI.checkout.title}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-text">{ui.checkout.title}</h1>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_20rem]">
         <form
           noValidate
           onSubmit={(event) => void handleSubmit(onSubmit)(event)}
           className="space-y-5 rounded-card border border-border bg-surface p-6 shadow-card"
         >
-          <h2 className="text-lg font-semibold text-text">{UI.checkout.shippingInfo}</h2>
+          <h2 className="text-lg font-semibold text-text">{ui.checkout.shippingInfo}</h2>
           <Input
-            label={UI.checkout.fullName}
+            label={ui.checkout.fullName}
             autoComplete="name"
             error={errors.name?.message}
             {...register("name")}
           />
           <Input
-            label={UI.checkout.phone}
+            label={ui.checkout.phone}
             type="tel"
             autoComplete="tel"
             error={errors.phone?.message}
             {...register("phone")}
           />
           <Input
-            label={UI.checkout.city}
+            label={ui.checkout.city}
             autoComplete="address-level2"
             error={errors.city?.message}
             {...register("city")}
           />
           <Input
-            label={UI.checkout.address}
+            label={ui.checkout.address}
             autoComplete="street-address"
             error={errors.address?.message}
             {...register("address")}
@@ -220,16 +226,16 @@ export default function Checkout() {
 
           <fieldset>
             <legend className="mb-2 text-sm font-medium text-text">
-              {UI.checkout.paymentMethod}
+              {ui.checkout.paymentMethod}
             </legend>
             <div className="flex flex-wrap gap-4">
               <label className="flex items-center gap-2 text-sm text-text">
                 <input type="radio" value="COD" {...register("payment_method")} />
-                {UI.checkout.cod}
+                {ui.checkout.cod}
               </label>
               <label className="flex items-center gap-2 text-sm text-text">
                 <input type="radio" value="CARD" {...register("payment_method")} />
-                {UI.checkout.card}
+                {ui.checkout.card}
               </label>
             </div>
             {errors.payment_method?.message ? (
@@ -242,19 +248,19 @@ export default function Checkout() {
               <p>{formError}</p>
               {stockIssue ? (
                 <Link to="/cart" className="mt-2 inline-block text-primary-strong underline">
-                  {UI.cart.continueShopping}
+                  {ui.cart.continueShopping}
                 </Link>
               ) : null}
             </div>
           ) : null}
 
           <Button type="submit" loading={submitting} className="w-full">
-            {submitting ? UI.checkout.submitting : UI.checkout.placeOrder}
+            {submitting ? ui.checkout.submitting : ui.checkout.placeOrder}
           </Button>
         </form>
 
         <aside className="h-fit rounded-card border border-border bg-surface p-5 shadow-card">
-          <h2 className="mb-4 text-lg font-semibold text-text">{UI.cart.title}</h2>
+          <h2 className="mb-4 text-lg font-semibold text-text">{ui.cart.title}</h2>
           <ul className="mb-4 space-y-2">
             {cart.items.map((item) => (
               <li key={item.product_id} className="flex justify-between gap-3 text-sm">
@@ -268,10 +274,10 @@ export default function Checkout() {
             ))}
           </ul>
           <div className="flex items-center justify-between border-t border-border pt-4">
-            <span className="text-sm text-text-muted">{UI.cart.subtotal}</span>
+            <span className="text-sm text-text-muted">{ui.cart.subtotal}</span>
             <MoneyText value={cart.getTotal()} className="text-lg font-bold text-text" />
           </div>
-          <p className="mt-3 text-xs text-text-muted">يتم تحديد رسوم الشحن من قبل الخادم.</p>
+          <p className="mt-3 text-xs text-text-muted">{ui.checkout.shippingFeeHint}</p>
         </aside>
       </div>
     </main>

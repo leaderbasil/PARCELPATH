@@ -1,5 +1,5 @@
 import { EmptyState } from "@/components/common/EmptyState";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import type { OrderListItem } from "@/types/domain";
 import { OrderRow } from "./OrderRow";
 
@@ -10,7 +10,8 @@ interface OrderListProps {
 }
 
 export function OrderList({ orders, onOpen, isAdmin = false }: OrderListProps) {
-  if (orders.length === 0) return <EmptyState message={UI.orders.empty} />;
+  const ui = useUI();
+  if (orders.length === 0) return <EmptyState message={ui.orders.empty} />;
 
   return (
     <ul className="space-y-3">

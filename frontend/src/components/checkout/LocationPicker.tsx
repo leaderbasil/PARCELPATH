@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { cn } from "@/utils/cn";
 import { googleMapsEmbedUrl, googleMapsSearchUrl, parseMapLocation } from "@/utils/googleMaps";
 
@@ -15,6 +15,7 @@ interface LocationPickerProps {
 }
 
 export function LocationPicker({ value, onChange, onBlur, inputRef, error }: LocationPickerProps) {
+  const ui = useUI();
   const parsed = parseMapLocation(value);
   const query = parsed.query;
   const hasLocation = query.length > 0;
@@ -27,31 +28,31 @@ export function LocationPicker({ value, onChange, onBlur, inputRef, error }: Loc
   }, [query]);
 
   const openInGoogleMaps = () => {
-    const url = parsed.url ?? googleMapsSearchUrl(query || "الرياض");
+    const url = parsed.url ?? googleMapsSearchUrl(query || ui.checkout.defaultCity);
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   return (
     <div className="space-y-2">
       <Input
-        label={UI.checkout.mapLocation}
+        label={ui.checkout.mapLocation}
         name="map_query"
         ref={inputRef}
         value={value}
         onChange={(event) => onChange(event.target.value)}
         onBlur={onBlur}
-        placeholder={UI.checkout.mapSearch}
-        hint={UI.checkout.mapHint}
+        placeholder={ui.checkout.mapSearch}
+        hint={ui.checkout.mapHint}
         error={error}
         dir="auto"
       />
       <Button type="button" variant="secondary" onClick={openInGoogleMaps} className="w-full">
-        {UI.checkout.openInMaps}
+        {ui.checkout.openInMaps}
       </Button>
 
       {hasLocation ? (
         <iframe
-          title={UI.checkout.mapLocation}
+          title={ui.checkout.mapLocation}
           src={googleMapsEmbedUrl(previewQuery)}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
@@ -62,7 +63,7 @@ export function LocationPicker({ value, onChange, onBlur, inputRef, error }: Loc
         />
       ) : (
         <div className="flex h-44 items-center justify-center rounded-xl border border-dashed border-border bg-background px-4 text-center text-xs text-text-muted">
-          {UI.checkout.mapSearch}
+          {ui.checkout.mapSearch}
         </div>
       )}
     </div>

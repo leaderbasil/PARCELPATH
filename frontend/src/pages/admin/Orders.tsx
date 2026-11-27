@@ -7,7 +7,7 @@ import { Input } from "@/components/common/Input";
 import { LoadingState } from "@/components/common/LoadingState";
 import { OrderList } from "@/components/orders/OrderList";
 import { config } from "@/config";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { statusLabel } from "@/constants/messages";
 import { useOrders } from "@/hooks/useOrders";
 import type { OrderStatus } from "@/types/domain";
@@ -36,6 +36,7 @@ function parseStatus(value: string): OrderStatus | "" {
 }
 
 export default function AdminOrders() {
+  const ui = useUI();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<OrderFilters>(EMPTY_FILTERS);
@@ -67,7 +68,7 @@ export default function AdminOrders() {
       >
         <div className="w-full">
           <label htmlFor="status" className="mb-1 block text-sm font-medium text-text">
-            {UI.orders.status}
+            {ui.orders.status}
           </label>
           <select
             id="status"
@@ -75,7 +76,7 @@ export default function AdminOrders() {
             onChange={(event) => setDraft((current) => ({ ...current, status: parseStatus(event.target.value) }))}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">{UI.common.all}</option>
+            <option value="">{ui.common.all}</option>
             {STATUS_OPTIONS.map((status) => (
               <option key={status} value={status}>
                 {statusLabel(status)}
@@ -85,14 +86,14 @@ export default function AdminOrders() {
         </div>
         <Input
           name="orderNumber"
-          label={UI.orders.number}
+          label={ui.orders.number}
           value={draft.orderNumber}
           onChange={(event) => setDraft((current) => ({ ...current, orderNumber: event.target.value }))}
         />
         <Input
           type="date"
           name="from"
-          label="من"
+          label={ui.admin.from}
           value={draft.from}
           max={draft.to || undefined}
           onChange={(event) => setDraft((current) => ({ ...current, from: event.target.value }))}
@@ -100,13 +101,13 @@ export default function AdminOrders() {
         <Input
           type="date"
           name="to"
-          label="إلى"
+          label={ui.admin.to}
           value={draft.to}
           min={draft.from || undefined}
           onChange={(event) => setDraft((current) => ({ ...current, to: event.target.value }))}
         />
         <div className="flex items-end gap-2">
-          <Button type="submit">{UI.common.search}</Button>
+          <Button type="submit">{ui.common.search}</Button>
           <Button
             type="button"
             variant="secondary"
@@ -116,7 +117,7 @@ export default function AdminOrders() {
               setPage(1);
             }}
           >
-            {UI.common.cancel}
+            {ui.common.cancel}
           </Button>
         </div>
       </form>
@@ -126,7 +127,7 @@ export default function AdminOrders() {
       ) : orders.error ? (
         <ErrorState error={orders.error} onRetry={() => void orders.refetch()} />
       ) : !orders.data || orders.data.items.length === 0 ? (
-        <EmptyState message={UI.common.noResults} />
+        <EmptyState message={ui.common.noResults} />
       ) : (
         <OrderList
           orders={orders.data.items}
@@ -146,14 +147,14 @@ export default function AdminOrders() {
               disabled={page <= 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
             >
-              {UI.common.previous}
+              {ui.common.previous}
             </Button>
             <Button
               variant="secondary"
               disabled={page >= totalPages}
               onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
             >
-              {UI.common.next}
+              {ui.common.next}
             </Button>
           </div>
         </div>

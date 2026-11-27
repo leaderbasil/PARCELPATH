@@ -8,7 +8,7 @@ import { LoadingState } from "@/components/common/LoadingState";
 import { MoneyText } from "@/components/common/MoneyText";
 import { ProductImage } from "@/components/common/ProductImage";
 import { config } from "@/config";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { getErrorMessage } from "@/constants/messages";
 import { useCategories, useDisableProduct, useProducts } from "@/hooks/useProducts";
 import { ApiRequestError } from "@/services/api";
@@ -36,6 +36,7 @@ function mutationError(error: unknown): string {
 }
 
 export default function AdminProducts() {
+  const ui = useUI();
   const [page, setPage] = useState(1);
   const [searchDraft, setSearchDraft] = useState("");
   const [search, setSearch] = useState("");
@@ -75,7 +76,7 @@ export default function AdminProducts() {
             setFormOpen(true);
           }}
         >
-          {UI.admin.newProduct}
+          {ui.admin.newProduct}
         </Button>
       </div>
 
@@ -88,13 +89,13 @@ export default function AdminProducts() {
       >
         <Input
           name="search"
-          label={UI.common.search}
+          label={ui.common.search}
           value={searchDraft}
           onChange={(event) => setSearchDraft(event.target.value)}
         />
         <div className="w-full">
           <label htmlFor="category" className="mb-1 block text-sm font-medium text-text">
-            {UI.catalog.categories}
+            {ui.catalog.categories}
           </label>
           <select
             id="category"
@@ -105,7 +106,7 @@ export default function AdminProducts() {
             }}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
-            <option value="">{UI.common.all}</option>
+            <option value="">{ui.common.all}</option>
             {(categories.data ?? []).map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -115,7 +116,7 @@ export default function AdminProducts() {
         </div>
         <div className="w-full">
           <label htmlFor="active" className="mb-1 block text-sm font-medium text-text">
-            {UI.admin.active}
+            {ui.admin.active}
           </label>
           <select
             id="active"
@@ -126,13 +127,13 @@ export default function AdminProducts() {
             }}
             className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-text outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
           >
-            <option value="all">{UI.common.all}</option>
-            <option value="active">{UI.admin.active}</option>
-            <option value="inactive">{UI.admin.inactive}</option>
+            <option value="all">{ui.common.all}</option>
+            <option value="active">{ui.admin.active}</option>
+            <option value="inactive">{ui.admin.inactive}</option>
           </select>
         </div>
         <div className="flex items-end gap-2">
-          <Button type="submit">{UI.common.search}</Button>
+          <Button type="submit">{ui.common.search}</Button>
           <Button
             type="button"
             variant="secondary"
@@ -144,7 +145,7 @@ export default function AdminProducts() {
               setPage(1);
             }}
           >
-            {UI.common.cancel}
+            {ui.common.cancel}
           </Button>
         </div>
       </form>
@@ -160,18 +161,18 @@ export default function AdminProducts() {
       ) : products.error ? (
         <ErrorState error={products.error} onRetry={() => void products.refetch()} />
       ) : !products.data || products.data.items.length === 0 ? (
-        <EmptyState message={UI.common.noResults} />
+        <EmptyState message={ui.common.noResults} />
       ) : (
         <div className="overflow-x-auto rounded-card border border-border bg-surface shadow-card">
           <table className="w-full text-right text-sm">
             <thead className="bg-background text-text-muted">
               <tr>
-                <th className="px-4 py-3 font-medium">{UI.catalog.name}</th>
+                <th className="px-4 py-3 font-medium">{ui.catalog.name}</th>
                 <th className="px-4 py-3 font-medium">SKU</th>
-                <th className="px-4 py-3 font-medium">{UI.catalog.categories}</th>
-                <th className="px-4 py-3 font-medium">{UI.cart.total}</th>
-                <th className="px-4 py-3 font-medium">{UI.admin.stock}</th>
-                <th className="px-4 py-3 font-medium">{UI.admin.active}</th>
+                <th className="px-4 py-3 font-medium">{ui.catalog.categories}</th>
+                <th className="px-4 py-3 font-medium">{ui.cart.total}</th>
+                <th className="px-4 py-3 font-medium">{ui.admin.stock}</th>
+                <th className="px-4 py-3 font-medium">{ui.admin.active}</th>
                 <th className="px-4 py-3 font-medium" />
               </tr>
             </thead>
@@ -201,11 +202,11 @@ export default function AdminProducts() {
                     <td className="px-4 py-3">
                       {(admin?.is_active ?? product.in_stock) ? (
                         <span className="rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success-strong">
-                          {UI.admin.active}
+                          {ui.admin.active}
                         </span>
                       ) : (
                         <span className="rounded-full bg-danger-soft px-2.5 py-0.5 text-xs font-medium text-danger-strong">
-                          {UI.admin.inactive}
+                          {ui.admin.inactive}
                         </span>
                       )}
                     </td>
@@ -218,14 +219,14 @@ export default function AdminProducts() {
                             setFormOpen(true);
                           }}
                         >
-                          {UI.common.edit}
+                          {ui.common.edit}
                         </Button>
                         <Button
                           variant="secondary"
                           disabled={disableProduct.isPending}
                           onClick={() => setDisableTarget({ id: product.id, name: product.name })}
                         >
-                          {UI.common.delete}
+                          {ui.common.delete}
                         </Button>
                       </div>
                     </td>
@@ -248,14 +249,14 @@ export default function AdminProducts() {
               disabled={page <= 1}
               onClick={() => setPage((current) => Math.max(1, current - 1))}
             >
-              {UI.common.previous}
+              {ui.common.previous}
             </Button>
             <Button
               variant="secondary"
               disabled={page >= totalPages}
               onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
             >
-              {UI.common.next}
+              {ui.common.next}
             </Button>
           </div>
         </div>
@@ -265,8 +266,8 @@ export default function AdminProducts() {
 
       <ConfirmDialog
         open={disableTarget !== null}
-        title={UI.common.delete}
-        message={`${UI.admin.deactivateConfirm}${disableTarget ? ` (${disableTarget.name})` : ""}`}
+        title={ui.common.delete}
+        message={`${ui.admin.deactivateConfirm}${disableTarget ? ` (${disableTarget.name})` : ""}`}
         loading={disableProduct.isPending}
         onCancel={() => setDisableTarget(null)}
         onConfirm={() => {

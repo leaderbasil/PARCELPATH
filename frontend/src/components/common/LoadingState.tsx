@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { UI } from "@/constants/ui";
+import { useUI } from "@/i18n";
 import { cn } from "@/utils/cn";
 
 type LoadingVariant =
@@ -334,6 +334,7 @@ function PageSkeleton() {
 }
 
 export function LoadingState({ variant = "cards", count }: LoadingStateProps) {
+  const ui = useUI();
   let content;
 
   switch (variant) {
@@ -372,8 +373,8 @@ export function LoadingState({ variant = "cards", count }: LoadingStateProps) {
   }
 
   return (
-    <div role="status" aria-label={UI.common.loading} className="w-full">
-      <span className="sr-only">{UI.common.loading}</span>
+    <div role="status" aria-label={ui.common.loading} className="w-full">
+      <span className="sr-only">{ui.common.loading}</span>
       <div aria-hidden="true">{content}</div>
     </div>
   );

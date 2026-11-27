@@ -1,4 +1,5 @@
 import { demoCredentials, demoLoginEnabled } from "@/constants/demo";
+import { getErrorMessage } from "@/constants/messages";
 import type { LoginIn, RegisterIn, Role, TokenOut, User } from "@/types/domain";
 
 import { ApiRequestError, api, unwrap } from "./api";
@@ -40,7 +41,7 @@ export async function login(payload: LoginIn): Promise<TokenOut> {
 export function loginDemo(role: Role = "CUSTOMER"): Promise<TokenOut> {
   if (!demoLoginEnabled || !demoCredentials) {
     throw new ApiRequestError(403, {
-      detail: "الوضع التجريبي غير مفعّل في هذا النشر.",
+      detail: getErrorMessage("DEMO_MODE_DISABLED"),
       code: "FORBIDDEN",
     });
   }
