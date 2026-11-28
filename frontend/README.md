@@ -30,7 +30,7 @@ The test suite uses jsdom and MSW v2, so it needs Node but **does not** need Pos
 First-time visitors enter the demo automatically as a CUSTOMER and land on the catalog. To switch roles, open `/login`, press **الدخول بالوضع التجريبي**, and choose **دخول كزبون** or **دخول كمدير**. The demo runs entirely in the browser:
 
 - `sessionStorage` holds a local demo token (`parcelpath-demo-token-v1`) and the selected demo user.
-- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v3.*`.
+- `localStorage` seeds and persists demo products, users and orders under `parcelpath.demo.v4.*`.
 - Product cards use lazy-loaded remote images with a local icon fallback.
 - Every service checks `isDemoMode()` first; non-demo sessions continue to call `/api/v1` exactly as before.
 - Catalog search/filtering, product details, cart, checkout, idempotent order creation, stock deduction, order tracking, cancellation, admin status changes, shipping, product/user management and reports all work offline.
@@ -51,16 +51,17 @@ Set `VITE_DEMO_LOGIN_ENABLED=false` to hide the demo button, or `VITE_DEMO_AUTO_
 | Server state | `src/hooks/` | TanStack Query v5 queries/mutations with central `queryKeys` and invalidation |
 | Client state | `src/context/` | `AuthContext` (sessionStorage tokens) and `CartContext` (localStorage cart) |
 | Routing | `src/App.tsx`, `src/routes/` | Lazy routes plus `ProtectedRoute` role guard (CUSTOMER / ADMIN) |
-| Forms | React Hook Form + Zod | All submit validation is schema-based with Arabic messages |
+| Forms | React Hook Form + Zod | All submit validation is schema-based with localized messages |
 | UI | `src/components/`, `src/pages/` | Common, layout, catalog, cart, orders, tracking, admin groups |
-| Copy | `src/constants/` | `ui.ts` holds all Arabic UI text; `messages.ts` maps error codes and status labels |
+| Copy | `src/locales/`, `src/i18n/` | `ar.json` and `en.json` are the only two UI copy files; `I18nProvider` applies the selected locale |
 
-Tailwind is used with **semantic design tokens only** (`bg-surface`, `text-text`, `bg-danger-soft`, `rounded-card`, `shadow-card`, …) defined in `tailwind.config.ts`; components do not hard-code raw color scales. `index.html` sets `lang="ar" dir="rtl"`, and all product-facing copy is Arabic.
- Light and dark themes share these tokens: ThemeProvider stores parcelpath-theme in localStorage and sets both data-theme and the Tailwind dark class on html. The toggle appears in the header and on the login screen.
+Tailwind is used with **semantic design tokens only** (`bg-surface`, `text-text`, `bg-danger-soft`, `rounded-card`, `shadow-card`, …) defined in `tailwind.config.ts`; components do not hard-code raw color scales. `index.html` defaults to `lang="ar" dir="rtl"`, then an inline script applies the saved locale before first paint. The UI runs in Arabic RTL and English LTR.
+
+Light and dark themes share these tokens: `ThemeProvider` stores `parcelpath-theme` in `localStorage` and sets both `data-theme` and the Tailwind `dark` class on `<html>`. The toggle appears in the header and on the login screen.
 
 ## Money, stock and idempotency
 
-- `src/utils/money.ts` converts fixed 2-decimal strings to integer subunits before summing or multiplying, then formats with `Intl.NumberFormat("ar-EG", { numberingSystem: "latn" })`. No floating point arithmetic is used for totals.
+- `src/utils/money.ts` converts fixed 2-decimal strings to integer subunits before summing or multiplying, then formats with a locale-aware `Intl.NumberFormat` (`ar-EG` or `en-US`, Latin digits). No floating point arithmetic is used for totals.
 - Checkout reuses a single `Idempotency-Key` from sessionStorage for retries; the key is only consumed after a successful order creation. The same key replayed against the backend returns the original order instead of a duplicate.
 - Cart mutations refresh the key, so editing the cart starts a new checkout attempt.
 - Order creation checks stock with row locks on the server; an `INSUFFICIENT_STOCK` response leaves both the cart and the retry key intact.

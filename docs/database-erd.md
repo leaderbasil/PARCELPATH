@@ -58,7 +58,7 @@ erDiagram
 
 ## الفهارس
 
-`ix_products_name` · `ix_products_category` · `ix_orders_customer_created(customer_id, created_at DESC)` · `ix_orders_status` · `ix_orders_created_at` · `ix_order_items_order_id` · `ix_order_items_product_id`.
+`ix_products_name` · `ix_products_category` · `ix_orders_customer_created(customer_id, created_at)` · `ix_orders_status` · `ix_orders_created_at` · `ix_order_items_order_id` · `ix_order_items_product_id`.
 
 ## قواعد مهمة
 
