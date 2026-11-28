@@ -1,4 +1,4 @@
-# Backend — Mini E-Commerce Order & Shipment Tracking
+# Backend — PARCELPATH
 
 FastAPI + SQLAlchemy 2.x (sync) + PostgreSQL 15, authenticated with JWT (PyJWT) and bcrypt password hashes. All endpoints live under `/api/v1`; interactive docs are at `/docs`.
 

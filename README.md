@@ -1,8 +1,14 @@
-# Mini E-Commerce Order & Shipment Tracking
+# PARCELPATH
+
+Orders that never oversell and never duplicate
 
 <p align="center">
   <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 420 120'><rect width='420' height='120' rx='20' fill='%23EEF2FF'/><text x='28' y='78' font-family='Segoe UI,sans-serif' font-size='42' font-weight='700' fill='%234F46E5'>PARCELPATH</text></svg>" alt="PARCELPATH" width="220" />
 </p>
+
+A storefront and admin dashboard for orders and shipments, built around correctness. Inventory is row-locked so concurrent checkouts can't oversell, retried requests return the original order through idempotency keys, and shipments move only through valid status transitions. Money stays exact as 2-decimal strings end to end.
+
+[View on GitHub](https://github.com/leaderbasil/PARCELPATH) · [Open the live demo](https://parcelpath-demo.netlify.app/login)
 
 - **Backend:** Python 3.11+, FastAPI, SQLAlchemy 2.x, PostgreSQL 15, Alembic, JWT + bcrypt
 - **Frontend:** React 18, Vite, strict TypeScript, Tailwind (design tokens only), TanStack Query v5, React Hook Form + Zod, Recharts, MSW tests
@@ -55,8 +61,8 @@ These checks require Node, PostgreSQL and/or Docker installed in the environment
 ## Key design decisions
 
 - **Money** is fixed 2-decimal strings end-to-end; the frontend sums integer subunits and formats with `ar-EG` Latin digits.
-- **Inventory** changes use row locks, and cancellation restores stock exactly once.
+- **Inventory** changes use row locks, and cancellation restores stock exactly once. `test_concurrent_last_unit_only_one_order_succeeds` proves a last-unit race produces exactly one order.
 - **Idempotency replay:** `POST /orders` honors `Idempotency-Key`; retries return the original order, and the frontend keeps the key on failures.
 - **Status machine** restricts admin transitions; only allowed actions are rendered.
 - **Reports** exclude `CANCELLED` orders from sales totals and top-product rankings.
-- **Frontend UI** is fully Arabic and RTL, uses semantic Tailwind tokens only, centralizes copy and error maps, and keeps server state in TanStack Query with schema-validated forms. Tests use MSW handlers that mirror the real API envelopes.
+- **Frontend UI** runs in Arabic RTL and English LTR, uses semantic Tailwind tokens only, centralizes copy and error maps, and keeps server state in TanStack Query with schema-validated forms. Tests use MSW handlers that mirror the real API envelopes.

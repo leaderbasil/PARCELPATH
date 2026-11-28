@@ -1,6 +1,6 @@
-# Frontend — Mini E-Commerce Order & Shipment Tracking
+# Frontend — PARCELPATH
 
-React 18 + Vite + TypeScript (strict) single-page app with an Arabic RTL interface. The API base URL defaults to `http://localhost:8000/api/v1` and can be overridden with `VITE_API_BASE_URL`.
+React 18 + Vite + TypeScript (strict) single-page app with Arabic RTL and English LTR interfaces. The API base URL defaults to `http://localhost:8000/api/v1` and can be overridden with `VITE_API_BASE_URL`.
 
 ## Prerequisites
 
